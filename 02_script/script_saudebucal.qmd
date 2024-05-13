@@ -1,0 +1,48 @@
+---
+title: "saude_bucal"
+format: html
+editor: visual
+---
+
+## Procedimentos metodológicos
+
+A construção do modelo de PDFT para saúde bucal baseado em necessidades foi construído a partir das orientações de Asamani et al. (2021) que sugerem algumas etapas, que serão descritas com maior detalhamento a seguir:
+
+1.  Definição de escopo da metodologia em termos de cobertura jurisdicional, objetivos e horizonte temporal;
+2.  Análise da necessidade de saúde bucal com base em aspectos da demografia, epidemiologia e serviços destinados da população a local;
+3.  Tradução do número de serviços em número de profissionais necessários;
+4.  Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos;
+5.  Análise de sensibilidade para simulação de parâmetros de incerteza;
+6.  Validação de modelo por meio de consulta a stakeholders.
+
+## Preparando ambiente
+
+Carregando os pacotes necessários para o R. 
+
+```{r}
+#|warning: false
+
+library(readxl)
+library(tidyverse)
+
+```
+
+## Etapa 1 - Definição de escopo
+
+A metodologia tem como escopo estimar a força de trabalho de cirurgiões dentistas atual e necessária para atuar em municípios brasileiros.
+
+## Etapa 2 - Análise das necessidades de saúde bucal
+
+A análise da necessidade de saúde bucal (NSB) foi construída a partir de três elementos: distribuição da população por faixa etária (P), prevalência de condições de saúde bucal (H) e procedimentos per capita (S).
+
+A distribuição por faixa etária foi construída com base em dados do último censo (2022) e estão disponíveis na página do IBGE.Para fins de exemplificação, vamos trabalhar apenas com um município como referência: Palmas (TO). Depois escalamos os resultados para o Brasil todo. 
+
+```{r}
+
+pop_tocantins <- read_excel('~/saude_bucal/01_dados/pop_tocantins.xlsx')
+
+```
+
+
+
+
