@@ -91,10 +91,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 </head>
 
-<body class="fullcontent">
+<body>
 
 <div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
-
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#procedimentos-metodológicos" id="toc-procedimentos-metodológicos" class="nav-link active" data-scroll-target="#procedimentos-metodológicos">Procedimentos metodológicos</a></li>
+  <li><a href="#preparando-ambiente-do-r" id="toc-preparando-ambiente-do-r" class="nav-link" data-scroll-target="#preparando-ambiente-do-r">Preparando ambiente do R</a></li>
+  <li><a href="#etapa-1---definição-de-escopo" id="toc-etapa-1---definição-de-escopo" class="nav-link" data-scroll-target="#etapa-1---definição-de-escopo">1. Etapa 1 - Definição de escopo</a></li>
+  <li><a href="#etapa-2---análise-das-necessidades-de-saúde-bucal" id="toc-etapa-2---análise-das-necessidades-de-saúde-bucal" class="nav-link" data-scroll-target="#etapa-2---análise-das-necessidades-de-saúde-bucal">2. Etapa 2 - Análise das necessidades de saúde bucal</a>
+  <ul class="collapse">
+  <li><a href="#levantando-a-faixa-etária-p" id="toc-levantando-a-faixa-etária-p" class="nav-link" data-scroll-target="#levantando-a-faixa-etária-p">2.1. Levantando a faixa etária (P)</a></li>
+  <li><a href="#prevalência-de-condições-de-saúde-bucal-h" id="toc-prevalência-de-condições-de-saúde-bucal-h" class="nav-link" data-scroll-target="#prevalência-de-condições-de-saúde-bucal-h">2.2. Prevalência de condições de saúde bucal (H)</a></li>
+  <li><a href="#parâmetros-normativos-de-procedimentos-per-capita-s" id="toc-parâmetros-normativos-de-procedimentos-per-capita-s" class="nav-link" data-scroll-target="#parâmetros-normativos-de-procedimentos-per-capita-s">2.3. Parâmetros normativos de procedimentos per capita (S)</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
 <main class="content" id="quarto-document-content">
 
 <header id="title-block-header" class="quarto-title-block default">
@@ -118,7 +134,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="procedimentos-metodológicos" class="level2">
 <h2 class="anchored" data-anchor-id="procedimentos-metodológicos">Procedimentos metodológicos</h2>
-<p>A construção do modelo de PDFT para saúde bucal baseado em necessidades foi construído a partir das orientações de Asamani et al.&nbsp;(2021) que sugerem algumas etapas, que serão descritas com maior detalhamento a seguir:</p>
+<p>A construção do modelo de PDFT para saúde bucal baseado em necessidades foi elaborado a partir das orientações de Asamani et al.&nbsp;(2021) que sugerem algumas etapas, que serão descritas com maior detalhamento a seguir:</p>
 <ol type="1">
 <li>Definição de escopo da metodologia em termos de cobertura jurisdicional, objetivos e horizonte temporal;</li>
 <li>Análise da necessidade de saúde bucal com base em aspectos da demografia, epidemiologia e serviços destinados da população a local;</li>
@@ -128,8 +144,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Validação de modelo por meio de consulta a stakeholders.</li>
 </ol>
 </section>
-<section id="preparando-ambiente" class="level2">
-<h2 class="anchored" data-anchor-id="preparando-ambiente">Preparando ambiente</h2>
+<section id="preparando-ambiente-do-r" class="level2">
+<h2 class="anchored" data-anchor-id="preparando-ambiente-do-r">Preparando ambiente do R</h2>
 <p>Carregando os pacotes necessários para o R.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen =</span> <span class="dv">999</span>)</span>
@@ -199,7 +215,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="prevalência-de-condições-de-saúde-bucal-h" class="level3">
 <h3 class="anchored" data-anchor-id="prevalência-de-condições-de-saúde-bucal-h">2.2. Prevalência de condições de saúde bucal (H)</h3>
 <p>O Ministério da Saúde - por meio do material Parâmetros Assistenciais para Programação Ambulatorial e Hospitalar no âmbito do SUS (Brasil, 2021), regulamentado pela portaria de consolidação nº1 de 2017 - traz uma série de parâmetros acerca da saúde bucal.</p>
-<p>Tais parâmetros foram construídos a partir da pesquisa saúde bucal (SB 2010). Com base na prevalência de determinadas condições de saúde bucal, foi calculada a necessidade de cobertura para cada faixa-etária. A lógica usada foi a seguinte:</p>
+<p>Um dos parâmetros é a cobertura de serviços de saúde. A cobertura foi calculada a partir da pesquisa SB 2010 para cada faixa etária e tipo de procedimento conforme a lógica da tabela baixo.</p>
 <table class="table">
 <caption>Fonte: Brasil (2021)</caption>
 <colgroup>
@@ -247,11 +263,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>li_cobertura, <span class="sc">-</span>ls_cobertura) <span class="sc">|&gt;</span> </span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-d46bf3cb597b4fd77a43" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-d46bf3cb597b4fd77a43">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],["0 a 14 anos","0 a 14 anos","0 a 14 anos","0 a 14 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","60 anos ou mais","60 anos ou mais","60 anos ou mais","60 anos ou mais"],[1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>procedimento<\/th>\n      <th>faixa_etaria<\/th>\n      <th>id_faixa<\/th>\n      <th>cobertura<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[5,6]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"procedimento","targets":3},{"name":"faixa_etaria","targets":4},{"name":"id_faixa","targets":5},{"name":"cobertura","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-4216885502a2113874b2" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-4216885502a2113874b2">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],["0 a 14 anos","0 a 14 anos","0 a 14 anos","0 a 14 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","60 anos ou mais","60 anos ou mais","60 anos ou mais","60 anos ou mais"],[1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>procedimento<\/th>\n      <th>faixa_etaria<\/th>\n      <th>id_faixa<\/th>\n      <th>cobertura<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[5,6]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"procedimento","targets":3},{"name":"faixa_etaria","targets":4},{"name":"id_faixa","targets":5},{"name":"cobertura","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
-<p>Considerando os dados de população e de cobertura, temos os seguintes resultados:</p>
+<p>Considerando os <strong>dados de população</strong> e de <strong>cobertura</strong>, temos os seguintes <strong>resultados para o parâmetro (H)</strong>:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pop_coberta <span class="ot">&lt;-</span> </span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  pop_palmas <span class="sc">|&gt;</span> </span>
@@ -265,8 +281,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>pop_coberta <span class="sc">|&gt;</span> </span>
 <span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-4ee3005c65ceb6838a5f" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-4ee3005c65ceb6838a5f">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos"],[68457,68457,68457,68457,82448,82448,82448,82448,126871,126871,126871,126871,24916,24916,24916,24916],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648],[35118.44,1711.43,0,0,46830.46,3545.26,0,9563.969999999999,106064.16,9134.709999999999,7104.78,98325.03,10265.39,996.64,597.98,16145.57]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>faixa<\/th>\n      <th>total<\/th>\n      <th>procedimento<\/th>\n      <th>cobertura<\/th>\n      <th>populacao_coberta<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[4,6,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"faixa","targets":3},{"name":"total","targets":4},{"name":"procedimento","targets":5},{"name":"cobertura","targets":6},{"name":"populacao_coberta","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-97e0f89ce9ff32ae05fe" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-97e0f89ce9ff32ae05fe">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos"],[68457,68457,68457,68457,82448,82448,82448,82448,126871,126871,126871,126871,24916,24916,24916,24916],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648],[35118.44,1711.43,0,0,46830.46,3545.26,0,9563.969999999999,106064.16,9134.709999999999,7104.78,98325.03,10265.39,996.64,597.98,16145.57]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>faixa<\/th>\n      <th>total<\/th>\n      <th>procedimento<\/th>\n      <th>cobertura<\/th>\n      <th>populacao_coberta<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[4,6,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"faixa","targets":3},{"name":"total","targets":4},{"name":"procedimento","targets":5},{"name":"cobertura","targets":6},{"name":"populacao_coberta","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>

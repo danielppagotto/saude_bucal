@@ -2,11 +2,12 @@
 title: "Saúde Bucal - material suplementar"
 format: html
 editor: visual
+toc: true
 ---
 
 ## Procedimentos metodológicos
 
-A construção do modelo de PDFT para saúde bucal baseado em necessidades foi construído a partir das orientações de Asamani et al. (2021) que sugerem algumas etapas, que serão descritas com maior detalhamento a seguir:
+A construção do modelo de PDFT para saúde bucal baseado em necessidades foi elaborado a partir das orientações de Asamani et al. (2021) que sugerem algumas etapas, que serão descritas com maior detalhamento a seguir:
 
 1.  Definição de escopo da metodologia em termos de cobertura jurisdicional, objetivos e horizonte temporal;
 2.  Análise da necessidade de saúde bucal com base em aspectos da demografia, epidemiologia e serviços destinados da população a local;
@@ -15,7 +16,7 @@ A construção do modelo de PDFT para saúde bucal baseado em necessidades foi c
 5.  Análise de sensibilidade para simulação de parâmetros de incerteza;
 6.  Validação de modelo por meio de consulta a stakeholders.
 
-## Preparando ambiente
+## Preparando ambiente do R
 
 Carregando os pacotes necessários para o R.
 
@@ -95,7 +96,7 @@ Cabe mencionar que o censo possui outras divisões de faixa etárias. No entanto
 
 O Ministério da Saúde - por meio do material Parâmetros Assistenciais para Programação Ambulatorial e Hospitalar no âmbito do SUS (Brasil, 2021), regulamentado pela portaria de consolidação nº1 de 2017 - traz uma série de parâmetros acerca da saúde bucal.
 
-Tais parâmetros foram construídos a partir da pesquisa saúde bucal (SB 2010). Com base na prevalência de determinadas condições de saúde bucal, foi calculada a necessidade de cobertura para cada faixa-etária. A lógica usada foi a seguinte:
+Um dos parâmetros é a cobertura de serviços de saúde. A cobertura foi calculada a partir da pesquisa SB 2010 para cada faixa etária e tipo de procedimento conforme a lógica da tabela baixo.
 
 +---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Área                      | Expressões usadas para cálculo de cobertura                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -134,7 +135,7 @@ cobertura_sb |>
   
 ```
 
-Considerando os dados de população e de cobertura, temos os seguintes resultados:
+Considerando os **dados de população** e de **cobertura**, temos os seguintes **resultados para o parâmetro (H)**:
 
 ```{r}
 
