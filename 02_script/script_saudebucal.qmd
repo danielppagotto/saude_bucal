@@ -28,16 +28,26 @@ options(scipen = 999)
 library(readxl)
 library(tidyverse)
 library(DT)
+library(RODBC)
 
 ```
 
-## 1. Etapa 1 - Definição de escopo
+## 1. Definição de escopo
 
-A metodologia tem como escopo estimar a força de trabalho de cirurgiões dentistas atual e necessária para atuar em municípios brasileiros. Serão feitos cálculos para
+A metodologia tem como escopo estimar a força de trabalho de cirurgiões dentistas e equipe auxiliar atual e necessária para atuação em municípios brasileiros, a nível de atenção primária, em procedimentos de natureza individual e coletiva, bem como três três procedimentos de natureza especializada: endodontia, prótese e periodontia.
 
-## 2. Etapa 2 - Análise das necessidades de saúde bucal
+## 2. Análise das necessidades de saúde bucal
 
 A análise da necessidade de saúde bucal (NSB) foi construída a partir de três elementos: distribuição da população por faixa etária (P), prevalência de condições de saúde bucal (H) e procedimentos per capita (S).
+
+![](figuras/equacao1_sb.png){fig-align="center" width="366"}
+
+Onde:
+
+-   NSB = Necessidade de saúde bucal contabilizada pelo número de serviços do tipo t destinados ao atendimento de população de faixa etária i e localidade l;
+-   P = População por faixa-etária i de uma localidade l;
+-   H = Prevalência de condições de saúde bucal que levam à necessidade de procedimentos do tipo t por faixa-etária i e dentro de uma localidade l;
+-   S = Procedimentos per capita do tipo t, para cada faixa-etária i e dentro de uma localidade l.
 
 ### 2.1. Levantando a faixa etária (P)
 
@@ -143,12 +153,15 @@ pop_coberta <-
   pop_palmas |> 
   left_join(cobertura_sb, by = c("ibge",
                                  "id_faixa")) |> 
-  select(ibge, municipio, faixa, 
+  select(ibge, municipio, faixa, id_faixa, 
          total, procedimento, cobertura) |> 
   mutate(populacao_coberta = cobertura * total) |> 
   mutate(populacao_coberta = round(populacao_coberta, 2))
 
 pop_coberta |> 
+  select(ibge, municipio, faixa, 
+         total, procedimento, cobertura,
+         populacao_coberta) |> 
   datatable()
 
 ```
@@ -192,3 +205,183 @@ Os cálculos de necessidade normativa por procedimento per capita (S) foram esti
 +----------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Fonte: Brasil (2021)
+
+```{r}
+#| warning: false
+
+producao_normativa <- 
+  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx", 
+    sheet = "Produção normativa", col_types = c("text", 
+        "text", "text", "text", "numeric", 
+        "numeric", "numeric", "numeric")) |>  
+                mutate(ibge = substr(ibge, 1, 6))
+
+producao_palmas <- producao_normativa |> 
+                      filter(ibge == "172100") |> 
+                      select(-municipio, -li_cobertura,
+                             -ls_cobertura,-faixa_etaria)
+
+necessidades_servicos <- pop_coberta |> 
+                            left_join(producao_palmas, 
+                                      by = c("ibge","id_faixa","procedimento")) |> 
+                            mutate(nec_servicos = populacao_coberta * producao_pc) |> 
+                            mutate(nec_servicos = round(nec_servicos, 2))
+```
+
+## 3. Tradução do número de serviços em número de profissionais necessários
+
+A etapa 3 consiste na tradução do número de serviços, calculado pela equação 1, em número de profissionais necessários (NPSB). Para isso, devem ser considerados dois elementos: produtividade (T) e o tempo total disponível (TTD).
+
+![](figuras/eq2_sb.png){fig-align="center" width="355"}
+
+Onde:
+
+-   NPSB = Necessidade de profissionais de saúde bucal;
+-   NSB = Necessidade de saúde bucal contabilizada pelo número de serviços do tipo t destinados ao atendimento de população de faixa etária i e localidade l;
+-   T = Tempo médio de serviços do tipo t;
+-   TTD = Tempo total disponível de um profissional ao longo de um ano.
+
+Vamos utilizar como tempo médio de consulta (T) o valor de 25 minutos. Esse valor foi baseado em um levantamento utilizando técnicas de time-motion realizado para aferir o tempo médio de procedimentos executados pela equipe de saúde bucal, em unidades básicas de saúde em São Paulo, Brasil (Bellotti et al, 2024).
+
+O tempo total disponível (TTD) corresponde ao tempo de um profissional deduzidas ausências programáticas (ex.: férias, feriados) e não programáticos (ex.: licenças para tratamento de saúde). Vamos utilizar como referência o TTD estimado em 1776 horas anuais do estudo de Bonfim et al. (2016), direcionados para enfermeiros. Infelizmente, não conseguimos localizar estudos que já tenham levatado um TTD para cirurgiões dentistas no Brasil ou fora.
+
+```{r}
+#| warning: false
+
+necessidades_prof <- necessidades_servicos |>
+                          mutate(nec_prof = 
+                                   (nec_servicos * 25/60)/1776) |> 
+                          mutate(nivel = if_else(procedimento == "Atenção Básica","APS","AES")) |> 
+                          group_by(ibge, municipio, nivel) |> 
+                          summarise(necessidade = sum(nec_prof))
+                          
+                        
+  
+```
+
+## 4. Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos
+
+O próximo passo consiste em avaliar qual a implicação dos resultados em termos de recursos. Neste sentido, duas etapas são realizadas:
+
+1\) Análise absoluta e relativa da oferta e necessidades por profissionais, que foi calculada de acordo com as seguintes fórmulas:
+
+![](figuras/eq3_sb.png){fig-align="center"}
+
+Onde:
+
+-   RA = Resultado absoluto;
+-   O = Oferta de cirurgiões-dentistas em dada localidade l;
+-   NPSB = Necessidades cirurgiões-dentistas em dada localidade l;
+
+![](figuras/eq4_sb.png){fig-align="center"}
+
+Onde:
+
+-   RR = Resultado relativo;
+-   O = Oferta de cirurgiões-dentistas em dada localidade l;
+-   NPSB = Necessidades cirurgiões-dentistas em dada localidade l;
+
+2\) Implicações em termos de custos;
+
+Para fins de implicação em termos de custo utilizamos as lacunas de força de trabalho em saúde, obtidas por meio de RA e multiplicamos pelo custo médio do trabalho em em cada estado, calculados a partir de dados da PNADc.
+
+### 4.1. Análises comparada absoluta e relativa entre oferta e demanda
+
+A análise comparada é calculada a partir das seguinte fórmulas.
+
+```{r}
+
+dremio_host <- Sys.getenv("endereco")
+dremio_port <- Sys.getenv("port")
+dremio_uid <- Sys.getenv("uid")
+dremio_pwd <- Sys.getenv("datalake")
+
+
+channel <- odbcDriverConnect(sprintf("DRIVER=Dremio Connector;
+                                     HOST=%s;
+                                     PORT=%s;
+                                     UID=%s;
+                                     PWD=%s;
+                                     AUTHENTICATIONTYPE=Basic Authentication;
+                                     CONNECTIONTYPE=Direct", 
+                         dremio_host, 
+                         dremio_port, 
+                         dremio_uid, 
+                         dremio_pwd))
+
+query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB e cirurgiões dentistas em APS e AES"'
+
+
+
+oferta_gyn <- sqlQuery(channel, query, 
+                     as.is = TRUE) 
+
+```
+
+``` sql
+
+
+WITH CH_PROFISSIONAIS AS(
+
+    SELECT CODUFMUN, 
+           COMPETEN, 
+           PROF_SUS,
+           NIVEL, 
+           CATEGORIA, 
+           HORAAMBULATORIAL,
+           HORAHOSPITALAR,
+           HORAOUTRO,
+           HORAAMBULATORIAL + HORAHOSPITALAR + HORAOUTRO AS HORA 
+    FROM(
+            SELECT CODUFMUN, 
+                COMPETEN, 
+                PROF_SUS, 
+                    CASE     
+                        WHEN TP_UNID = '01' OR 
+                             TP_UNID = '02' OR 
+                             TP_UNID = '32' OR
+                             TP_UNID = '40' THEN  'APS'
+                        WHEN TP_UNID = '36' OR
+                             TP_UNID = '73' OR
+                             TP_UNID = '04' OR
+                             TP_UNID = '22' THEN 'ESPECIALIZADO'
+                    END NIVEL,
+                    CASE 
+                        WHEN substr(CBO, 1, 4) = '2232' THEN 'Cirurgião-dentista'
+                        WHEN substr(CBO, 1, 4) = '3324' THEN 'Técnico ou Auxiliar de Saúde Bucal'
+                    END CATEGORIA,
+                    SUM(HORA_AMB) AS HORAAMBULATORIAL, 
+                    SUM(HORAHOSP) AS HORAHOSPITALAR, 
+                    SUM(HORAOUTR) AS HORAOUTRO  
+
+            FROM Dados.cnes.PF 
+                            
+            WHERE (substr(CBO, 1, 4) = '2232' OR 
+                    substr(CBO, 1, 4) = '3324') AND
+                    COMPETEN = '202401'
+            GROUP BY CODUFMUN, COMPETEN, NIVEL, PROF_SUS, CBO
+    )
+)
+
+SELECT p.CODUFMUN, 
+       q.municipio, 
+       q.uf_sigla, 
+       q.latitude, 
+       q.longitude, 
+       q.cod_regsaud, 
+       q.cod_macrorregiao, 
+       q.regiao_saude, 
+       q.macrorregiao_pad, 
+       p.COMPETEN, 
+       p.PROF_SUS,
+       p.NIVEL, 
+       p.CATEGORIA,
+       p.HORA, 
+       p.HORA/40 AS FTE40 
+   FROM CH_PROFISSIONAIS p
+   LEFT JOIN 
+   "Analytics Layer".Territorial."Municípios - Hierarquia Completa" q
+                ON CAST(P.CODUFMUN AS INTEGER) = q.cod_municipio 
+```
+
+## Referências

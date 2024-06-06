@@ -101,13 +101,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
   <li><a href="#procedimentos-metodológicos" id="toc-procedimentos-metodológicos" class="nav-link active" data-scroll-target="#procedimentos-metodológicos">Procedimentos metodológicos</a></li>
   <li><a href="#preparando-ambiente-do-r" id="toc-preparando-ambiente-do-r" class="nav-link" data-scroll-target="#preparando-ambiente-do-r">Preparando ambiente do R</a></li>
-  <li><a href="#etapa-1---definição-de-escopo" id="toc-etapa-1---definição-de-escopo" class="nav-link" data-scroll-target="#etapa-1---definição-de-escopo">1. Etapa 1 - Definição de escopo</a></li>
-  <li><a href="#etapa-2---análise-das-necessidades-de-saúde-bucal" id="toc-etapa-2---análise-das-necessidades-de-saúde-bucal" class="nav-link" data-scroll-target="#etapa-2---análise-das-necessidades-de-saúde-bucal">2. Etapa 2 - Análise das necessidades de saúde bucal</a>
+  <li><a href="#definição-de-escopo" id="toc-definição-de-escopo" class="nav-link" data-scroll-target="#definição-de-escopo">1. Definição de escopo</a></li>
+  <li><a href="#análise-das-necessidades-de-saúde-bucal" id="toc-análise-das-necessidades-de-saúde-bucal" class="nav-link" data-scroll-target="#análise-das-necessidades-de-saúde-bucal">2. Análise das necessidades de saúde bucal</a>
   <ul class="collapse">
   <li><a href="#levantando-a-faixa-etária-p" id="toc-levantando-a-faixa-etária-p" class="nav-link" data-scroll-target="#levantando-a-faixa-etária-p">2.1. Levantando a faixa etária (P)</a></li>
   <li><a href="#prevalência-de-condições-de-saúde-bucal-h" id="toc-prevalência-de-condições-de-saúde-bucal-h" class="nav-link" data-scroll-target="#prevalência-de-condições-de-saúde-bucal-h">2.2. Prevalência de condições de saúde bucal (H)</a></li>
   <li><a href="#parâmetros-normativos-de-procedimentos-per-capita-s" id="toc-parâmetros-normativos-de-procedimentos-per-capita-s" class="nav-link" data-scroll-target="#parâmetros-normativos-de-procedimentos-per-capita-s">2.3. Parâmetros normativos de procedimentos per capita (S)</a></li>
   </ul></li>
+  <li><a href="#tradução-do-número-de-serviços-em-número-de-profissionais-necessários" id="toc-tradução-do-número-de-serviços-em-número-de-profissionais-necessários" class="nav-link" data-scroll-target="#tradução-do-número-de-serviços-em-número-de-profissionais-necessários">3. Tradução do número de serviços em número de profissionais necessários</a></li>
+  <li><a href="#exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos" id="toc-exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos" class="nav-link" data-scroll-target="#exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos">4. Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos</a>
+  <ul class="collapse">
+  <li><a href="#análises-comparada-entre-oferta-e-demanda" id="toc-análises-comparada-entre-oferta-e-demanda" class="nav-link" data-scroll-target="#análises-comparada-entre-oferta-e-demanda">4.1. Análises comparada entre oferta e demanda</a></li>
+  </ul></li>
+  <li><a href="#referências" id="toc-referências" class="nav-link" data-scroll-target="#referências">Referências</a></li>
   </ul>
 </nav>
 </div>
@@ -152,16 +158,29 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RODBC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="etapa-1---definição-de-escopo" class="level2">
-<h2 class="anchored" data-anchor-id="etapa-1---definição-de-escopo">1. Etapa 1 - Definição de escopo</h2>
-<p>A metodologia tem como escopo estimar a força de trabalho de cirurgiões dentistas atual e necessária para atuar em municípios brasileiros. Serão feitos cálculos para</p>
+<section id="definição-de-escopo" class="level2">
+<h2 class="anchored" data-anchor-id="definição-de-escopo">1. Definição de escopo</h2>
+<p>A metodologia tem como escopo estimar a força de trabalho de cirurgiões dentistas e equipe auxiliar atual e necessária para atuação em municípios brasileiros, a nível de atenção primária, em procedimentos de natureza individual e coletiva, bem como três três procedimentos de natureza especializada: endodontia, prótese e periodontia.</p>
 </section>
-<section id="etapa-2---análise-das-necessidades-de-saúde-bucal" class="level2">
-<h2 class="anchored" data-anchor-id="etapa-2---análise-das-necessidades-de-saúde-bucal">2. Etapa 2 - Análise das necessidades de saúde bucal</h2>
+<section id="análise-das-necessidades-de-saúde-bucal" class="level2">
+<h2 class="anchored" data-anchor-id="análise-das-necessidades-de-saúde-bucal">2. Análise das necessidades de saúde bucal</h2>
 <p>A análise da necessidade de saúde bucal (NSB) foi construída a partir de três elementos: distribuição da população por faixa etária (P), prevalência de condições de saúde bucal (H) e procedimentos per capita (S).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/equacao1_sb.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="366"></p>
+</figure>
+</div>
+<p>Onde:</p>
+<ul>
+<li><p>NSB = Necessidade de saúde bucal contabilizada pelo número de serviços do tipo t destinados ao atendimento de população de faixa etária i e localidade l;</p></li>
+<li><p>P = População por faixa-etária i de uma localidade l;</p></li>
+<li><p>H = Prevalência de condições de saúde bucal que levam à necessidade de procedimentos do tipo t por faixa-etária i e dentro de uma localidade l;</p></li>
+<li><p>S = Procedimentos per capita do tipo t, para cada faixa-etária i e dentro de uma localidade l.</p></li>
+</ul>
 <section id="levantando-a-faixa-etária-p" class="level3">
 <h3 class="anchored" data-anchor-id="levantando-a-faixa-etária-p">2.1. Levantando a faixa etária (P)</h3>
 <p>A distribuição por faixa etária foi construída com base em dados do último censo (2022) e estão disponíveis na página do IBGE.</p>
@@ -263,8 +282,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>li_cobertura, <span class="sc">-</span>ls_cobertura) <span class="sc">|&gt;</span> </span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-1fba3c0a67c9ef9a55c2" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-1fba3c0a67c9ef9a55c2">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],["0 a 14 anos","0 a 14 anos","0 a 14 anos","0 a 14 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","60 anos ou mais","60 anos ou mais","60 anos ou mais","60 anos ou mais"],[1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>procedimento<\/th>\n      <th>faixa_etaria<\/th>\n      <th>id_faixa<\/th>\n      <th>cobertura<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[5,6]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"procedimento","targets":3},{"name":"faixa_etaria","targets":4},{"name":"id_faixa","targets":5},{"name":"cobertura","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-dda76171d9d802b96c48" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-dda76171d9d802b96c48">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],["0 a 14 anos","0 a 14 anos","0 a 14 anos","0 a 14 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","60 anos ou mais","60 anos ou mais","60 anos ou mais","60 anos ou mais"],[1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>procedimento<\/th>\n      <th>faixa_etaria<\/th>\n      <th>id_faixa<\/th>\n      <th>cobertura<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[5,6]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"procedimento","targets":3},{"name":"faixa_etaria","targets":4},{"name":"id_faixa","targets":5},{"name":"cobertura","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <p>Considerando os <strong>dados de população</strong> e de <strong>cobertura</strong>, temos os seguintes <strong>resultados para o parâmetro (H)</strong>:</p>
@@ -273,16 +292,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  pop_palmas <span class="sc">|&gt;</span> </span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(cobertura_sb, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"ibge"</span>,</span>
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"id_faixa"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ibge, municipio, faixa, </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ibge, municipio, faixa, id_faixa, </span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>         total, procedimento, cobertura) <span class="sc">|&gt;</span> </span>
 <span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">populacao_coberta =</span> cobertura <span class="sc">*</span> total) <span class="sc">|&gt;</span> </span>
 <span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">populacao_coberta =</span> <span class="fu">round</span>(populacao_coberta, <span class="dv">2</span>))</span>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>pop_coberta <span class="sc">|&gt;</span> </span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ibge, municipio, faixa, </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>         total, procedimento, cobertura,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>         populacao_coberta) <span class="sc">|&gt;</span> </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<div class="datatables html-widget html-fill-item" id="htmlwidget-915f2d208a71438d7985" style="width:100%;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-915f2d208a71438d7985">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos"],[68457,68457,68457,68457,82448,82448,82448,82448,126871,126871,126871,126871,24916,24916,24916,24916],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648],[35118.44,1711.43,0,0,46830.46,3545.26,0,9563.969999999999,106064.16,9134.709999999999,7104.78,98325.03,10265.39,996.64,597.98,16145.57]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>faixa<\/th>\n      <th>total<\/th>\n      <th>procedimento<\/th>\n      <th>cobertura<\/th>\n      <th>populacao_coberta<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[4,6,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"faixa","targets":3},{"name":"total","targets":4},{"name":"procedimento","targets":5},{"name":"cobertura","targets":6},{"name":"populacao_coberta","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+<div class="datatables html-widget html-fill-item" id="htmlwidget-a03250fd82ffaeb0fc94" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-a03250fd82ffaeb0fc94">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos"],[68457,68457,68457,68457,82448,82448,82448,82448,126871,126871,126871,126871,24916,24916,24916,24916],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648],[35118.44,1711.43,0,0,46830.46,3545.26,0,9563.969999999999,106064.16,9134.709999999999,7104.78,98325.03,10265.39,996.64,597.98,16145.57]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>faixa<\/th>\n      <th>total<\/th>\n      <th>procedimento<\/th>\n      <th>cobertura<\/th>\n      <th>populacao_coberta<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[4,6,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"faixa","targets":3},{"name":"total","targets":4},{"name":"procedimento","targets":5},{"name":"cobertura","targets":6},{"name":"populacao_coberta","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 </section>
@@ -336,7 +358,153 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>producao_normativa <span class="ot">&lt;-</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(<span class="st">"~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx"</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">sheet =</span> <span class="st">"Produção normativa"</span>, <span class="at">col_types =</span> <span class="fu">c</span>(<span class="st">"text"</span>, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"text"</span>, <span class="st">"text"</span>, <span class="st">"text"</span>, <span class="st">"numeric"</span>, </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"numeric"</span>, <span class="st">"numeric"</span>, <span class="st">"numeric"</span>)) <span class="sc">|&gt;</span>  </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">ibge =</span> <span class="fu">substr</span>(ibge, <span class="dv">1</span>, <span class="dv">6</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>producao_palmas <span class="ot">&lt;-</span> producao_normativa <span class="sc">|&gt;</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">filter</span>(ibge <span class="sc">==</span> <span class="st">"172100"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">select</span>(<span class="sc">-</span>municipio, <span class="sc">-</span>li_cobertura,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                             <span class="sc">-</span>ls_cobertura,<span class="sc">-</span>faixa_etaria)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>necessidades_servicos <span class="ot">&lt;-</span> pop_coberta <span class="sc">|&gt;</span> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">left_join</span>(producao_palmas, </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"ibge"</span>,<span class="st">"id_faixa"</span>,<span class="st">"procedimento"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">mutate</span>(<span class="at">nec_servicos =</span> populacao_coberta <span class="sc">*</span> producao_pc) <span class="sc">|&gt;</span> </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">mutate</span>(<span class="at">nec_servicos =</span> <span class="fu">round</span>(nec_servicos, <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
+</section>
+<section id="tradução-do-número-de-serviços-em-número-de-profissionais-necessários" class="level2">
+<h2 class="anchored" data-anchor-id="tradução-do-número-de-serviços-em-número-de-profissionais-necessários">3. Tradução do número de serviços em número de profissionais necessários</h2>
+<p>A etapa 3 consiste na tradução do número de serviços, calculado pela equação 1, em número de profissionais necessários (NPSB). Para isso, devem ser considerados dois elementos: produtividade (T) e o tempo total disponível (TTD).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/eq2_sb.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="355"></p>
+</figure>
+</div>
+<p>Onde:</p>
+<ul>
+<li><p>NPSB = Necessidade de profissionais de saúde bucal;</p></li>
+<li><p>NSB = Necessidade de saúde bucal contabilizada pelo número de serviços do tipo t destinados ao atendimento de população de faixa etária i e localidade l;</p></li>
+<li><p>T = Tempo médio de serviços do tipo t;</p></li>
+<li><p>TTD = Tempo total disponível de um profissional ao longo de um ano.</p></li>
+</ul>
+<p>Vamos utilizar como tempo médio de consulta (T) o valor de 25 minutos. Esse valor foi baseado em um levantamento utilizando técnicas de time-motion realizado para aferir o tempo médio de procedimentos executados pela equipe de saúde bucal, em unidades básicas de saúde em São Paulo, Brasil (Bellotti et al, 2024).</p>
+<p>O tempo total disponível (TTD) corresponde ao tempo de um profissional deduzidas ausências programáticas (ex.: férias, feriados) e não programáticos (ex.: licenças para tratamento de saúde). Vamos utilizar como referência o TTD estimado em 1776 horas anuais do estudo de Bonfim et al.&nbsp;(2016), direcionados para enfermeiros. Infelizmente, não conseguimos localizar estudos que já tenham levatado um TTD para cirurgiões dentistas no Brasil ou fora.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>necessidades_prof <span class="ot">&lt;-</span> necessidades_servicos <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">mutate</span>(<span class="at">nec_prof =</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                                   (nec_servicos <span class="sc">*</span> <span class="dv">25</span><span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1776</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">mutate</span>(<span class="at">nivel =</span> <span class="fu">if_else</span>(procedimento <span class="sc">==</span> <span class="st">"Atenção Básica"</span>,<span class="st">"APS"</span>,<span class="st">"AES"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">group_by</span>(ibge, municipio, nivel) <span class="sc">|&gt;</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">summarise</span>(<span class="at">necessidade =</span> <span class="fu">sum</span>(nec_prof))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos" class="level2">
+<h2 class="anchored" data-anchor-id="exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos">4. Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos</h2>
+<p>O próximo passo consiste em avaliar qual a implicação dos resultados em termos de recursos. Neste sentido, duas etapas são realizadas:</p>
+<p>1) Análise absoluta e relativa da oferta e necessidades por profissionais;</p>
+<p>2) Implicações em termos de custos;</p>
+<section id="análises-comparada-entre-oferta-e-demanda" class="level3">
+<h3 class="anchored" data-anchor-id="análises-comparada-entre-oferta-e-demanda">4.1. Análises comparada entre oferta e demanda</h3>
+<p>A análise comparada é calculada a partir das seguinte fórmulas.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dremio_host <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"endereco"</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>dremio_port <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"port"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dremio_uid <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"uid"</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>dremio_pwd <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"datalake"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>channel <span class="ot">&lt;-</span> <span class="fu">odbcDriverConnect</span>(<span class="fu">sprintf</span>(<span class="st">"DRIVER=Dremio Connector;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="st">                                     HOST=%s;</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="st">                                     PORT=%s;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="st">                                     UID=%s;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="st">                                     PWD=%s;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="st">                                     AUTHENTICATIONTYPE=Basic Authentication;</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="st">                                     CONNECTIONTYPE=Direct"</span>, dremio_host, </span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>                         dremio_port, </span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>                         dremio_uid, </span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                         dremio_pwd))</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB e cirurgiões dentistas em APS e AES"'</span></span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>oferta_gyn <span class="ot">&lt;-</span> <span class="fu">sqlQuery</span>(channel, query, </span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>                     <span class="at">as.is =</span> <span class="cn">TRUE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> CH_PROFISSIONAIS <span class="kw">AS</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> CODUFMUN, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>           COMPETEN, </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>           PROF_SUS,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>           NIVEL, </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>           CATEGORIA, </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>           HORAAMBULATORIAL,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>           HORAHOSPITALAR,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>           HORAOUTRO,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>           HORAAMBULATORIAL <span class="op">+</span> HORAHOSPITALAR <span class="op">+</span> HORAOUTRO <span class="kw">AS</span> HORA </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span>(</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> CODUFMUN, </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                COMPETEN, </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                PROF_SUS, </span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">CASE</span>     </span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">WHEN</span> TP_UNID <span class="op">=</span> <span class="st">'01'</span> <span class="kw">OR</span> </span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'02'</span> <span class="kw">OR</span> </span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'32'</span> <span class="kw">OR</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'40'</span> <span class="cf">THEN</span>  <span class="st">'APS'</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">WHEN</span> TP_UNID <span class="op">=</span> <span class="st">'36'</span> <span class="kw">OR</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'73'</span> <span class="kw">OR</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'04'</span> <span class="kw">OR</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'22'</span> <span class="cf">THEN</span> <span class="st">'ESPECIALIZADO'</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">END</span> NIVEL,</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">CASE</span> </span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">WHEN</span> <span class="fu">substr</span>(CBO, <span class="dv">1</span>, <span class="dv">4</span>) <span class="op">=</span> <span class="st">'2232'</span> <span class="cf">THEN</span> <span class="st">'Cirurgião-dentista'</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">WHEN</span> <span class="fu">substr</span>(CBO, <span class="dv">1</span>, <span class="dv">4</span>) <span class="op">=</span> <span class="st">'3324'</span> <span class="cf">THEN</span> <span class="st">'Técnico ou Auxiliar de Saúde Bucal'</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">END</span> CATEGORIA,</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">SUM</span>(HORA_AMB) <span class="kw">AS</span> HORAAMBULATORIAL, </span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">SUM</span>(HORAHOSP) <span class="kw">AS</span> HORAHOSPITALAR, </span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">SUM</span>(HORAOUTR) <span class="kw">AS</span> HORAOUTRO  </span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> Dados.cnes.PF </span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                            </span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>            <span class="kw">WHERE</span> (<span class="fu">substr</span>(CBO, <span class="dv">1</span>, <span class="dv">4</span>) <span class="op">=</span> <span class="st">'2232'</span> <span class="kw">OR</span> </span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">substr</span>(CBO, <span class="dv">1</span>, <span class="dv">4</span>) <span class="op">=</span> <span class="st">'3324'</span>) <span class="kw">AND</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>                    COMPETEN <span class="op">=</span> <span class="st">'202401'</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>            <span class="kw">GROUP</span> <span class="kw">BY</span> CODUFMUN, COMPETEN, NIVEL, PROF_SUS, CBO</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> p.CODUFMUN, </span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>       q.municipio, </span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>       q.uf_sigla, </span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>       q.latitude, </span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>       q.longitude, </span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>       q.cod_regsaud, </span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>       q.cod_macrorregiao, </span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>       q.regiao_saude, </span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>       q.macrorregiao_pad, </span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>       p.COMPETEN, </span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>       p.PROF_SUS,</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>       p.NIVEL, </span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>       p.CATEGORIA,</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>       p.HORA, </span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>       p.HORA<span class="op">/</span><span class="dv">40</span> <span class="kw">AS</span> FTE40 </span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>   <span class="kw">FROM</span> CH_PROFISSIONAIS p</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>   <span class="kw">LEFT</span> <span class="kw">JOIN</span> </span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>   <span class="ot">"Analytics Layer"</span>.Territorial.<span class="ot">"Municípios - Hierarquia Completa"</span> q</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>                <span class="kw">ON</span> <span class="fu">CAST</span>(P.CODUFMUN <span class="kw">AS</span> <span class="dt">INTEGER</span>) <span class="op">=</span> q.cod_municipio </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="referências" class="level2">
+<h2 class="anchored" data-anchor-id="referências">Referências</h2>
 </section>
 
 </main>
