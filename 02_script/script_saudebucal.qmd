@@ -40,7 +40,7 @@ A metodologia tem como escopo estimar a força de trabalho de cirurgiões dentis
 
 A análise da necessidade de saúde bucal (NSB) foi construída a partir de três elementos: distribuição da população por faixa etária (P), prevalência de condições de saúde bucal (H) e procedimentos per capita (S).
 
-![](figuras/equacao1_sb.png){fig-align="center" width="366"}
+![](figuras/equacao1_sb.png){fig-align="center" width="260"}
 
 Onde:
 
@@ -108,12 +108,17 @@ O Ministério da Saúde - por meio do material Parâmetros Assistenciais para Pr
 
 Um dos parâmetros é a cobertura de serviços de saúde. A cobertura foi calculada a partir da pesquisa SB 2010 para cada faixa etária e tipo de procedimento conforme a lógica da tabela baixo.
 
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Área                      | Expressões usadas para cálculo de cobertura                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
++===========================+=======================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
 | Atenção básica            | NT_1 (Número de dentes necessitando de restauração de 1 superfície) + NT_2 (Número de dentes necessitando de restauração de 2 ou mais superfícies) + NT_6 (Número de dentes necessitando de extração) + NT_7 (Número de dentes necessitando de controle de lesão branca) + NT_8 (Número de dentes necessitando de selante) + P_CALC (Prevalência de cálculo) + P_BR (Prevalência de bolsa rasa). Foi então criada a variável COB_AB. Se COB_AB = 0 o indivíduo não necessita de procedimentos de atenção básica, se COB_AB =1 ele necessita. A cobertura de atenção básica foi então estimada pelo percentual de pessoas com COB_AB=1 |
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Endodontia                | A cobertura de endodontia foi calculada a partir da variável NT_5 (Número de dentes necessitando de tratamento pulpar + restauração). Foi criada a variável ENDO onde ENDO=0 se NT_5=0 e ENDO=1 se NT_5≠0. Desta forma, a cobertura de endodontia foi então estimada pelo percentual de pessoas com ENDO=1                                                                                                                                                                                                                                                                                                                            |
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Periodontia especializada | A cobertura de periodontia especializada foi estimada pelo percentual de pessoas com a variável P_BP (Prevalência de bolsa profunda) = 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Prótese                   | A cobertura de prótese foi calculada pelo percentual de pessoas com a variável NECPROT (Necessidade geral de prótese) ≠ 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Fonte: Brasil (2021)
 
@@ -227,7 +232,7 @@ necessidades_servicos <- pop_coberta |>
 
 A etapa 3 consiste na tradução do número de serviços, calculado pela equação 1, em número de profissionais necessários (NPSB). Para isso, devem ser considerados dois elementos: produtividade (T) e o tempo total disponível (TTD).
 
-![](figuras/eq2_sb.png){fig-align="center" width="355"}
+![](figuras/eq2_sb.png){fig-align="center" width="260"}
 
 Onde:
 
@@ -250,41 +255,24 @@ necessidades_prof <- necessidades_servicos |>
                           group_by(ibge, municipio, nivel) |> 
                           summarise(necessidade = sum(nec_prof))
                           
-                        
+DT::datatable(necessidades_prof)       
   
 ```
 
 ## 4. Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos
 
-O próximo passo consiste em avaliar qual a implicação dos resultados em termos de recursos. Neste sentido, duas etapas são realizadas:
+O próximo passo consiste em algumas etapas, sendo elas:
 
-1\) Análise absoluta e relativa da oferta e necessidades por profissionais, que foi calculada de acordo com as seguintes fórmulas:
+1.  Obtenção da oferta de profissionais;
+2.  Cálculo de valor líquido da oferta;
+3.  Comparação da oferta com necessidades;
 
-![](figuras/eq3_sb.png){fig-align="center"}
+### 4.1. Obtenção da oferta de profissionais
 
-Onde:
-
--   RA = Resultado absoluto;
--   O = Oferta de cirurgiões-dentistas em dada localidade l;
--   NPSB = Necessidades cirurgiões-dentistas em dada localidade l;
-
-![](figuras/eq4_sb.png){fig-align="center"}
-
-Onde:
-
--   RR = Resultado relativo;
--   O = Oferta de cirurgiões-dentistas em dada localidade l;
--   NPSB = Necessidades cirurgiões-dentistas em dada localidade l;
-
-2\) Implicações em termos de custos;
-
-Para fins de implicação em termos de custo utilizamos as lacunas de força de trabalho em saúde, obtidas por meio de RA e multiplicamos pelo custo médio do trabalho em em cada estado, calculados a partir de dados da PNADc.
-
-### 4.1. Análises comparada absoluta e relativa entre oferta e demanda
-
-A análise comparada é calculada a partir das seguinte fórmulas.
+Para acessar a oferta de profissionais, foi necessário realizar uma consulta no Cadastro Nacional de Estabelecimentos de Saúde - tabela Profissionais (CNES-PF). Como profissionais podem ter múltiplos vínculos, padronizou-se a contagem por meio do Full-time equivalent (FTE), tomando como referência a carga horária de contrato.
 
 ```{r}
+# codigo para acessar dados de um datalake 
 
 dremio_host <- Sys.getenv("endereco")
 dremio_port <- Sys.getenv("port")
@@ -308,10 +296,27 @@ query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB 
 
 
 
-oferta_gyn <- sqlQuery(channel, query, 
+oferta <- sqlQuery(channel, query, 
                      as.is = TRUE) 
 
 ```
+
+O script abaixo descreve a consulta realizada por meio de `SQL`. Foram acessados dados de todos os municípios para a `COMPETEN` (mês e ano) de janeiro de 2024. Foram acessados dados de Cirurgiões dentistas e Técnicos/Auxiliares de Saúde Bucal. Não houve restrição quanto ao vínculo - SUS ou não SUS. Em uma primeira simulação são feitas análises apenas com um recorte de profissionais SUS.
+
+Foram acessados dados dos seguintes tipos de unidade:
+
+-   Atenção Primária à Saúde (APS)
+    -   01 - Posto de saúde
+    -   02 - Centro de Saúde/Unidade Básica
+    -   32 - Unidade Móvel Fluvial
+    -   40 - Unidade Móvel Terrestre
+-   Atenção Especializada à Saúde (AES)
+    -   36 - Clínica/Centro de Especialidade
+    -   73 - Pronto atendimento
+    -   04 - Policlínica
+    -   22 - Consultório Isolado
+
+Não foi incluída a força de trabalho atuante em hospitais, tendo em vista o escopo da metodologia.
 
 ``` sql
 
@@ -343,7 +348,7 @@ WITH CH_PROFISSIONAIS AS(
                     END NIVEL,
                     CASE 
                         WHEN substr(CBO, 1, 4) = '2232' THEN 'Cirurgião-dentista'
-                        WHEN substr(CBO, 1, 4) = '3324' THEN 'Técnico ou Auxiliar de Saúde Bucal'
+                        WHEN substr(CBO, 1, 4) = '3224' THEN 'Técnico ou Auxiliar de Saúde Bucal'
                     END CATEGORIA,
                     SUM(HORA_AMB) AS HORAAMBULATORIAL, 
                     SUM(HORAHOSP) AS HORAHOSPITALAR, 
@@ -352,7 +357,7 @@ WITH CH_PROFISSIONAIS AS(
             FROM Dados.cnes.PF 
                             
             WHERE (substr(CBO, 1, 4) = '2232' OR 
-                    substr(CBO, 1, 4) = '3324') AND
+                    substr(CBO, 1, 4) = '3224') AND
                     COMPETEN = '202401'
             GROUP BY CODUFMUN, COMPETEN, NIVEL, PROF_SUS, CBO
     )
@@ -377,6 +382,100 @@ SELECT p.CODUFMUN,
    LEFT JOIN 
    "Analytics Layer".Territorial."Municípios - Hierarquia Completa" q
                 ON CAST(P.CODUFMUN AS INTEGER) = q.cod_municipio 
+```
+
+Vamos filtrar apenas para acessar dados de Palmas (TO) e profissionais atuando no SUS.
+
+```{r}
+#| warning: false
+
+oferta$FTE40 <- as.numeric(oferta$FTE40)
+
+oferta_palmas <- 
+  oferta |> 
+  filter(CODUFMUN == "172100" & PROF_SUS == "1") |> 
+  group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
+  summarise(FTE40 = sum(FTE40)) |> 
+  filter(NIVEL != "NA") |> 
+  mutate(NIVEL = if_else(NIVEL == "APS","APS","AES"))  
+
+
+```
+
+### 4.2. Cálculo de valor líquido da oferta
+
+O cálculo do valor líquido da oferta é feito por meio da fórmula 3:
+
+![](figuras/eq3_sb.png){fig-align="center" width="260"}
+
+Onde:
+
+-   O = Oferta de cirurgiões-dentistas em dada localidade l;
+-   E = Estoque de profissionais atuantes em estabelecimentos de saúde me dada localidade l;
+-   AD = Percentual da carga de trabalho dedicada a atividades diretas (%);
+-   FC = Percentual da carga de trabalho dedicada a um foco clínico (%)
+
+Desta forma, o script abaixo é usado para calcular os valores líquidos.
+
+```{r}
+
+oferta_palmas <- 
+  oferta_palmas |> 
+  mutate(FTE_40_direto = FTE40 * 0.80) |> 
+  mutate(FTE_40_linha = FTE_40_direto * 0.80)
+
+oferta_palmas
+
+```
+
+### 4.3. Implicações de resultados 
+
+Por fim, são feitos os cálculos entre oferta e demanda. São aplicadas duas métricas:
+
+-   Resultado Absoluto (RA), que é referente à diferença entre oferta e demanda, conforme equação 4;
+
+-   Resultado Relativo (RR) se refere à diferença percentual entre oferta e demanda, conforme equação 5.
+
+![](figuras/eq4_sb.png){fig-align="center" width="260"}
+
+Onde:
+
+-   RA = Resultado absoluto;
+-   O = Oferta de cirurgiões-dentistas em dada localidade l;
+-   NPSB = Necessidades cirurgiões-dentistas em dada localidade l;
+
+![](figuras/eq5_sb.png){fig-align="center" width="260"}
+
+Onde:
+
+-   RR = Resultado relativo;
+-   O = Oferta de cirurgiões-dentistas em dada localidade l;
+-   NPSB = Necessidades cirurgiões-dentistas em dada localidade l;
+
+Os cálculos são realizados conforme os seguintes scripts:
+
+```{r}
+
+oferta_palmas_cd <- oferta_palmas |> 
+                        filter(CATEGORIA == "Cirurgião-dentista")
+
+oferta_vs_demanda <-
+  necessidades_prof |> 
+  left_join(oferta_palmas_cd, 
+            by = c("ibge"="CODUFMUN",
+                   "nivel" = "NIVEL")) |> 
+  mutate(ra = FTE_40_linha - necessidade, 
+         rr = (FTE_40_linha/necessidade) * 100) |> 
+  mutate(ra = round(ra, 2),
+         rr = round(rr, 2))
+
+oferta_vs_demanda |>
+  mutate(necessidade = round(necessidade, 2)) |>
+  mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
+  select(ibge, municipio, 
+         nivel, necessidade, 
+         FTE_40_linha, rr, ra) |> 
+  datatable()  
 ```
 
 ## Referências
