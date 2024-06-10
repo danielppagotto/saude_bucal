@@ -487,15 +487,15 @@ A distribuição por faixa etária foi construída com base em dados do último 
 pop_brasil <- read_excel("~/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
 
 pop_brasil_tratado <- pop_brasil |>
-                  select(cod_municipiodv, municipio, de_0_a_14_anos,
+                  select(ibge_sb, municipio, de_0_a_14_anos,
                          de_15_a_29_anos, de_30_a_59_anos,
                          acima_de_60_anos) |> 
                   gather(key = "faixa", 
                          value = "total",
                          3:6) |> 
                   mutate(faixa = gsub("_"," ",faixa)) |> 
-                  mutate(ibge = as.character(cod_municipiodv)) |> 
-                  mutate(ibge = substr(cod_municipiodv, 1, 6)) |> 
+                  mutate(ibge = as.character(ibge_sb)) |> 
+                  mutate(ibge = substr(ibge_sb, 1, 6)) |> 
                   mutate(id_faixa = case_when(faixa == "de 0 a 14 anos" ~ 1,
                                               faixa == "de 15 a 29 anos" ~ 2,
                                               faixa == "de 30 a 59 anos" ~ 3,
@@ -530,7 +530,9 @@ Vamos fazer a leitura dos dados de cobertura para todos os municípios do Brasil
 ```{r}
 # Lendo dados 
 
-cobertura_sb <-read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx") |>  
+cobertura_sb <-read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx",
+    sheet = "Cobertura") |>  
+  
                 mutate(ibge = substr(ibge, 1, 6))
 
 # apresentando dados em formato de tabela interativa
@@ -541,17 +543,23 @@ cobertura_sb |>
 ```
 
 ```{r}
+
+pop_brasil_tratado <-
+  pop_brasil_tratado |> 
+    mutate(ibge_sb = as.character(ibge_sb)) |> 
+    mutate(ibge_sb = str_sub(ibge_sb, start = 1, end = 6))
+
 pop_coberta <- 
   pop_brasil_tratado |> 
-  left_join(cobertura_sb, by = c("ibge",
+  left_join(cobertura_sb, by = c("ibge_sb" = "ibge",
                                  "id_faixa")) |> 
-  select(ibge, municipio, faixa, id_faixa, 
+  select(ibge, faixa, id_faixa, 
          total, procedimento, cobertura) |> 
   mutate(populacao_coberta = cobertura * total) |> 
   mutate(populacao_coberta = round(populacao_coberta, 2))
 
 pop_coberta |> 
-  select(ibge, municipio, faixa, 
+  select(ibge, faixa, 
          total, procedimento, cobertura,
          populacao_coberta) |> 
   datatable()
