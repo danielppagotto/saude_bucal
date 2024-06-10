@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Saúde Bucal - material suplementar</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="br_script_sb_files/libs/clipboard/clipboard.min.js"></script>
+<script src="br_script_sb_files/libs/quarto-html/quarto.js"></script>
+<script src="br_script_sb_files/libs/quarto-html/popper.min.js"></script>
+<script src="br_script_sb_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="br_script_sb_files/libs/quarto-html/anchor.min.js"></script>
+<link href="br_script_sb_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="br_script_sb_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="br_script_sb_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="br_script_sb_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="br_script_sb_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+<script src="br_script_sb_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="br_script_sb_files/libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+<script src="br_script_sb_files/libs/datatables-binding-0.33/datatables.js"></script>
+<script src="br_script_sb_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="br_script_sb_files/libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+<link href="br_script_sb_files/libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+<script src="br_script_sb_files/libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<link href="br_script_sb_files/libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="br_script_sb_files/libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#procedimentos-metodológicos" id="toc-procedimentos-metodológicos" class="nav-link active" data-scroll-target="#procedimentos-metodológicos">Procedimentos metodológicos</a></li>
+  <li><a href="#preparando-ambiente-do-r" id="toc-preparando-ambiente-do-r" class="nav-link" data-scroll-target="#preparando-ambiente-do-r">Preparando ambiente do R</a></li>
+  <li><a href="#definição-de-escopo" id="toc-definição-de-escopo" class="nav-link" data-scroll-target="#definição-de-escopo">1. Definição de escopo</a></li>
+  <li><a href="#análise-das-necessidades-de-saúde-bucal" id="toc-análise-das-necessidades-de-saúde-bucal" class="nav-link" data-scroll-target="#análise-das-necessidades-de-saúde-bucal">2. Análise das necessidades de saúde bucal</a>
+  <ul class="collapse">
+  <li><a href="#levantando-a-faixa-etária-p" id="toc-levantando-a-faixa-etária-p" class="nav-link" data-scroll-target="#levantando-a-faixa-etária-p">2.1. Levantando a faixa etária (P)</a></li>
+  <li><a href="#prevalência-de-condições-de-saúde-bucal-h" id="toc-prevalência-de-condições-de-saúde-bucal-h" class="nav-link" data-scroll-target="#prevalência-de-condições-de-saúde-bucal-h">2.2. Prevalência de condições de saúde bucal (H)</a></li>
+  <li><a href="#parâmetros-normativos-de-procedimentos-per-capita-s" id="toc-parâmetros-normativos-de-procedimentos-per-capita-s" class="nav-link" data-scroll-target="#parâmetros-normativos-de-procedimentos-per-capita-s">2.3. Parâmetros normativos de procedimentos per capita (S)</a></li>
+  </ul></li>
+  <li><a href="#tradução-do-número-de-serviços-em-número-de-profissionais-necessários" id="toc-tradução-do-número-de-serviços-em-número-de-profissionais-necessários" class="nav-link" data-scroll-target="#tradução-do-número-de-serviços-em-número-de-profissionais-necessários">3. Tradução do número de serviços em número de profissionais necessários</a></li>
+  <li><a href="#exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos" id="toc-exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos" class="nav-link" data-scroll-target="#exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos">4. Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos</a>
+  <ul class="collapse">
+  <li><a href="#obtenção-da-oferta-de-profissionais" id="toc-obtenção-da-oferta-de-profissionais" class="nav-link" data-scroll-target="#obtenção-da-oferta-de-profissionais">4.1. Obtenção da oferta de profissionais</a></li>
+  <li><a href="#cálculo-de-valor-líquido-da-oferta" id="toc-cálculo-de-valor-líquido-da-oferta" class="nav-link" data-scroll-target="#cálculo-de-valor-líquido-da-oferta">4.2. Cálculo de valor líquido da oferta</a></li>
+  <li><a href="#implicações-de-resultados" id="toc-implicações-de-resultados" class="nav-link" data-scroll-target="#implicações-de-resultados">4.3. Implicações de resultados</a></li>
+  </ul></li>
+  <li><a href="#referências" id="toc-referências" class="nav-link" data-scroll-target="#referências">Referências</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Saúde Bucal - material suplementar</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="procedimentos-metodológicos" class="level2">
+<h2 class="anchored" data-anchor-id="procedimentos-metodológicos">Procedimentos metodológicos</h2>
+<p>A construção do modelo de PDFT para saúde bucal baseado em necessidades foi elaborado a partir das orientações de Asamani et al.&nbsp;(2021) que sugerem algumas etapas, que serão descritas com maior detalhamento a seguir:</p>
+<ol type="1">
+<li>Definição de escopo da metodologia em termos de cobertura jurisdicional, objetivos e horizonte temporal;</li>
+<li>Análise da necessidade de saúde bucal com base em aspectos da demografia, epidemiologia e serviços destinados da população a local;</li>
+<li>Tradução do número de serviços em número de profissionais necessários;</li>
+<li>Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos;</li>
+<li>Análise de sensibilidade para simulação de parâmetros de incerteza;</li>
+<li>Validação de modelo por meio de consulta a stakeholders.</li>
+</ol>
+</section>
+<section id="preparando-ambiente-do-r" class="level2">
+<h2 class="anchored" data-anchor-id="preparando-ambiente-do-r">Preparando ambiente do R</h2>
+<p>Carregando os pacotes necessários para o R.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">scipen =</span> <span class="dv">999</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DT)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RODBC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="definição-de-escopo" class="level2">
+<h2 class="anchored" data-anchor-id="definição-de-escopo">1. Definição de escopo</h2>
+<p>A metodologia tem como escopo estimar a força de trabalho de cirurgiões dentistas e equipe auxiliar atual e necessária para atuação em municípios brasileiros, a nível de atenção primária, em procedimentos de natureza individual e coletiva, bem como três três procedimentos de natureza especializada: endodontia, prótese e periodontia.</p>
+</section>
+<section id="análise-das-necessidades-de-saúde-bucal" class="level2">
+<h2 class="anchored" data-anchor-id="análise-das-necessidades-de-saúde-bucal">2. Análise das necessidades de saúde bucal</h2>
+<p>A análise da necessidade de saúde bucal (NSB) foi construída a partir de três elementos: distribuição da população por faixa etária (P), prevalência de condições de saúde bucal (H) e procedimentos per capita (S).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/equacao1_sb.png" class="img-fluid figure-img" width="260"></p>
+</figure>
+</div>
+<p>Onde:</p>
+<ul>
+<li>NSB = Necessidade de saúde bucal contabilizada pelo número de serviços do tipo t destinados ao atendimento de população de faixa etária i e localidade l;</li>
+<li>P = População por faixa-etária i de uma localidade l;</li>
+<li>H = Prevalência de condições de saúde bucal que levam à necessidade de procedimentos do tipo t por faixa-etária i e dentro de uma localidade l;</li>
+<li>S = Procedimentos per capita do tipo t, para cada faixa-etária i e dentro de uma localidade l.</li>
+</ul>
+<section id="levantando-a-faixa-etária-p" class="level3">
+<h3 class="anchored" data-anchor-id="levantando-a-faixa-etária-p">2.1. Levantando a faixa etária (P)</h3>
+<p>A distribuição por faixa etária foi construída com base em dados do último censo (2022) e estão disponíveis na página do IBGE.</p>
+<p>Para fins de exemplificação, vamos trabalhar apenas com um município como referência: Palmas (TO). Depois escalamos os resultados para o Brasil todo.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pop_tocantins <span class="ot">&lt;-</span> <span class="fu">read_excel</span>(<span class="st">"C:/Users/alefs/OneDrive/Documentos/saude_bucal/01_dados/pop_tocantins.xlsx"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>pop_palmas <span class="ot">&lt;-</span> pop_tocantins <span class="sc">|&gt;</span> </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">filter</span>(ibge <span class="sc">==</span> <span class="st">"1721000"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">select</span>(ibge, Município, de_0_a_14_anos,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>                         de_15_a_29_anos, de_30_a_59_anos,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>                         acima_de_60_anos) <span class="sc">|&gt;</span> </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">gather</span>(<span class="at">key =</span> <span class="st">"faixa"</span>, </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>                         <span class="at">value =</span> <span class="st">"total"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>                         <span class="dv">3</span><span class="sc">:</span><span class="dv">6</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">mutate</span>(<span class="at">faixa =</span> <span class="fu">gsub</span>(<span class="st">"_"</span>,<span class="st">" "</span>,faixa)) <span class="sc">|&gt;</span> </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">mutate</span>(<span class="at">ibge =</span> <span class="fu">as.character</span>(ibge)) <span class="sc">|&gt;</span> </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">mutate</span>(<span class="at">ibge =</span> <span class="fu">substr</span>(ibge, <span class="dv">1</span>, <span class="dv">6</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>                  <span class="fu">mutate</span>(<span class="at">id_faixa =</span> <span class="fu">case_when</span>(faixa <span class="sc">==</span> <span class="st">"de 0 a 14 anos"</span> <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>                                              faixa <span class="sc">==</span> <span class="st">"de 15 a 29 anos"</span> <span class="sc">~</span> <span class="dv">2</span>,</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                                              faixa <span class="sc">==</span> <span class="st">"de 30 a 59 anos"</span> <span class="sc">~</span> <span class="dv">3</span>,</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>                                              faixa <span class="sc">==</span> <span class="st">"acima de 60 anos"</span> <span class="sc">~</span> <span class="dv">4</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Plotando a informação de faixa etária. Nota-se que a faixa etária de 30 a 59 anos possui maior frequência em relação às demais.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ordem <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"de 0 a 14 anos"</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>           <span class="st">"de 15 a 29 anos"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>           <span class="st">"de 30 a 59 anos"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>           <span class="st">"acima de 60 anos"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pop_palmas<span class="sc">$</span>faixa <span class="ot">&lt;-</span> <span class="fu">factor</span>(pop_palmas<span class="sc">$</span>faixa, <span class="at">levels =</span> ordem)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>pop_palmas <span class="sc">|&gt;</span> </span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> faixa, <span class="at">y =</span> total)) <span class="sc">+</span> <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> <span class="fu">coord_flip</span>() <span class="sc">+</span> </span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.title.x =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.title.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>),</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="at">axis.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">16</span>)) <span class="sc">+</span> </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"Distribuição de faixa etária por município"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="br_script_sb_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Cabe mencionar que o censo possui outras divisões de faixa etárias. No entanto, utilizamos estas para padronizar com os dados do parâmetro H, calculado a partir da pesquisa de SB 2010 (próximo tópico).</p>
+</section>
+<section id="prevalência-de-condições-de-saúde-bucal-h" class="level3">
+<h3 class="anchored" data-anchor-id="prevalência-de-condições-de-saúde-bucal-h">2.2. Prevalência de condições de saúde bucal (H)</h3>
+<p>O Ministério da Saúde - por meio do material Parâmetros Assistenciais para Programação Ambulatorial e Hospitalar no âmbito do SUS (Brasil, 2021), regulamentado pela portaria de consolidação nº1 de 2017 - traz uma série de parâmetros acerca da saúde bucal.</p>
+<p>Um dos parâmetros é a cobertura de serviços de saúde. A cobertura foi calculada a partir da pesquisa SB 2010 para cada faixa etária e tipo de procedimento conforme a lógica da tabela baixo.</p>
+<table class="table">
+<caption>Fonte: Brasil (2021)</caption>
+<colgroup>
+<col style="width: 4%">
+<col style="width: 95%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Área</th>
+<th>Expressões usadas para cálculo de cobertura</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Atenção básica</td>
+<td>NT_1 (Número de dentes necessitando de restauração de 1 superfície) + NT_2 (Número de dentes necessitando de restauração de 2 ou mais superfícies) + NT_6 (Número de dentes necessitando de extração) + NT_7 (Número de dentes necessitando de controle de lesão branca) + NT_8 (Número de dentes necessitando de selante) + P_CALC (Prevalência de cálculo) + P_BR (Prevalência de bolsa rasa). Foi então criada a variável COB_AB. Se COB_AB = 0 o indivíduo não necessita de procedimentos de atenção básica, se COB_AB =1 ele necessita. A cobertura de atenção básica foi então estimada pelo percentual de pessoas com COB_AB=1</td>
+</tr>
+<tr class="even">
+<td>Endodontia</td>
+<td>A cobertura de endodontia foi calculada a partir da variável NT_5 (Número de dentes necessitando de tratamento pulpar + restauração). Foi criada a variável ENDO onde ENDO=0 se NT_5=0 e ENDO=1 se NT_5≠0. Desta forma, a cobertura de endodontia foi então estimada pelo percentual de pessoas com ENDO=1</td>
+</tr>
+<tr class="odd">
+<td>Periodontia especializada</td>
+<td>A cobertura de periodontia especializada foi estimada pelo percentual de pessoas com a variável P_BP (Prevalência de bolsa profunda) = 1</td>
+</tr>
+<tr class="even">
+<td>Prótese</td>
+<td>A cobertura de prótese foi calculada pelo percentual de pessoas com a variável NECPROT (Necessidade geral de prótese) ≠ 0</td>
+</tr>
+</tbody>
+</table>
+<p>Com base nos valores de cobertura, é possível então calcular qual a cobertura para cada tipo de procedimento e cada faixa etária.</p>
+<p>Vamos fazer a leitura dos dados e filtrar para Palmas-TO.</p>
+<p>Cabe destacar que, devido à estrutura da SB2010, estes parâmetros foram calculados para capitais de cada estado ou interior da região.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lendo dados </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>cobertura_sb <span class="ot">&lt;-</span><span class="fu">read_excel</span>(<span class="st">"~/saude_bucal/01_dados/cobertura sb.xlsx"</span>) <span class="sc">|&gt;</span>  </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">ibge =</span> <span class="fu">substr</span>(ibge, <span class="dv">1</span>, <span class="dv">6</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co"># apresentando dados em formato de tabela interativa</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>cobertura_sb <span class="sc">|&gt;</span> </span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(municipio <span class="sc">==</span> <span class="st">"Palmas"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>li_cobertura, <span class="sc">-</span>ls_cobertura) <span class="sc">|&gt;</span> </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div class="datatables html-widget html-fill-item" id="htmlwidget-51ca9c1650e48af430e5" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-51ca9c1650e48af430e5">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],["0 a 14 anos","0 a 14 anos","0 a 14 anos","0 a 14 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","15 a 29 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","30 a 59 anos","60 anos ou mais","60 anos ou mais","60 anos ou mais","60 anos ou mais"],[1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>procedimento<\/th>\n      <th>faixa_etaria<\/th>\n      <th>id_faixa<\/th>\n      <th>cobertura<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[5,6]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"procedimento","targets":3},{"name":"faixa_etaria","targets":4},{"name":"id_faixa","targets":5},{"name":"cobertura","targets":6}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>Considerando os <strong>dados de população</strong> e de <strong>cobertura</strong>, temos os seguintes <strong>resultados para o parâmetro (H)</strong>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pop_coberta <span class="ot">&lt;-</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  pop_palmas <span class="sc">|&gt;</span> </span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(cobertura_sb, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"ibge"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                                 <span class="st">"id_faixa"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ibge, municipio, faixa, id_faixa, </span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>         total, procedimento, cobertura) <span class="sc">|&gt;</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">populacao_coberta =</span> cobertura <span class="sc">*</span> total) <span class="sc">|&gt;</span> </span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">populacao_coberta =</span> <span class="fu">round</span>(populacao_coberta, <span class="dv">2</span>))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>pop_coberta <span class="sc">|&gt;</span> </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ibge, municipio, faixa, </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>         total, procedimento, cobertura,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>         populacao_coberta) <span class="sc">|&gt;</span> </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div class="datatables html-widget html-fill-item" id="htmlwidget-f4de95e58d1ccd000a04" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-f4de95e58d1ccd000a04">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16"],["172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100","172100"],["Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas","Palmas"],["de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 0 a 14 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 15 a 29 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","de 30 a 59 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos","acima de 60 anos"],[68457,68457,68457,68457,82448,82448,82448,82448,126871,126871,126871,126871,24916,24916,24916,24916],["Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese","Atenção Básica","Endodontia","Periodontia","Prótese"],[0.513,0.025,0,0,0.5679999999999999,0.043,0,0.116,0.836,0.07199999999999999,0.056,0.775,0.412,0.04,0.024,0.648],[35118.44,1711.43,0,0,46830.46,3545.26,0,9563.969999999999,106064.16,9134.709999999999,7104.78,98325.03,10265.39,996.64,597.98,16145.57]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>faixa<\/th>\n      <th>total<\/th>\n      <th>procedimento<\/th>\n      <th>cobertura<\/th>\n      <th>populacao_coberta<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[4,6,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"faixa","targets":3},{"name":"total","targets":4},{"name":"procedimento","targets":5},{"name":"cobertura","targets":6},{"name":"populacao_coberta","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="parâmetros-normativos-de-procedimentos-per-capita-s" class="level3">
+<h3 class="anchored" data-anchor-id="parâmetros-normativos-de-procedimentos-per-capita-s">2.3. Parâmetros normativos de procedimentos per capita (S)</h3>
+<p>Os cálculos de necessidade normativa por procedimento per capita (S) foram estimados também no caderno de parâmetros de acordo com o quadro a seguir.</p>
+<table class="table">
+<caption>Fonte: Brasil (2021)</caption>
+<colgroup>
+<col style="width: 5%">
+<col style="width: 94%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Área</th>
+<th>Procedimentos</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Atenção básica</td>
+<td><p>No banco de dados do projeto SB BRASIL 2010 foram transformados os códigos 0 (hígido), A (não examinado) e X (excluído) das variáveis CPI17, CPI11, CPI 27, CPI37, CPI31 e CPI47 em 0 e em 1 para as variáveis que tivessem o código 2 (cálculo) e 3 (bolsa rasa).</p>
+<p>Ao final essas variáveis foram somadas e a variável NECPERIO_AB criada para armazenar esta soma.</p>
+<p>Foram somados os valores referentes as variáveis NT_1, NT_2, NT_6, NT_7 e NT_8 formando a variável NEC_AB. Finalmente foram somadas NECPERIO_AB e NEC_AB para se obter a variável NEC_AB_TOTAL.</p>
+<p>Foi então obtida a média da variável NEC_AB_TOTAL estratificada por idade e domínios geográficos (capitais e interior).</p></td>
+</tr>
+<tr class="even">
+<td>Endodontia</td>
+<td>Foi obtida a média da variável NT_5 (Número de dentes necessitando de tratamento pulpar + restauração) estratificada por idade e domínios geográficos (capitais e interior).</td>
+</tr>
+<tr class="odd">
+<td>Periodontia</td>
+<td><p>No banco de dados do projeto SB BRASIL 2010 foram transformados os códigos 0 (hígido), A (não examinado) e X (excluído) das variáveis CPI17, CPI11, CPI 27, CPI37, CPI31 e CPI47 em 0 e em 1 para as variáveis que tivessem o código 4 (bolsa profunda).</p>
+<p>Ao final essas variáveis foram somadas e a variável NECPERIO_ESPEC criada para armazenar esta soma.</p>
+<p>Foi então obtida a média da variável NECPERIO_ESPEC estratificada por idade e domínios geográficos (capitais e interior). Para as idades de 5 e 12 anos esta variável não foi mensurada no projeto SB BRASIL 2010, portanto não há dados de necessidade normativa para a faixa de 0 a 14 anos.</p></td>
+</tr>
+<tr class="even">
+<td>Prótese</td>
+<td><p>A variável NECPROT foi transformada em NUMPROT (número de próteses) como explicitado a seguir:</p>
+<ul>
+<li>Se NECPROT = 0 (Não necessita), então NUMPROT = 0</li>
+<li>Se NECPROT = 1 (Parcial 1 maxilar), então NUMPROT = 1</li>
+<li>Se NECPROT = 2 (Parcial 2 maxilares), então NUMPROT = 2</li>
+<li>Se NECPROT = 3 (Total 1 maxilar), então NUMPROT = 3</li>
+<li>Se NECPROT = 4 (Parcial + total), então NUMPROT = 2</li>
+<li>Se NECPROT = 5 (Total 2 maxilares), então NUMPROT = 2</li>
+<li>Se NECPROT = 9 (Sem informação), então NUMPROT = 0</li>
+</ul>
+<p>Foi então obtida a média da variável NUMPROT estratificada por idade e domínios geográficos (capitais e interior).</p>
+<p>Para as idades de 5 e 12 anos esta variável não foi mensurada no projeto SB BRASIL 2010, portanto não há dados de necessidade normativa para a faixa de 0 a 14 anos.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>producao_normativa <span class="ot">&lt;-</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_excel</span>(<span class="st">"~/saude_bucal/01_dados/cobertura sb.xlsx"</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">sheet =</span> <span class="st">"Produção normativa"</span>, <span class="at">col_types =</span> <span class="fu">c</span>(<span class="st">"text"</span>, </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"text"</span>, <span class="st">"text"</span>, <span class="st">"text"</span>, <span class="st">"numeric"</span>, </span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"numeric"</span>, <span class="st">"numeric"</span>, <span class="st">"numeric"</span>)) <span class="sc">|&gt;</span>  </span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">ibge =</span> <span class="fu">substr</span>(ibge, <span class="dv">1</span>, <span class="dv">6</span>))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>producao_palmas <span class="ot">&lt;-</span> producao_normativa <span class="sc">|&gt;</span> </span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">filter</span>(ibge <span class="sc">==</span> <span class="st">"172100"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                      <span class="fu">select</span>(<span class="sc">-</span>municipio, <span class="sc">-</span>li_cobertura,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                             <span class="sc">-</span>ls_cobertura,<span class="sc">-</span>faixa_etaria)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>necessidades_servicos <span class="ot">&lt;-</span> pop_coberta <span class="sc">|&gt;</span> </span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">left_join</span>(producao_palmas, </span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"ibge"</span>,<span class="st">"id_faixa"</span>,<span class="st">"procedimento"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">mutate</span>(<span class="at">nec_servicos =</span> populacao_coberta <span class="sc">*</span> producao_pc) <span class="sc">|&gt;</span> </span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>                            <span class="fu">mutate</span>(<span class="at">nec_servicos =</span> <span class="fu">round</span>(nec_servicos, <span class="dv">2</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="tradução-do-número-de-serviços-em-número-de-profissionais-necessários" class="level2">
+<h2 class="anchored" data-anchor-id="tradução-do-número-de-serviços-em-número-de-profissionais-necessários">3. Tradução do número de serviços em número de profissionais necessários</h2>
+<p>A etapa 3 consiste na tradução do número de serviços, calculado pela equação 1, em número de profissionais necessários (NPSB). Para isso, devem ser considerados dois elementos: produtividade (T) e o tempo total disponível (TTD).</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/eq2_sb.png" class="img-fluid figure-img" width="260"></p>
+</figure>
+</div>
+<p>Onde:</p>
+<ul>
+<li>NPSB = Necessidade de profissionais de saúde bucal;</li>
+<li>NSB = Necessidade de saúde bucal contabilizada pelo número de serviços do tipo t destinados ao atendimento de população de faixa etária i e localidade l;</li>
+<li>T = Tempo médio de serviços do tipo t;</li>
+<li>TTD = Tempo total disponível de um profissional ao longo de um ano.</li>
+</ul>
+<p>Vamos utilizar como tempo médio de consulta (T) o valor de 25 minutos. Esse valor foi baseado em um levantamento utilizando técnicas de time-motion realizado para aferir o tempo médio de procedimentos executados pela equipe de saúde bucal, em unidades básicas de saúde em São Paulo, Brasil (Bellotti et al, 2024).</p>
+<p>O tempo total disponível (TTD) corresponde ao tempo de um profissional deduzidas ausências programáticas (ex.: férias, feriados) e não programáticos (ex.: licenças para tratamento de saúde). Vamos utilizar como referência o TTD estimado em 1776 horas anuais do estudo de Bonfim et al.&nbsp;(2016), direcionados para enfermeiros. Infelizmente, não conseguimos localizar estudos que já tenham levatado um TTD para cirurgiões dentistas no Brasil ou fora.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>necessidades_prof <span class="ot">&lt;-</span> necessidades_servicos <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">mutate</span>(<span class="at">nec_prof =</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                                   (nec_servicos <span class="sc">*</span> <span class="dv">25</span><span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1776</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">mutate</span>(<span class="at">nivel =</span> <span class="fu">if_else</span>(procedimento <span class="sc">==</span> <span class="st">"Atenção Básica"</span>,<span class="st">"APS"</span>,<span class="st">"AES"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">group_by</span>(ibge, municipio, nivel) <span class="sc">|&gt;</span> </span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                          <span class="fu">summarise</span>(<span class="at">necessidade =</span> <span class="fu">sum</span>(nec_prof))</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                          </span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>DT<span class="sc">::</span><span class="fu">datatable</span>(necessidades_prof)       </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div class="datatables html-widget html-fill-item" id="htmlwidget-7850713f8054847bf081" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-7850713f8054847bf081">{"x":{"filter":"none","vertical":false,"data":[["1","2"],["172100","172100"],["Palmas","Palmas"],["AES","APS"],[30.5631639451952,141.3847574136637]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>nivel<\/th>\n      <th>necessidade<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":4},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"nivel","targets":3},{"name":"necessidade","targets":4}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+<section id="exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos" class="level2">
+<h2 class="anchored" data-anchor-id="exploração-das-implicações-em-termos-de-recursos-como-a-oferta-atual-de-profissionais-e-custos">4. Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos</h2>
+<p>O próximo passo consiste em algumas etapas, sendo elas:</p>
+<ol type="1">
+<li>Obtenção da oferta de profissionais;</li>
+<li>Cálculo de valor líquido da oferta;</li>
+<li>Comparação da oferta com necessidades;</li>
+</ol>
+<section id="obtenção-da-oferta-de-profissionais" class="level3">
+<h3 class="anchored" data-anchor-id="obtenção-da-oferta-de-profissionais">4.1. Obtenção da oferta de profissionais</h3>
+<p>Para acessar a oferta de profissionais, foi necessário realizar uma consulta no Cadastro Nacional de Estabelecimentos de Saúde - tabela Profissionais (CNES-PF). Como profissionais podem ter múltiplos vínculos, padronizou-se a contagem por meio do Full-time equivalent (FTE), tomando como referência a carga horária de contrato.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># codigo para acessar dados de um datalake </span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>dremio_host <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"endereco"</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>dremio_port <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"port"</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>dremio_uid <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"uid"</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>dremio_pwd <span class="ot">&lt;-</span> <span class="fu">Sys.getenv</span>(<span class="st">"datalake"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>channel <span class="ot">&lt;-</span> <span class="fu">odbcDriverConnect</span>(<span class="fu">sprintf</span>(<span class="st">"DRIVER=Dremio Connector;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="st">                                     HOST=%s;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="st">                                     PORT=%s;</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="st">                                     UID=%s;</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="st">                                     PWD=%s;</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="st">                                     AUTHENTICATIONTYPE=Basic Authentication;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="st">                                     CONNECTIONTYPE=Direct"</span>, </span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>                         dremio_host, </span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>                         dremio_port, </span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>                         dremio_uid, </span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>                         dremio_pwd))</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB e cirurgiões dentistas em APS e AES"'</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>oferta <span class="ot">&lt;-</span> <span class="fu">sqlQuery</span>(channel, query, </span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>                     <span class="at">as.is =</span> <span class="cn">TRUE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>O script abaixo descreve a consulta realizada por meio de <code>SQL</code>. Foram acessados dados de todos os municípios para a <code>COMPETEN</code> (mês e ano) de janeiro de 2024. Foram acessados dados de Cirurgiões dentistas e Técnicos/Auxiliares de Saúde Bucal. Não houve restrição quanto ao vínculo - SUS ou não SUS. Em uma primeira simulação são feitas análises apenas com um recorte de profissionais SUS.</p>
+<p>Foram acessados dados dos seguintes tipos de unidade:</p>
+<ul>
+<li>Atenção Primária à Saúde (APS)
+<ul>
+<li>01 - Posto de saúde</li>
+<li>02 - Centro de Saúde/Unidade Básica</li>
+<li>32 - Unidade Móvel Fluvial</li>
+<li>40 - Unidade Móvel Terrestre</li>
+</ul></li>
+<li>Atenção Especializada à Saúde (AES)
+<ul>
+<li>36 - Clínica/Centro de Especialidade</li>
+<li>73 - Pronto atendimento</li>
+<li>04 - Policlínica</li>
+<li>22 - Consultório Isolado</li>
+</ul></li>
+</ul>
+<p>Não foi incluída a força de trabalho atuante em hospitais, tendo em vista o escopo da metodologia.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">WITH</span> CH_PROFISSIONAIS <span class="kw">AS</span>(</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">SELECT</span> CODUFMUN, </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>           COMPETEN, </span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>           PROF_SUS,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>           NIVEL, </span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>           CATEGORIA, </span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>           HORAAMBULATORIAL,</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>           HORAHOSPITALAR,</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>           HORAOUTRO,</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>           HORAAMBULATORIAL <span class="op">+</span> HORAHOSPITALAR <span class="op">+</span> HORAOUTRO <span class="kw">AS</span> HORA </span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="kw">FROM</span>(</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>            <span class="kw">SELECT</span> CODUFMUN, </span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>                COMPETEN, </span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>                PROF_SUS, </span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">CASE</span>     </span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">WHEN</span> TP_UNID <span class="op">=</span> <span class="st">'01'</span> <span class="kw">OR</span> </span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'02'</span> <span class="kw">OR</span> </span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'32'</span> <span class="kw">OR</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'40'</span> <span class="cf">THEN</span>  <span class="st">'APS'</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">WHEN</span> TP_UNID <span class="op">=</span> <span class="st">'36'</span> <span class="kw">OR</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'73'</span> <span class="kw">OR</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'04'</span> <span class="kw">OR</span></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>                             TP_UNID <span class="op">=</span> <span class="st">'22'</span> <span class="cf">THEN</span> <span class="st">'ESPECIALIZADO'</span></span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">END</span> NIVEL,</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">CASE</span> </span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">WHEN</span> <span class="fu">substr</span>(CBO, <span class="dv">1</span>, <span class="dv">4</span>) <span class="op">=</span> <span class="st">'2232'</span> <span class="cf">THEN</span> <span class="st">'Cirurgião-dentista'</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">WHEN</span> <span class="fu">substr</span>(CBO, <span class="dv">1</span>, <span class="dv">4</span>) <span class="op">=</span> <span class="st">'3224'</span> <span class="cf">THEN</span> <span class="st">'Técnico ou Auxiliar de Saúde Bucal'</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">END</span> CATEGORIA,</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">SUM</span>(HORA_AMB) <span class="kw">AS</span> HORAAMBULATORIAL, </span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">SUM</span>(HORAHOSP) <span class="kw">AS</span> HORAHOSPITALAR, </span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">SUM</span>(HORAOUTR) <span class="kw">AS</span> HORAOUTRO  </span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>            <span class="kw">FROM</span> Dados.cnes.PF </span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                            </span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>            <span class="kw">WHERE</span> (<span class="fu">substr</span>(CBO, <span class="dv">1</span>, <span class="dv">4</span>) <span class="op">=</span> <span class="st">'2232'</span> <span class="kw">OR</span> </span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                    <span class="fu">substr</span>(CBO, <span class="dv">1</span>, <span class="dv">4</span>) <span class="op">=</span> <span class="st">'3224'</span>) <span class="kw">AND</span></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>                    COMPETEN <span class="op">=</span> <span class="st">'202401'</span></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>            <span class="kw">GROUP</span> <span class="kw">BY</span> CODUFMUN, COMPETEN, NIVEL, PROF_SUS, CBO</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="kw">SELECT</span> p.CODUFMUN, </span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>       q.municipio, </span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>       q.uf_sigla, </span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>       q.latitude, </span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>       q.longitude, </span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>       q.cod_regsaud, </span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>       q.cod_macrorregiao, </span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>       q.regiao_saude, </span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>       q.macrorregiao_pad, </span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>       p.COMPETEN, </span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>       p.PROF_SUS,</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>       p.NIVEL, </span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>       p.CATEGORIA,</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>       p.HORA, </span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>       p.HORA<span class="op">/</span><span class="dv">40</span> <span class="kw">AS</span> FTE40 </span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>   <span class="kw">FROM</span> CH_PROFISSIONAIS p</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>   <span class="kw">LEFT</span> <span class="kw">JOIN</span> </span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>   <span class="ot">"Analytics Layer"</span>.Territorial.<span class="ot">"Municípios - Hierarquia Completa"</span> q</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>                <span class="kw">ON</span> <span class="fu">CAST</span>(P.CODUFMUN <span class="kw">AS</span> <span class="dt">INTEGER</span>) <span class="op">=</span> q.cod_municipio </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Vamos filtrar apenas para acessar dados de Palmas (TO) e profissionais atuando no SUS.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>oferta<span class="sc">$</span>FTE40 <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(oferta<span class="sc">$</span>FTE40)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>oferta_palmas <span class="ot">&lt;-</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  oferta <span class="sc">|&gt;</span> </span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(CODUFMUN <span class="sc">==</span> <span class="st">"172100"</span> <span class="sc">&amp;</span> PROF_SUS <span class="sc">==</span> <span class="st">"1"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(CODUFMUN, CATEGORIA, NIVEL) <span class="sc">|&gt;</span> </span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">FTE40 =</span> <span class="fu">sum</span>(FTE40)) <span class="sc">|&gt;</span> </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(NIVEL <span class="sc">!=</span> <span class="st">"NA"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">NIVEL =</span> <span class="fu">if_else</span>(NIVEL <span class="sc">==</span> <span class="st">"APS"</span>,<span class="st">"APS"</span>,<span class="st">"AES"</span>))  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="cálculo-de-valor-líquido-da-oferta" class="level3">
+<h3 class="anchored" data-anchor-id="cálculo-de-valor-líquido-da-oferta">4.2. Cálculo de valor líquido da oferta</h3>
+<p>O cálculo do valor líquido da oferta é feito por meio da fórmula 3:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/eq3_sb.png" class="img-fluid figure-img" width="260"></p>
+</figure>
+</div>
+<p>Onde:</p>
+<ul>
+<li>O = Oferta de cirurgiões-dentistas em dada localidade l;</li>
+<li>E = Estoque de profissionais atuantes em estabelecimentos de saúde me dada localidade l;</li>
+<li>AD = Percentual da carga de trabalho dedicada a atividades diretas (%);</li>
+<li>FC = Percentual da carga de trabalho dedicada a um foco clínico (%)</li>
+</ul>
+<p>Desta forma, o script abaixo é usado para calcular os valores líquidos.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>oferta_palmas <span class="ot">&lt;-</span> </span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  oferta_palmas <span class="sc">|&gt;</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">FTE_40_direto =</span> FTE40 <span class="sc">*</span> <span class="fl">0.80</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">FTE_40_linha =</span> FTE_40_direto <span class="sc">*</span> <span class="fl">0.80</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>oferta_palmas</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 6
+# Groups:   CODUFMUN, CATEGORIA [2]
+  CODUFMUN CATEGORIA                      NIVEL FTE40 FTE_40_direto FTE_40_linha
+  &lt;chr&gt;    &lt;chr&gt;                          &lt;chr&gt; &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;
+1 172100   Cirurgião-dentista             APS      99          79.2         63.4
+2 172100   Cirurgião-dentista             AES      33          26.4         21.1
+3 172100   Técnico ou Auxiliar de Saúde … APS      78          62.4         49.9
+4 172100   Técnico ou Auxiliar de Saúde … AES      16          12.8         10.2</code></pre>
+</div>
+</div>
+</section>
+<section id="implicações-de-resultados" class="level3">
+<h3 class="anchored" data-anchor-id="implicações-de-resultados">4.3. Implicações de resultados</h3>
+<p>Por fim, são feitos os cálculos entre oferta e demanda. São aplicadas duas métricas:</p>
+<ul>
+<li><p>Resultado Absoluto (RA), que é referente à diferença entre oferta e demanda, conforme equação 4;</p></li>
+<li><p>Resultado Relativo (RR) se refere à diferença percentual entre oferta e demanda, conforme equação 5.</p></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/eq4_sb.png" class="img-fluid figure-img" width="260"></p>
+</figure>
+</div>
+<p>Onde:</p>
+<ul>
+<li>RA = Resultado absoluto;</li>
+<li>O = Oferta de cirurgiões-dentistas em dada localidade l;</li>
+<li>NPSB = Necessidades cirurgiões-dentistas em dada localidade l;</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="figuras/eq5_sb.png" class="img-fluid figure-img" width="260"></p>
+</figure>
+</div>
+<p>Onde:</p>
+<ul>
+<li>RR = Resultado relativo;</li>
+<li>O = Oferta de cirurgiões-dentistas em dada localidade l;</li>
+<li>NPSB = Necessidades cirurgiões-dentistas em dada localidade l;</li>
+</ul>
+<p>Os cálculos são realizados conforme os seguintes scripts:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>oferta_palmas_cd <span class="ot">&lt;-</span> oferta_palmas <span class="sc">|&gt;</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>                        <span class="fu">filter</span>(CATEGORIA <span class="sc">==</span> <span class="st">"Cirurgião-dentista"</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>oferta_vs_demanda <span class="ot">&lt;-</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  necessidades_prof <span class="sc">|&gt;</span> </span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(oferta_palmas_cd, </span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"ibge"</span><span class="ot">=</span><span class="st">"CODUFMUN"</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>                   <span class="st">"nivel"</span> <span class="ot">=</span> <span class="st">"NIVEL"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ra =</span> FTE_40_linha <span class="sc">-</span> necessidade, </span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">rr =</span> (FTE_40_linha<span class="sc">/</span>necessidade) <span class="sc">*</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">ra =</span> <span class="fu">round</span>(ra, <span class="dv">2</span>),</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">rr =</span> <span class="fu">round</span>(rr, <span class="dv">2</span>))</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>oferta_vs_demanda <span class="sc">|&gt;</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">necessidade =</span> <span class="fu">round</span>(necessidade, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">FTE_40_linha =</span> <span class="fu">round</span>(FTE_40_linha, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(ibge, municipio, </span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>         nivel, necessidade, </span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>         FTE_40_linha, rr, ra) <span class="sc">|&gt;</span> </span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">datatable</span>()  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div class="datatables html-widget html-fill-item" id="htmlwidget-151a1cc688d909667da9" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-151a1cc688d909667da9">{"x":{"filter":"none","vertical":false,"data":[["1","2"],["172100","172100"],["Palmas","Palmas"],["AES","APS"],[30.56,141.38],[21.12,63.36],[69.09999999999999,44.81],[-9.44,-78.02]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>ibge<\/th>\n      <th>municipio<\/th>\n      <th>nivel<\/th>\n      <th>necessidade<\/th>\n      <th>FTE_40_linha<\/th>\n      <th>rr<\/th>\n      <th>ra<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[4,5,6,7]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"ibge","targets":1},{"name":"municipio","targets":2},{"name":"nivel","targets":3},{"name":"necessidade","targets":4},{"name":"FTE_40_linha","targets":5},{"name":"rr","targets":6},{"name":"ra","targets":7}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+</section>
+</section>
+<section id="referências" class="level2">
+<h2 class="anchored" data-anchor-id="referências">Referências</h2>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

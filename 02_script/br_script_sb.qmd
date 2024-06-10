@@ -57,7 +57,7 @@ Para fins de exemplificação, vamos trabalhar apenas com um município como ref
 
 ```{r}
 
-pop_tocantins <- read_excel("~/GitHub/saude_bucal/01_dados/pop_tocantins.xlsx")
+pop_tocantins <- read_excel("~/saude_bucal/01_dados/pop_tocantins.xlsx")
 
 pop_palmas <- pop_tocantins |> 
                   filter(ibge == "1721000") |> 
@@ -108,12 +108,17 @@ O Ministério da Saúde - por meio do material Parâmetros Assistenciais para Pr
 
 Um dos parâmetros é a cobertura de serviços de saúde. A cobertura foi calculada a partir da pesquisa SB 2010 para cada faixa etária e tipo de procedimento conforme a lógica da tabela baixo.
 
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Área                      | Expressões usadas para cálculo de cobertura                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
++===========================+=======================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
 | Atenção básica            | NT_1 (Número de dentes necessitando de restauração de 1 superfície) + NT_2 (Número de dentes necessitando de restauração de 2 ou mais superfícies) + NT_6 (Número de dentes necessitando de extração) + NT_7 (Número de dentes necessitando de controle de lesão branca) + NT_8 (Número de dentes necessitando de selante) + P_CALC (Prevalência de cálculo) + P_BR (Prevalência de bolsa rasa). Foi então criada a variável COB_AB. Se COB_AB = 0 o indivíduo não necessita de procedimentos de atenção básica, se COB_AB =1 ele necessita. A cobertura de atenção básica foi então estimada pelo percentual de pessoas com COB_AB=1 |
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Endodontia                | A cobertura de endodontia foi calculada a partir da variável NT_5 (Número de dentes necessitando de tratamento pulpar + restauração). Foi criada a variável ENDO onde ENDO=0 se NT_5=0 e ENDO=1 se NT_5≠0. Desta forma, a cobertura de endodontia foi então estimada pelo percentual de pessoas com ENDO=1                                                                                                                                                                                                                                                                                                                            |
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Periodontia especializada | A cobertura de periodontia especializada foi estimada pelo percentual de pessoas com a variável P_BP (Prevalência de bolsa profunda) = 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Prótese                   | A cobertura de prótese foi calculada pelo percentual de pessoas com a variável NECPROT (Necessidade geral de prótese) ≠ 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
++---------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Fonte: Brasil (2021)
 
@@ -128,7 +133,7 @@ Cabe destacar que, devido à estrutura da SB2010, estes parâmetros foram calcul
 
 # Lendo dados 
 
-cobertura_sb <- read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx") |>  
+cobertura_sb <-read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx") |>  
                 mutate(ibge = substr(ibge, 1, 6))
 
 # apresentando dados em formato de tabela interativa
@@ -205,7 +210,7 @@ Os cálculos de necessidade normativa por procedimento per capita (S) foram esti
 #| warning: false
 
 producao_normativa <- 
-  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx", 
+  read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx", 
     sheet = "Produção normativa", col_types = c("text", 
         "text", "text", "text", "numeric", 
         "numeric", "numeric", "numeric")) |>  
@@ -473,4 +478,82 @@ oferta_vs_demanda |>
   datatable()  
 ```
 
-## Referências
+## 5. Levantando a faixa etária (P) - Brasil
+
+A distribuição por faixa etária foi construída com base em dados do último censo (2022) e estão disponíveis na página do IBGE.
+
+```{r}
+
+pop_brasil <- read_excel("~/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
+
+pop_brasil_tratado <- pop_brasil |>
+                  select(cod_municipiodv, municipio, de_0_a_14_anos,
+                         de_15_a_29_anos, de_30_a_59_anos,
+                         acima_de_60_anos) |> 
+                  gather(key = "faixa", 
+                         value = "total",
+                         3:6) |> 
+                  mutate(faixa = gsub("_"," ",faixa)) |> 
+                  mutate(ibge = as.character(cod_municipiodv)) |> 
+                  mutate(ibge = substr(cod_municipiodv, 1, 6)) |> 
+                  mutate(id_faixa = case_when(faixa == "de 0 a 14 anos" ~ 1,
+                                              faixa == "de 15 a 29 anos" ~ 2,
+                                              faixa == "de 30 a 59 anos" ~ 3,
+                                              faixa == "acima de 60 anos" ~ 4))
+
+```
+
+Plotando a informação de faixa etária. Nota-se que a faixa etária com maior frequência é de30 a 59 anos, assim como em Palmas
+
+```{r}
+ordem <- c("de 0 a 14 anos",
+           "de 15 a 29 anos",
+           "de 30 a 59 anos",
+           "acima de 60 anos")
+
+pop_brasil_tratado$faixa <- factor(pop_brasil_tratado$faixa, levels = ordem)
+
+
+pop_brasil_tratado |> 
+  ggplot(aes(x = faixa, y = total)) + geom_col() +
+  theme_minimal() + coord_flip() + 
+  theme(axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text = element_text(size = 16)) + 
+  ggtitle("Distribuição de faixa etária por município")
+```
+
+## 6. Prevalência de condições de saúde bucal (H) - Brasil
+
+Vamos fazer a leitura dos dados de cobertura para todos os municípios do Brasil.
+
+```{r}
+# Lendo dados 
+
+cobertura_sb <-read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx") |>  
+                mutate(ibge = substr(ibge, 1, 6))
+
+# apresentando dados em formato de tabela interativa
+
+cobertura_sb |>
+  select(-li_cobertura, -ls_cobertura) |> 
+  datatable()
+```
+
+```{r}
+pop_coberta <- 
+  pop_brasil_tratado |> 
+  left_join(cobertura_sb, by = c("ibge",
+                                 "id_faixa")) |> 
+  select(ibge, municipio, faixa, id_faixa, 
+         total, procedimento, cobertura) |> 
+  mutate(populacao_coberta = cobertura * total) |> 
+  mutate(populacao_coberta = round(populacao_coberta, 2))
+
+pop_coberta |> 
+  select(ibge, municipio, faixa, 
+         total, procedimento, cobertura,
+         populacao_coberta) |> 
+  datatable()
+
+```
