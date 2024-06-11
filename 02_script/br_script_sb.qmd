@@ -32,6 +32,8 @@ library(RODBC)
 
 ```
 
+# Aplicação reduzida para um município
+
 ## 1. Definição de escopo
 
 A metodologia tem como escopo estimar a força de trabalho de cirurgiões dentistas e equipe auxiliar atual e necessária para atuação em municípios brasileiros, a nível de atenção primária, em procedimentos de natureza individual e coletiva, bem como três três procedimentos de natureza especializada: endodontia, prótese e periodontia.
@@ -478,13 +480,15 @@ oferta_vs_demanda |>
   datatable()  
 ```
 
+# Aplicação para Brasil
+
 ## 5. Levantando a faixa etária (P) - Brasil
 
 A distribuição por faixa etária foi construída com base em dados do último censo (2022) e estão disponíveis na página do IBGE.
 
 ```{r}
 
-pop_brasil <- read_excel("~/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
+pop_brasil <- read_excel("~/GitHub/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
 
 pop_brasil_tratado <- pop_brasil |>
                   select(ibge_sb, municipio, de_0_a_14_anos,
@@ -549,19 +553,16 @@ pop_brasil_tratado <-
     mutate(ibge_sb = as.character(ibge_sb)) |> 
     mutate(ibge_sb = str_sub(ibge_sb, start = 1, end = 6))
 
+cobertura_sb$ibge <- as.character(cobertura_sb$ibge)
+
 pop_coberta <- 
   pop_brasil_tratado |> 
   left_join(cobertura_sb, by = c("ibge_sb" = "ibge",
-                                 "id_faixa")) |> 
-  select(ibge, faixa, id_faixa, 
+                                 "id_faixa" = "id_faixa")) |> 
+  select(ibge, ibge_sb, municipio.x, faixa, id_faixa, 
          total, procedimento, cobertura) |> 
   mutate(populacao_coberta = cobertura * total) |> 
   mutate(populacao_coberta = round(populacao_coberta, 2))
 
-pop_coberta |> 
-  select(ibge, faixa, 
-         total, procedimento, cobertura,
-         populacao_coberta) |> 
-  datatable()
 
 ```
