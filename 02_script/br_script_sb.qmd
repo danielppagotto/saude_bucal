@@ -512,6 +512,7 @@ pop_brasil_tratado <- pop_brasil |>
                   mutate(ibge = as.character(ibge_sb)) |> 
                   mutate(ibge = substr(ibge_sb, 1, 6)) |> 
                   mutate(cod_municipiodv = as.character(cod_municipiodv)) |> 
+                  mutate(cod_mun_loc = cod_municipiodv) |> 
                   mutate(cod_municipiodv = substr(cod_municipiodv, 1, 6)) |> 
                   mutate(id_faixa = case_when(faixa == "de 0 a 14 anos" ~ 1,
                                               faixa == "de 15 a 29 anos" ~ 2,
@@ -573,7 +574,7 @@ pop_coberta_br <-
   left_join(cobertura_sb, by = c("ibge_sb" = "ibge",
                                  "id_faixa" = "id_faixa")) |> 
   select(ibge, ibge_sb, municipio.x, faixa, id_faixa, 
-         total, procedimento, cobertura, cod_municipiodv) |> 
+         total, procedimento, cobertura, cod_municipiodv, cod_mun_loc) |> 
   mutate(populacao_coberta = cobertura * total) |> 
   mutate(populacao_coberta = round(populacao_coberta, 2))
 
@@ -609,7 +610,7 @@ necessidades_prof_br <- necessidades_servicos_br |>
                           mutate(nec_prof = 
                                    (nec_servicos * 25/60)/1776) |> 
                           mutate(nivel = if_else(procedimento == "Atenção Básica","APS","AES")) |> 
-                          group_by(ibge, municipio.x, nivel, cod_municipiodv) |> 
+                          group_by(ibge, municipio.x, nivel, cod_municipiodv, cod_mun_loc) |> 
                           summarise(necessidade = sum(nec_prof))
                           
 DT::datatable(necessidades_prof_br) 
@@ -703,8 +704,104 @@ oferta_vs_demanda <- oferta_vs_demanda |>
   mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
   select(ibge, municipio.x, 
          nivel, necessidade, 
-         FTE_40_linha, rr, ra) |> 
-  datatable()  
+         FTE_40_linha, rr, ra, cod_municipiodv, cod_mun_loc)
+```
+
+```{r}
+# Criando mapa de regiões de saúde considerando os percentis de retenção. 
+
+# preparando os shapes dos mapas
+library(sf)
+library(ggplot2)
+library(ggrepel)
+library(ggspatial)
+library(dplyr)
+library(geojsonio)
+library(rnaturalearth)
+library(rnaturalearthdata)
+
+data("World", package = "rnaturalearth")
+
+World <- ne_countries(scale = "medium", returnclass = "sf")
+
+latam <- World |> filter(continent == "South America")
+
+# Converter para sf
+latam <- sf::st_as_sf(latam)
+
+# Carregar shapefile GeoJSON e converter para sf
+spdf <- geojson_read("C:/Users/alefs/OneDrive/Documentos/saude_bucal/02_script/BR_Regionais_Simplificado.geojson", what = "sp")
+spdf_fortified <- sf::st_as_sf(spdf)
+
+# Definir o CRS de latam para ser o mesmo que o do shapefile carregado
+sf::st_crs(latam) <- sf::st_crs(spdf_fortified)
+
+# Converter códigos de região de saúde para inteiros
+oferta$cod_macrorregiao <- as.integer(oferta$cod_macrorregiao)
+
+# Coordenadas das capitais
+capitais <- c("1100205","1302603","1200401","5002704","1600303","5300108",
+              "1400100","5103403","1721000","3550308","2211001","3304557",
+              "1501402","5208707","2927408","4205407","2111300","2704302",
+              "4314902","4106902","3106200","2304400","2611606","2507507",
+              "2800308","2408102","3205309")
+
+capitais_coord <- 
+  oferta_vs_demanda |>
+  mutate(ibge = as.character(ibge)) |> 
+  filter(ibge %in% capitais) |> 
+  select(ibge, municipio.x, longitude, latitude) |> 
+  mutate(latitude = as.numeric(latitude))
+
+# Definir limites de longitude e latitude para focar no Brasil
+limite_long <- c(-75, -28)  # limites de longitude
+limite_lat <- c(-33, 4)     # limites de latitude
+
+# Criar o mapa
+mapa <- spdf_fortified |>
+  left_join(oferta, by = c("reg_id"="cod_macrorregiao")) |>
+  ggplot() +
+  geom_sf(data = latam, fill = "lightgrey", color = "black") + 
+  geom_sf(aes(fill = Retenção)) +
+  geom_point(data = capitais_coord, aes(x = longitude, y = latitude), color = "blue", size = 1) +
+  geom_text_repel(data = capitais_coord, aes(label = municipio, longitude, y = latitude)) +
+  xlab("Longitude") + ylab("Latitude") +
+  theme_minimal() +
+  scale_fill_gradient(low = "#d43621", high = "#91e17c", n.breaks = 5) +
+  coord_sf(xlim = limite_long, ylim = limite_lat)
+
+mapa + 
+  ggspatial::annotation_north_arrow(
+    style = ggspatial::north_arrow_nautical(
+      fill = c("grey40", "white"),
+      line_col = "grey20"))
+```
+
+```{r}
+# instalando pacote
+  install.packages("geobr")
+  library(geobr)
+
+# carregando shape files de todos municipios do Brasil
+  mun <- read_municipality(code_muni="all", year=2022)
+  mun <- mun |> 
+    mutate(code_muni = as.character(code_muni))
+
+# gerando mapa
+  library(dplyr)
+  library(sf)
+  library(ggplot2)
+  
+  if (!inherits(mun, "sf")) {
+  mun <- st_as_sf(mun)
+}
+
+  mun2 <- left_join(oferta_vs_demanda, mun, by = c("cod_mun_loc" = "code_muni")
+                    
+  mun2 <- oferta_vs_demanda |> 
+    left_join(mun, by= c("cod_mun_loc" = "code_muni"))
+
+  ggplot() + geom_sf(data=mun, aes(fill= Score))
 ```
 
 ```{r}
