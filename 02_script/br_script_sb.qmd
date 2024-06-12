@@ -737,7 +737,7 @@ ggplot() +
   scale_fill_gradient(low = "green", high = "red") +  # Use uma paleta de cores Viridis
   labs(fill = "Taxa RR") +  # Etiqueta para a legenda de cores
   scale_fill_viridis_c(limits = c(0, 100)) +
-  theme_minimal() 
+  theme_void() 
 
 
 ggsave('mapa2.png', width = 8, height = 8, dpi = 500)
