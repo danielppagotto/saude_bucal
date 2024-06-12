@@ -707,75 +707,6 @@ oferta_vs_demanda <- oferta_vs_demanda |>
          FTE_40_linha, rr, ra, cod_municipiodv, cod_mun_loc)
 ```
 
-```{r}
-# Criando mapa de regiões de saúde considerando os percentis de retenção. 
-
-# preparando os shapes dos mapas
-library(sf)
-library(ggplot2)
-library(ggrepel)
-library(ggspatial)
-library(dplyr)
-library(geojsonio)
-library(rnaturalearth)
-library(rnaturalearthdata)
-
-data("World", package = "rnaturalearth")
-
-World <- ne_countries(scale = "medium", returnclass = "sf")
-
-latam <- World |> filter(continent == "South America")
-
-# Converter para sf
-latam <- sf::st_as_sf(latam)
-
-# Carregar shapefile GeoJSON e converter para sf
-spdf <- geojson_read("C:/Users/alefs/OneDrive/Documentos/saude_bucal/02_script/BR_Regionais_Simplificado.geojson", what = "sp")
-spdf_fortified <- sf::st_as_sf(spdf)
-
-# Definir o CRS de latam para ser o mesmo que o do shapefile carregado
-sf::st_crs(latam) <- sf::st_crs(spdf_fortified)
-
-# Converter códigos de região de saúde para inteiros
-oferta$cod_macrorregiao <- as.integer(oferta$cod_macrorregiao)
-
-# Coordenadas das capitais
-capitais <- c("1100205","1302603","1200401","5002704","1600303","5300108",
-              "1400100","5103403","1721000","3550308","2211001","3304557",
-              "1501402","5208707","2927408","4205407","2111300","2704302",
-              "4314902","4106902","3106200","2304400","2611606","2507507",
-              "2800308","2408102","3205309")
-
-capitais_coord <- 
-  oferta_vs_demanda |>
-  mutate(ibge = as.character(ibge)) |> 
-  filter(ibge %in% capitais) |> 
-  select(ibge, municipio.x, longitude, latitude) |> 
-  mutate(latitude = as.numeric(latitude))
-
-# Definir limites de longitude e latitude para focar no Brasil
-limite_long <- c(-75, -28)  # limites de longitude
-limite_lat <- c(-33, 4)     # limites de latitude
-
-# Criar o mapa
-mapa <- spdf_fortified |>
-  left_join(oferta, by = c("reg_id"="cod_macrorregiao")) |>
-  ggplot() +
-  geom_sf(data = latam, fill = "lightgrey", color = "black") + 
-  geom_sf(aes(fill = Retenção)) +
-  geom_point(data = capitais_coord, aes(x = longitude, y = latitude), color = "blue", size = 1) +
-  geom_text_repel(data = capitais_coord, aes(label = municipio, longitude, y = latitude)) +
-  xlab("Longitude") + ylab("Latitude") +
-  theme_minimal() +
-  scale_fill_gradient(low = "#d43621", high = "#91e17c", n.breaks = 5) +
-  coord_sf(xlim = limite_long, ylim = limite_lat)
-
-mapa + 
-  ggspatial::annotation_north_arrow(
-    style = ggspatial::north_arrow_nautical(
-      fill = c("grey40", "white"),
-      line_col = "grey20"))
-```
 
 ```{r}
 # instalando pacote
@@ -791,38 +722,25 @@ mapa +
   library(dplyr)
   library(sf)
   library(ggplot2)
-  
-  if (!inherits(mun, "sf")) {
-  mun <- st_as_sf(mun)
-}
-
-  mun2 <- left_join(oferta_vs_demanda, mun, by = c("cod_mun_loc" = "code_muni")
                     
   mun2 <- oferta_vs_demanda |> 
     left_join(mun, by= c("cod_mun_loc" = "code_muni"))
+  
+  
+  
+  
+mun2_sf <- st_as_sf(mun2)
 
-  ggplot() + geom_sf(data=mun, aes(fill= Score))
+
+ggplot() +
+  geom_sf(data = mun2_sf, aes(fill = rr)) +
+  scale_fill_gradient(low = "green", high = "red") +  # Use uma paleta de cores Viridis
+  labs(fill = "Taxa RR") +  # Etiqueta para a legenda de cores
+  scale_fill_viridis_c(limits = c(0, 100)) +
+  theme_minimal() 
+
+
+ggsave('mapa2.png', width = 8, height = 8, dpi = 500)
 ```
-
-```{r}
-#BAIXANDO OS PACOTES NECESSÁRIOS
-install.packages("geobr")
-install.packages("ggplot2")
-library(geobr)
-library(ggplot2)
-library(dplyr)
-
-municipios <- read_municipality(year = 2022)
-
-municipios <- municipios |> 
-  mutate(geom = as.character(geom)) |> 
-  as.data.frame() |> 
-
-#Incorporando a coluna Geom do data municipios no dataframe oferta_vs_demanda
-
-
-
-oferta_vs_demanda2 <- oferta_vs_demanda |> 
-  left_join(municipios, by = c("cod_municipiodv" = "code_muni")) |>    select(geom, ibge, municipio.x, nivel, cod_municipiodv, necessidade, CATEGORIA, FTE40, FTE_40_direto, FTE_40_linha, ra, rr)
   
 ```
