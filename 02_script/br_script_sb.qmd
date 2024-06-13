@@ -29,6 +29,10 @@ library(readxl)
 library(tidyverse)
 library(DT)
 library(RODBC)
+library(dplyr)
+library(sf)
+library(ggplot2)
+library(geobr)
 
 ```
 
@@ -652,7 +656,7 @@ query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB 
 
 
 oferta <- sqlQuery(channel, query, 
-                     as.is = TRUE) 
+                     as.is = TRUE)
 ```
 
 ```{r}
@@ -707,29 +711,24 @@ oferta_vs_demanda <- oferta_vs_demanda |>
          FTE_40_linha, rr, ra, cod_municipiodv, cod_mun_loc)
 ```
 
+#### 7.3.1 Gerando o mapa
 
 ```{r}
 # instalando pacote
-  install.packages("geobr")
-  library(geobr)
 
 # carregando shape files de todos municipios do Brasil
   mun <- read_municipality(code_muni="all", year=2022)
   mun <- mun |> 
     mutate(code_muni = as.character(code_muni))
 
-# gerando mapa
-  library(dplyr)
-  library(sf)
-  library(ggplot2)
-                    
+
   mun2 <- oferta_vs_demanda |> 
     left_join(mun, by= c("cod_mun_loc" = "code_muni"))
   
   
   
   
-mun2_sf <- st_as_sf(mun2)
+mun_sf <- st_as_sf(mun)
 
 
 ggplot() +
@@ -741,6 +740,192 @@ ggplot() +
 
 
 ggsave('mapa2.png', width = 8, height = 8, dpi = 500)
+k
 ```
+
+### 8. Criando função com alguns parâmetros
+
+```{r}
+
+#CRIANDO A FUNÇÃO COM OS PARÂMETROS
+
+gap_necessidade_demanda <- function(tempo, ttd, pd, pl){
   
+pop_brasil <- read_excel("~/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
+
+pop_brasil_tratado <- pop_brasil |>
+                  select(cod_municipiodv, 
+                         ibge_sb, municipio, de_0_a_14_anos,
+                         de_15_a_29_anos, de_30_a_59_anos,
+                         acima_de_60_anos) |> 
+                  gather(key = "faixa", 
+                         value = "total",
+                         4:7) |> 
+                  mutate(faixa = gsub("_"," ",faixa)) |> 
+                  mutate(ibge = as.character(ibge_sb)) |> 
+                  mutate(ibge = substr(ibge_sb, 1, 6)) |> 
+                  mutate(cod_municipiodv = as.character(cod_municipiodv)) |> 
+                  mutate(cod_mun_loc = cod_municipiodv) |> 
+                  mutate(cod_municipiodv = substr(cod_municipiodv, 1, 6)) |> 
+                  mutate(id_faixa = case_when(faixa == "de 0 a 14 anos" ~ 1,
+                                              faixa == "de 15 a 29 anos" ~ 2,
+                                              faixa == "de 30 a 59 anos" ~ 3,
+                                              faixa == "acima de 60 anos" ~ 4))
+
+cobertura_sb <-read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx",
+    sheet = "Cobertura") |>  
+  
+                mutate(ibge = substr(ibge, 1, 6))
+
+# apresentando dados em formato de tabela interativa
+
+cobertura_sb |>
+  select(-li_cobertura, -ls_cobertura) |> 
+  datatable()
+
+pop_brasil_tratado <-
+  pop_brasil_tratado |> 
+    mutate(ibge_sb = as.character(ibge_sb)) |> 
+    mutate(ibge_sb = str_sub(ibge_sb, start = 1, end = 6))
+
+cobertura_sb$ibge <- as.character(cobertura_sb$ibge)
+
+pop_coberta_br <- 
+  pop_brasil_tratado |> 
+  left_join(cobertura_sb, by = c("ibge_sb" = "ibge",
+                                 "id_faixa" = "id_faixa")) |> 
+  select(ibge, ibge_sb, municipio.x, faixa, id_faixa, 
+         total, procedimento, cobertura, cod_municipiodv, cod_mun_loc) |> 
+  mutate(populacao_coberta = cobertura * total) |> 
+  mutate(populacao_coberta = round(populacao_coberta, 2))
+
+# Calculando necessidade
+producao_normativa_br <- 
+  read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx", 
+    sheet = "Produção normativa", col_types = c("text", 
+        "text", "text", "text", "numeric", 
+        "numeric", "numeric", "numeric")) |>  
+                mutate(ibge = substr(ibge, 1, 6))
+
+producao_brasil <- producao_normativa_br |> 
+                      select(-municipio, -li_cobertura,
+                             -ls_cobertura,-faixa_etaria)
+
+necessidades_servicos_br <- pop_coberta_br |> 
+                            left_join(producao_brasil, 
+                                      by = c("ibge" = "ibge","id_faixa","procedimento")) |> 
+                            mutate(nec_servicos = populacao_coberta * producao_pc) |> 
+                            mutate(nec_servicos = round(nec_servicos, 2))
+  
+
+necessidades_prof_br <- necessidades_servicos_br |>
+                          mutate(nec_prof = 
+                                   (nec_servicos * tempo/60)/ttd) |> 
+                          mutate(nivel = if_else(procedimento == "Atenção Básica","APS","AES")) |> 
+                          group_by(ibge, municipio.x, nivel, cod_municipiodv, cod_mun_loc) |> 
+                          summarise(necessidade = sum(nec_prof))
+DT::datatable(necessidades_prof_br) 
+
+
+# codigo para acessar dados de um datalake 
+
+dremio_host <- Sys.getenv("endereco")
+dremio_port <- Sys.getenv("port")
+dremio_uid <- Sys.getenv("uid")
+dremio_pwd <- Sys.getenv("datalake")
+
+
+channel <- odbcDriverConnect(sprintf("DRIVER=Dremio Connector;
+                                     HOST=%s;
+                                     PORT=%s;
+                                     UID=%s;
+                                     PWD=%s;
+                                     AUTHENTICATIONTYPE=Basic Authentication;
+                                     CONNECTIONTYPE=Direct", 
+                         dremio_host, 
+                         dremio_port, 
+                         dremio_uid, 
+                         dremio_pwd))
+
+query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB e cirurgiões dentistas em APS e AES"'
+oferta <- sqlQuery(channel, query, 
+                     as.is = TRUE)
+
+
+oferta$FTE40 <- as.numeric(oferta$FTE40)
+
+oferta_brasil <- 
+  oferta |> 
+  filter(PROF_SUS == "1") |> 
+  group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
+  summarise(FTE40 = sum(FTE40)) |> 
+  filter(NIVEL != "NA") |> 
+  mutate(NIVEL = if_else(NIVEL == "APS","APS","AES")) 
+  
+
+oferta_brasil <- 
+  oferta_brasil |> 
+  mutate(FTE_40_direto = FTE40 * pd) |> 
+  mutate(FTE_40_linha = FTE_40_direto * pl)
+
+
+oferta_brasil_cd <- oferta_brasil |> 
+                        filter(CATEGORIA == "Cirurgião-dentista")
+
+oferta_vs_demanda <-
+  necessidades_prof_br |> 
+  left_join(oferta_brasil_cd, 
+            by = c("cod_municipiodv"="CODUFMUN",
+                   "nivel" = "NIVEL")) |> 
+  mutate(ra = FTE_40_linha - necessidade, 
+         rr = (FTE_40_linha/necessidade) * 100) |> 
+  mutate(ra = round(ra, 2),
+         rr = round(rr, 2)) |> 
+  filter(CATEGORIA != "NA")
+
+oferta_vs_demanda <- oferta_vs_demanda |>
+  mutate(necessidade = round(necessidade, 2)) |>
+  mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
+  select(ibge, municipio.x, 
+         nivel, necessidade, 
+         FTE_40_linha, rr, ra, cod_municipiodv, cod_mun_loc)
+
+}
+```
+
+#### 8.1. Executando a função para um conjunto de vetores
+
+```{r}
+
+teste <- gap_necessidade_demanda(35, 1776, 0.8, 0.8)
+#CRIANDO LISTAS DE VETORES
+
+list_ttd <- as.numeric(c("1676", "1776", "1876"))
+list_tempo <- as.numeric(c("25", "35", "45", "55"))
+list_pd <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
+list_pl <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
+
+
+# EXECUTANDO LOOP DA FUNÇÃO COM AS LISTAS DE VETORES
+resultado <- list()
+
+for (list_ttd in list_ttd) {
+  for (list_tempo in list_tempo) {
+    for (list_pd in list_pd) {
+      for (list_pl in list_pl) { 
+        res <- gap_necessidade_demanda(tempo = list_tempo, ttd = list_ttd, pd = list_pd, pl = list_pl)
+        res <- cbind(res, ttd = list_ttd, tempo = list_tempo, pd = list_pd, pl = list_pl)
+        res$atributos <- paste(list_ttd, list_tempo, list_pd, list_pl, sep = "_")
+        resultado[[length(resultado) + 1]] <- res
+      }
+    }
+  }
+}
+
+
+# Combina os resultados em um único data frame
+gap_resultado <- do.call(rbind, resultado)
+
+# Exibir o resultado final
+print(gap_resultado)
 ```
