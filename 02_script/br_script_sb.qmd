@@ -786,28 +786,30 @@ Agora vamos comparar a força de trabalho disponível com a necessidade. Para is
 
 #### 7.3.1. Resultados para cirurgiões-dentistas
 
+O script a seguir calcula os resultados para Cirurgiões dentistas.
+
 ```{r}
 oferta_brasil_cd <- oferta_brasil |> 
                         filter(CATEGORIA == "Cirurgião-dentista")
 
-oferta_vs_demanda_br <-
+cd_oferta_vs_demanda_br <-
   necessidades_prof_br |> 
   left_join(oferta_brasil_cd, 
             by = c("cod_municipiodv"="CODUFMUN",
                    "nivel" = "NIVEL")) 
 
 
-oferta_vs_demanda_br$FTE_40_linha[is.na(oferta_vs_demanda_br$FTE_40_linha)] <- 0
+cd_oferta_vs_demanda_br$FTE_40_linha[is.na(cd_oferta_vs_demanda_br$FTE_40_linha)] <- 0
 
 
-oferta_vs_demanda_br$FTE40[is.na(oferta_vs_demanda_br$FTE40)] <- 0
+cd_oferta_vs_demanda_br$FTE40[is.na(cd_oferta_vs_demanda_br$FTE40)] <- 0
 
 
-oferta_vs_demanda_br$FTE_40_direto[is.na(oferta_vs_demanda_br$FTE_40_direto)] <- 0
+cd_oferta_vs_demanda_br$FTE_40_direto[is.na(cd_oferta_vs_demanda_br$FTE_40_direto)] <- 0
 
 
-oferta_vs_demanda_br <- 
-  oferta_vs_demanda_br |> 
+cd_oferta_vs_demanda_br <- 
+  cd_oferta_vs_demanda_br |> 
   mutate(ra = FTE_40_linha - necessidade, 
          rr = (FTE_40_linha/necessidade) * 100) |> 
   mutate(ra = round(ra, 2),
@@ -818,14 +820,15 @@ oferta_vs_demanda_br <-
          nivel, necessidade, 
          FTE_40_linha, rr, ra, cod_municipiodv, 
          cod_mun_loc)
+
+cd_oferta_vs_demanda_br |> 
+  DT::datatable()
 ```
 
-#### 7.3.1 Gerando o mapa
+Vamos gerar a visualização usando um mapa cloroplético.
 
 ```{r}
 #| warning: false
-
-# carregando shape files de todos municipios do Brasil
 
 mun <- read_municipality(code_muni="all", year=2022)
 
@@ -833,29 +836,59 @@ mun <- mun |>
   mutate(code_muni = 
            as.character(code_muni))
 
-mun2 <- oferta_vs_demanda_br |> 
+mun2 <- cd_oferta_vs_demanda_br |> 
     left_join(mun, by= c("cod_mun_loc" = "code_muni"))
   
 mun_sf <- st_as_sf(mun2)
 
 ggplot() +
-  geom_sf(data = mun_sf, aes(fill = rr), color = NA) +
-  scale_fill_gradientn(colors = c("#D92B3A", "#F2C744", "#ADBF69"), 
-                       values = rescale(c(0, 100, 600)), 
+  geom_sf(data = mun_sf, aes(fill = rr), 
+          color = NA) +
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#F2C744", 
+                                  "#ADBF69"), 
+                       values = rescale(c(0, 
+                                          100, 
+                                          300)), 
                        limits = c(0, 600)) +  
-  labs(fill = "Taxa RR") +  # Etiqueta para a legenda de cores
+  labs(fill = "Taxa RR") +  
   theme_void() + 
   facet_grid(~nivel)
 
-#ggsave('mapa2.png', width = 8, height = 8, dpi = 500)
-
 ```
 
-### 8. Criando função com alguns parâmetros
+De acordo com os resultados das tabelas e do mapa, nós temos alguns poucos municípios que possuem um resultado relativo muito elevado, na ordem de 600%. Isso significa que a oferta é muito superior à necessidade.
+
+Isso ocorre geralmente em municípios muito pequenos. O município de Cachoeira Dourada - MG possui apenas 2706 habitantes. Com bases nos cálculos, a necessidade é de 0,31 profissionais para atenção especializada. No entanto, o município conta com 1,92 profissionais. Por isso a diferença elevada.
+
+Calculando o gap por UF para ter uma noção de quais estados possuem as maiores lacunas de profissionais.
 
 ```{r}
 
-#CRIANDO A FUNÇÃO COM OS PARÂMETROS
+hierarquia_municipios <- read_csv("~/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv")
+
+uf <- hierarquia_municipios |> 
+          select(cod_municipiodv, uf_sigla, regiao)
+
+uf$cod_municipiodv <- as.character(uf$cod_municipiodv)
+
+cd_oferta_vs_demanda_br |>
+    filter(rr < 200) |> 
+    left_join(uf, by = c("cod_mun_loc"="cod_municipiodv")) |> 
+    ggplot(aes(x = rr, 
+               y = fct_reorder(uf_sigla,rr),
+               fill = regiao)) + 
+      geom_boxplot() + facet_wrap(~nivel) + 
+    theme_minimal()
+
+```
+
+## 8. Criando função com alguns parâmetros
+
+Uma das últimas etapas do desenvolvimento de metodologias consiste na
+
+```{r}
+
 
 gap_necessidade_demanda <- 
   function(tempo, ttd, pd, pl){
@@ -984,9 +1017,24 @@ for (list_ttd in list_ttd) {
   for (list_tempo in list_tempo) {
     for (list_pd in list_pd) {
       for (list_pl in list_pl) { 
-        res <- gap_necessidade_demanda(tempo = list_tempo, ttd = list_ttd, pd = list_pd, pl = list_pl)
-        res <- cbind(res, ttd = list_ttd, tempo = list_tempo, pd = list_pd, pl = list_pl)
-        res$atributos <- paste(list_ttd, list_tempo, list_pd, list_pl, sep = "_")
+        
+        res <- 
+          gap_necessidade_demanda(tempo = list_tempo, 
+                                  ttd = list_ttd, 
+                                  pd = list_pd, 
+                                  pl = list_pl)
+        
+        res <- cbind(res, 
+                     ttd = list_ttd, 
+                     tempo = list_tempo, 
+                     pd = list_pd, 
+                     pl = list_pl)
+        
+        res$atributos <- paste(list_ttd, 
+                               list_tempo, 
+                               list_pd, 
+                               list_pl, sep = "_")
+        
         resultado[[length(resultado) + 1]] <- res
       }
     }
@@ -999,3 +1047,5 @@ gap_resultado <- do.call(rbind, resultado)
 
 
 ```
+
+# Referências
