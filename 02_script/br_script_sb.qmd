@@ -33,10 +33,11 @@ library(dplyr)
 library(sf)
 library(ggplot2)
 library(geobr)
+library(scales)
 
 ```
 
-# Aplicação reduzida para um município
+# A) Aplicação reduzida para um município
 
 ## 1. Definição de escopo
 
@@ -46,7 +47,7 @@ A metodologia tem como escopo estimar a força de trabalho de cirurgiões dentis
 
 A análise da necessidade de saúde bucal (NSB) foi construída a partir de três elementos: distribuição da população por faixa etária (P), prevalência de condições de saúde bucal (H) e procedimentos per capita (S).
 
-![](figuras/equacao1_sb.png){fig-align="center" width="260"}
+![](figuras/equacao1_sb.png){fig-align="center" width="344"}
 
 Onde:
 
@@ -63,7 +64,7 @@ Para fins de exemplificação, vamos trabalhar apenas com um município como ref
 
 ```{r}
 
-pop_tocantins <- read_excel("~/saude_bucal/01_dados/pop_tocantins.xlsx")
+pop_tocantins <- read_excel("~/GitHub/saude_bucal/01_dados/pop_tocantins.xlsx")
 
 pop_palmas <- pop_tocantins |> 
                   filter(ibge == "1721000") |> 
@@ -139,14 +140,16 @@ Cabe destacar que, devido à estrutura da SB2010, estes parâmetros foram calcul
 
 # Lendo dados 
 
-cobertura_sb <-read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx") |>  
-                mutate(ibge = substr(ibge, 1, 6))
+cobertura_sb <-
+  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx") |>  
+  mutate(ibge = substr(ibge, 1, 6))
 
 # apresentando dados em formato de tabela interativa
 
 cobertura_sb |> 
-  filter(municipio == "Palmas") |> 
-  select(-li_cobertura, -ls_cobertura) |> 
+  filter(ibge == "172100") |> 
+  select(-li_cobertura, 
+         -ls_cobertura) |> 
   datatable()
   
 ```
@@ -155,7 +158,7 @@ Considerando os **dados de população** e de **cobertura**, temos os seguintes 
 
 ```{r}
 
-pop_coberta <- 
+pop_coberta_palmas <- 
   pop_palmas |> 
   left_join(cobertura_sb, by = c("ibge",
                                  "id_faixa")) |> 
@@ -164,7 +167,7 @@ pop_coberta <-
   mutate(populacao_coberta = cobertura * total) |> 
   mutate(populacao_coberta = round(populacao_coberta, 2))
 
-pop_coberta |> 
+pop_coberta_palmas |> 
   select(ibge, municipio, faixa, 
          total, procedimento, cobertura,
          populacao_coberta) |> 
@@ -216,22 +219,28 @@ Os cálculos de necessidade normativa por procedimento per capita (S) foram esti
 #| warning: false
 
 producao_normativa <- 
-  read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx", 
-    sheet = "Produção normativa", col_types = c("text", 
-        "text", "text", "text", "numeric", 
-        "numeric", "numeric", "numeric")) |>  
-                mutate(ibge = substr(ibge, 1, 6))
+  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx", 
+    sheet = "Produção normativa", 
+    col_types = c("text","text", "text", "text", "numeric", 
+                  "numeric", "numeric", "numeric")) |>  
+  mutate(ibge = substr(ibge, 1, 6))
 
 producao_palmas <- producao_normativa |> 
                       filter(ibge == "172100") |> 
-                      select(-municipio, -li_cobertura,
-                             -ls_cobertura,-faixa_etaria)
+                      select(-municipio, 
+                             -li_cobertura,
+                             -ls_cobertura,
+                             -faixa_etaria)
 
-necessidades_servicos <- pop_coberta |> 
+necessidades_servicos <- pop_coberta_palmas |> 
                             left_join(producao_palmas, 
-                                      by = c("ibge","id_faixa","procedimento")) |> 
-                            mutate(nec_servicos = populacao_coberta * producao_pc) |> 
-                            mutate(nec_servicos = round(nec_servicos, 2))
+                                      by = c("ibge",
+                                             "id_faixa",
+                                             "procedimento")) |> 
+                            mutate(nec_servicos = 
+                                  populacao_coberta * producao_pc) |> 
+                            mutate(nec_servicos = 
+                                  round(nec_servicos, 2))
 ```
 
 ## 3. Tradução do número de serviços em número de profissionais necessários
@@ -249,19 +258,26 @@ Onde:
 
 Vamos utilizar como tempo médio de consulta (T) o valor de 25 minutos. Esse valor foi baseado em um levantamento utilizando técnicas de time-motion realizado para aferir o tempo médio de procedimentos executados pela equipe de saúde bucal, em unidades básicas de saúde em São Paulo, Brasil (Bellotti et al, 2024).
 
-O tempo total disponível (TTD) corresponde ao tempo de um profissional deduzidas ausências programáticas (ex.: férias, feriados) e não programáticos (ex.: licenças para tratamento de saúde). Vamos utilizar como referência o TTD estimado em 1776 horas anuais do estudo de Bonfim et al. (2016), direcionados para enfermeiros. Infelizmente, não conseguimos localizar estudos que já tenham levatado um TTD para cirurgiões dentistas no Brasil ou fora.
+O tempo total disponível (TTD) corresponde ao tempo de um profissional deduzidas ausências programáticas (ex.: férias, feriados) e não programáticos (ex.: licenças para tratamento de saúde). Vamos utilizar como referência o TTD estimado em 1576 horas, frequentemente usado para enfermeiros. Infelizmente, não conseguimos localizar estudos que já tenham levatado um TTD para cirurgiões dentistas no Brasil.
+
+Este resultado indica quantos cirurgiões dentistas por mês são necessários ao longo de um ano para cobrir as necessidades da população.
 
 ```{r}
 #| warning: false
 
-necessidades_prof <- necessidades_servicos |>
+necessidades_prof_palmas <- 
+                    necessidades_servicos |>
                           mutate(nec_prof = 
-                                   (nec_servicos * 25/60)/1776) |> 
-                          mutate(nivel = if_else(procedimento == "Atenção Básica","APS","AES")) |> 
+                                   (nec_servicos * 25/60)/1576) |> 
+                          mutate(nivel = if_else(
+                            procedimento == "Atenção Básica",
+                                            "APS",
+                                            "AES")) |> 
                           group_by(ibge, municipio, nivel) |> 
-                          summarise(necessidade = sum(nec_prof))
+                          summarise(necessidade = sum(nec_prof)) |> 
+                          mutate(necessidade = round(necessidade, 2))
                           
-DT::datatable(necessidades_prof)       
+DT::datatable(necessidades_prof_palmas)       
   
 ```
 
@@ -323,6 +339,8 @@ Foram acessados dados dos seguintes tipos de unidade:
     -   22 - Consultório Isolado
 
 Não foi incluída a força de trabalho atuante em hospitais, tendo em vista o escopo da metodologia.
+
+Outro ponto que merece atenção em relação ao código abaixo é a padronização da força de trabalho por um métrica chamada full-time equivalent (FTE). O FTE é utilizado para a padronização da força de trabalho tendo em vista que na área de saúde é comum ter profissionais com múltiplos vínculos e cargas horárias.
 
 ``` sql
 
@@ -399,11 +417,14 @@ oferta$FTE40 <- as.numeric(oferta$FTE40)
 
 oferta_palmas <- 
   oferta |> 
-  filter(CODUFMUN == "172100" & PROF_SUS == "1") |> 
+  filter(CODUFMUN == "172100" & 
+         PROF_SUS == "1") |> 
   group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
   summarise(FTE40 = sum(FTE40)) |> 
   filter(NIVEL != "NA") |> 
-  mutate(NIVEL = if_else(NIVEL == "APS","APS","AES"))  
+  mutate(NIVEL = if_else(NIVEL == "APS",
+                                  "APS",
+                                  "AES"))  
 
 
 ```
@@ -466,7 +487,7 @@ oferta_palmas_cd <- oferta_palmas |>
                         filter(CATEGORIA == "Cirurgião-dentista")
 
 oferta_vs_demanda <-
-  necessidades_prof |> 
+  necessidades_prof_palmas |> 
   left_join(oferta_palmas_cd, 
             by = c("ibge"="CODUFMUN",
                    "nivel" = "NIVEL")) |> 
@@ -484,48 +505,65 @@ oferta_vs_demanda |>
   datatable()  
 ```
 
-# Aplicação para Brasil
+Ao final, sugere-se o cálculo do impacto financeiro desta lacuna. Isso pode ser feito multiplicando o RA ao salário médio de cirurgiões dentistas em Palmas-TO adicionado a um custo trabalhista. De acordo com dados da Pesquisa Nacional de Amostragem por Domicílio contínua (PNADc) do Instituto Brasileiro de Geografia e Estatística (IBGE), o salário médio é na ordem de 4000. Adicionado a um fator para calcular o custo trabalhista (1.42), tem-se os resultados na tabela a seguir.
 
-A mesma metodologia utilizada para o munícipio de Palmas, será escalado para todos os municípios brasileiros, abaixo segue a ánalise estruturada em etapas.
+```{r}
+
+custo_palmas <- 
+  oferta_vs_demanda |> 
+  mutate(custo = ra * (-1) * (4000 * 1.42)) |> 
+  select(ibge, municipio, nivel, CATEGORIA,
+         custo)
+  
+custo_palmas |> 
+  DT::datatable()
+
+```
+
+# B) Aplicação para Brasil
+
+A mesma metodologia utilizada para o munícipio de Palmas-TO será escalada para cada município brasileiro. Abaixo detalhamos a análise estruturada em etapas.
 
 ## 5. Análise das necessidades de saúde bucal para o Brasil
 
 A análise da necessidade de saúde bucal (NSB) foi construída a partir de três elementos: distribuição da população por faixa etária (P), prevalência de condições de saúde bucal (H) e procedimentos per capita (S).
 
-![](images/clipboard-2716667280.png)
-
-Portanto, a primeira etapa consistará em levantar os dados da população por faixa etária e muncípio.
-
 ### 5.1. Levantando a faixa etária (P) - Brasil
 
-A distribuição por faixa etária foi construída com base em dados do último censo (2022) e estão disponíveis na página do IBGE.
+A distribuição por faixa etária (P) foi construída com base em dados do último censo (2022) e estão disponíveis na página do IBGE.
 
 ```{r}
 
-pop_brasil <- read_excel("~/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
+pop_brasil <- read_excel("~/GitHub/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
 
 pop_brasil_tratado <- pop_brasil |>
                   select(cod_municipiodv, 
-                         ibge_sb, municipio, de_0_a_14_anos,
-                         de_15_a_29_anos, de_30_a_59_anos,
+                         ibge_sb, municipio, 
+                         de_0_a_14_anos,
+                         de_15_a_29_anos, 
+                         de_30_a_59_anos,
                          acima_de_60_anos) |> 
                   gather(key = "faixa", 
                          value = "total",
                          4:7) |> 
-                  mutate(faixa = gsub("_"," ",faixa)) |> 
+                  mutate(faixa = gsub("_"," ",
+                                      faixa)) |> 
                   mutate(ibge = as.character(ibge_sb)) |> 
                   mutate(ibge = substr(ibge_sb, 1, 6)) |> 
-                  mutate(cod_municipiodv = as.character(cod_municipiodv)) |> 
+                  mutate(cod_municipiodv = 
+                           as.character(cod_municipiodv)) |> 
                   mutate(cod_mun_loc = cod_municipiodv) |> 
-                  mutate(cod_municipiodv = substr(cod_municipiodv, 1, 6)) |> 
-                  mutate(id_faixa = case_when(faixa == "de 0 a 14 anos" ~ 1,
-                                              faixa == "de 15 a 29 anos" ~ 2,
-                                              faixa == "de 30 a 59 anos" ~ 3,
-                                              faixa == "acima de 60 anos" ~ 4))
+                  mutate(cod_municipiodv = 
+                           substr(cod_municipiodv, 1, 6)) |> 
+                  mutate(id_faixa = 
+                           case_when(faixa == "de 0 a 14 anos" ~ 1,
+                                     faixa == "de 15 a 29 anos" ~ 2,
+                                     faixa == "de 30 a 59 anos" ~ 3,
+                                     faixa == "acima de 60 anos" ~ 4))
 
 ```
 
-Plotando a informação de faixa etária. Nota-se que a faixa etária com maior frequência é de30 a 59 anos, assim como em Palmas
+Plotando a informação de faixa etária. Nota-se que a faixa etária com maior frequência é de 30 a 59 anos.
 
 ```{r}
 ordem <- c("de 0 a 14 anos",
@@ -533,12 +571,16 @@ ordem <- c("de 0 a 14 anos",
            "de 30 a 59 anos",
            "acima de 60 anos")
 
-pop_brasil_tratado$faixa <- factor(pop_brasil_tratado$faixa, levels = ordem)
+pop_brasil_tratado$faixa <- factor(pop_brasil_tratado$faixa, 
+                                   levels = ordem)
 
 
 pop_brasil_tratado |> 
-  ggplot(aes(x = faixa, y = total)) + geom_col() +
-  theme_minimal() + coord_flip() + 
+  ggplot(aes(x = faixa, 
+             y = total)) + 
+  geom_col() +
+  theme_minimal() + 
+  coord_flip() + 
   theme(axis.title.x = element_text(size = 16),
         axis.title.y = element_text(size = 16),
         axis.text = element_text(size = 16)) + 
@@ -547,38 +589,56 @@ pop_brasil_tratado |>
 
 ### 5.2. Prevalência de condições de saúde bucal (H) - Brasil
 
-Vamos fazer a leitura dos dados de cobertura para todos os municípios do Brasil.
+Vamos fazer a leitura dos dados de cobertura de procedimentos para cada faixa etária em todos os municípios do Brasil para, em sequência, calcular a prevalência de condições de saúde bucal (H).
+
+Conforme pode ser observado na tabela, as capitais de todos os estados possuem valores de cobertura associados. No entanto, municípios do interior não possuem uma cobertura individualizada, mas sim um parâmetro correspondente ao interior da região (ex.: o município de Formosa-GO fica no interior da Região Centro-Oeste, logo usamos o parâmetro de interior da Região Centro-Oeste).
 
 ```{r}
+#| warning: false
+
 # Lendo dados 
 
-cobertura_sb <-read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx",
-    sheet = "Cobertura") |>  
-  
-                mutate(ibge = substr(ibge, 1, 6))
+cobertura_sb <-
+  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx",
+            sheet = "Cobertura") |>  
+  mutate(ibge = substr(ibge, 1, 6))
 
 # apresentando dados em formato de tabela interativa
 
 cobertura_sb |>
-  select(-li_cobertura, -ls_cobertura) |> 
+  select(-li_cobertura, 
+         -ls_cobertura) |> 
   datatable()
 ```
 
+No script abaixo, juntamos a população de cada município à respectiva cobertura.
+
 ```{r}
+#| warning: false
 
 pop_brasil_tratado <-
   pop_brasil_tratado |> 
-    mutate(ibge_sb = as.character(ibge_sb)) |> 
-    mutate(ibge_sb = str_sub(ibge_sb, start = 1, end = 6))
+    mutate(ibge_sb = 
+             as.character(ibge_sb)) |> 
+    mutate(ibge_sb = 
+             str_sub(ibge_sb, 
+                     start = 1, 
+                     end = 6)) 
+    
 
 cobertura_sb$ibge <- as.character(cobertura_sb$ibge)
 
 pop_coberta_br <- 
   pop_brasil_tratado |> 
-  left_join(cobertura_sb, by = c("ibge_sb" = "ibge",
-                                 "id_faixa" = "id_faixa")) |> 
-  select(ibge, ibge_sb, municipio.x, faixa, id_faixa, 
-         total, procedimento, cobertura, cod_municipiodv, cod_mun_loc) |> 
+  left_join(cobertura_sb, 
+            by = c("ibge_sb" = "ibge",
+                   "id_faixa" = "id_faixa")) |> 
+  select(ibge, ibge_sb, 
+         municipio.x, 
+         faixa, id_faixa, 
+         total, procedimento, cobertura, 
+         cod_municipiodv, cod_mun_loc) |> 
+  rename(municipio = municipio.x) |> 
   mutate(populacao_coberta = cobertura * total) |> 
   mutate(populacao_coberta = round(populacao_coberta, 2))
 
@@ -587,37 +647,63 @@ pop_coberta_br <-
 
 ### 5.3. Parâmetros normativos de procedimentos per capita (S) - BRASIL
 
+O próximo passo consiste em juntar as tabelas com o população coberta e a necessidade normativa para cada tipo de procedimento (S). Isso levará ao resultado da necessidade de saúde bucal (NSB), que corresponde ao total de serviços necessários para atender cada faixa etária.
+
 ```{r}
 
 producao_normativa_br <- 
-  read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx", 
-    sheet = "Produção normativa", col_types = c("text", 
-        "text", "text", "text", "numeric", 
-        "numeric", "numeric", "numeric")) |>  
-                mutate(ibge = substr(ibge, 1, 6))
+  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx", 
+    sheet = "Produção normativa", 
+    col_types = c("text","text",
+                  "text","text",
+                  "numeric","numeric",
+                  "numeric","numeric")) |>  
+    mutate(ibge = substr(ibge, 1, 6))
 
 producao_brasil <- producao_normativa_br |> 
-                      select(-municipio, -li_cobertura,
-                             -ls_cobertura,-faixa_etaria)
+                      select(-municipio, 
+                             -li_cobertura,
+                             -ls_cobertura,
+                             -faixa_etaria)
 
 necessidades_servicos_br <- pop_coberta_br |> 
                             left_join(producao_brasil, 
-                                      by = c("ibge" = "ibge","id_faixa","procedimento")) |> 
-                            mutate(nec_servicos = populacao_coberta * producao_pc) |> 
-                            mutate(nec_servicos = round(nec_servicos, 2))
+                                      by = c("ibge" = "ibge",
+                                             "id_faixa",
+                                             "procedimento")) |> 
+                            mutate(nec_servicos = 
+                                    populacao_coberta * producao_pc) |> 
+                            mutate(nec_servicos = 
+                                     round(nec_servicos, 2))
+
+necessidades_servicos_br |> 
+  select(cod_municipiodv, municipio, 
+         procedimento, faixa, nec_servicos) |> 
+  datatable()
+
 ```
 
 ## 6. Tradução do número de serviços em número de profissionais necessários - BRASIL
 
+Uma vez que sabemos a necessidade de saúde bucal (NSB) com base na distribuição da população por faixa etária (P), prevalência de condições de saúde bucal (H) e procedimentos per capita (S) podemos traduzir o número de serviços em profissionais necessários.
+
 ```{r}
-necessidades_prof_br <- necessidades_servicos_br |>
+necessidades_prof_br <- 
+            necessidades_servicos_br |>
                           mutate(nec_prof = 
-                                   (nec_servicos * 25/60)/1776) |> 
-                          mutate(nivel = if_else(procedimento == "Atenção Básica","APS","AES")) |> 
-                          group_by(ibge, municipio.x, nivel, cod_municipiodv, cod_mun_loc) |> 
-                          summarise(necessidade = sum(nec_prof))
+                                (nec_servicos * 25/60)/1576) |> 
+                          mutate(nivel = if_else(
+                            procedimento == "Atenção Básica",
+                                           "APS",
+                                           "AES")) |> 
+                          group_by(ibge, municipio, 
+                                   nivel, cod_municipiodv, 
+                                   cod_mun_loc) |> 
+                          summarise(necessidade = sum(nec_prof)) |> 
+                          mutate(necessidade = round(necessidade, 2))
                           
 DT::datatable(necessidades_prof_br) 
+
 ```
 
 ## 7. Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos
@@ -630,7 +716,11 @@ O próximo passo consiste em algumas etapas, sendo elas:
 
 ### 7.1. Obtenção da oferta de profissionais
 
+O código abaixo traz o script de acesso a dados do CNES-PF para cirurgiões-dentistas e técnicos/auxiliares de saúde bucal, usando infraestrutura própria.
+
 ```{r}
+#| warning: false
+
 # codigo para acessar dados de um datalake 
 
 dremio_host <- Sys.getenv("endereco")
@@ -658,6 +748,8 @@ query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB 
 oferta <- sqlQuery(channel, query, 
                      as.is = TRUE)
 ```
+
+O script abaixo agrupa o total da força de trabalho por nível de atenção e município.
 
 ```{r}
 #| warning: false
@@ -675,6 +767,8 @@ oferta_brasil <-
 
 ### 7.2. Cálculo de valor líquido da oferta
 
+O próximo passo consiste na deducação da força de trabalho associada a atividades indiretas, bem como o percentual associado à linha de cuidado.
+
 ```{r}
 
 oferta_brasil <- 
@@ -688,59 +782,73 @@ oferta_brasil
 
 ### 7.3. Implicações de resultados
 
+Agora vamos comparar a força de trabalho disponível com a necessidade. Para isso, utilizamos duas referências, a força de trabalho
+
+#### 7.3.1. Resultados para cirurgiões-dentistas
+
 ```{r}
 oferta_brasil_cd <- oferta_brasil |> 
                         filter(CATEGORIA == "Cirurgião-dentista")
 
-oferta_vs_demanda <-
+oferta_vs_demanda_br <-
   necessidades_prof_br |> 
   left_join(oferta_brasil_cd, 
             by = c("cod_municipiodv"="CODUFMUN",
-                   "nivel" = "NIVEL")) |> 
+                   "nivel" = "NIVEL")) 
+
+
+oferta_vs_demanda_br$FTE_40_linha[is.na(oferta_vs_demanda_br$FTE_40_linha)] <- 0
+
+
+oferta_vs_demanda_br$FTE40[is.na(oferta_vs_demanda_br$FTE40)] <- 0
+
+
+oferta_vs_demanda_br$FTE_40_direto[is.na(oferta_vs_demanda_br$FTE_40_direto)] <- 0
+
+
+oferta_vs_demanda_br <- 
+  oferta_vs_demanda_br |> 
   mutate(ra = FTE_40_linha - necessidade, 
          rr = (FTE_40_linha/necessidade) * 100) |> 
   mutate(ra = round(ra, 2),
          rr = round(rr, 2)) |> 
-  filter(CATEGORIA != "NA")
-
-oferta_vs_demanda <- oferta_vs_demanda |>
   mutate(necessidade = round(necessidade, 2)) |>
   mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
-  select(ibge, municipio.x, 
+  select(ibge, municipio, 
          nivel, necessidade, 
-         FTE_40_linha, rr, ra, cod_municipiodv, cod_mun_loc)
+         FTE_40_linha, rr, ra, cod_municipiodv, 
+         cod_mun_loc)
 ```
 
 #### 7.3.1 Gerando o mapa
 
 ```{r}
-# instalando pacote
+#| warning: false
 
 # carregando shape files de todos municipios do Brasil
-  mun <- read_municipality(code_muni="all", year=2022)
-  mun <- mun |> 
-    mutate(code_muni = as.character(code_muni))
 
+mun <- read_municipality(code_muni="all", year=2022)
 
-  mun2 <- oferta_vs_demanda |> 
+mun <- mun |> 
+  mutate(code_muni = 
+           as.character(code_muni))
+
+mun2 <- oferta_vs_demanda_br |> 
     left_join(mun, by= c("cod_mun_loc" = "code_muni"))
   
-  
-  
-  
-mun_sf <- st_as_sf(mun)
-
+mun_sf <- st_as_sf(mun2)
 
 ggplot() +
-  geom_sf(data = mun2_sf, aes(fill = rr)) +
-  scale_fill_gradient(low = "green", high = "red") +  # Use uma paleta de cores Viridis
+  geom_sf(data = mun_sf, aes(fill = rr), color = NA) +
+  scale_fill_gradientn(colors = c("#D92B3A", "#F2C744", "#ADBF69"), 
+                       values = rescale(c(0, 100, 600)), 
+                       limits = c(0, 600)) +  
   labs(fill = "Taxa RR") +  # Etiqueta para a legenda de cores
-  scale_fill_viridis_c(limits = c(0, 100)) +
-  theme_void() 
+  theme_void() + 
+  facet_grid(~nivel)
 
+#ggsave('mapa2.png', width = 8, height = 8, dpi = 500)
 
-ggsave('mapa2.png', width = 8, height = 8, dpi = 500)
-k
 ```
 
 ### 8. Criando função com alguns parâmetros
@@ -749,11 +857,11 @@ k
 
 #CRIANDO A FUNÇÃO COM OS PARÂMETROS
 
-gap_necessidade_demanda <- function(tempo, ttd, pd, pl){
-  
-pop_brasil <- read_excel("~/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
+gap_necessidade_demanda <- 
+  function(tempo, ttd, pd, pl){
 
-pop_brasil_tratado <- pop_brasil |>
+          pop_brasil_tratado <- 
+                  pop_brasil |>
                   select(cod_municipiodv, 
                          ibge_sb, municipio, de_0_a_14_anos,
                          de_15_a_29_anos, de_30_a_59_anos,
@@ -764,24 +872,16 @@ pop_brasil_tratado <- pop_brasil |>
                   mutate(faixa = gsub("_"," ",faixa)) |> 
                   mutate(ibge = as.character(ibge_sb)) |> 
                   mutate(ibge = substr(ibge_sb, 1, 6)) |> 
-                  mutate(cod_municipiodv = as.character(cod_municipiodv)) |> 
+                  mutate(cod_municipiodv = 
+                           as.character(cod_municipiodv)) |> 
                   mutate(cod_mun_loc = cod_municipiodv) |> 
-                  mutate(cod_municipiodv = substr(cod_municipiodv, 1, 6)) |> 
-                  mutate(id_faixa = case_when(faixa == "de 0 a 14 anos" ~ 1,
-                                              faixa == "de 15 a 29 anos" ~ 2,
-                                              faixa == "de 30 a 59 anos" ~ 3,
-                                              faixa == "acima de 60 anos" ~ 4))
-
-cobertura_sb <-read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx",
-    sheet = "Cobertura") |>  
-  
-                mutate(ibge = substr(ibge, 1, 6))
-
-# apresentando dados em formato de tabela interativa
-
-cobertura_sb |>
-  select(-li_cobertura, -ls_cobertura) |> 
-  datatable()
+                  mutate(cod_municipiodv = 
+                           substr(cod_municipiodv, 1, 6)) |> 
+                  mutate(id_faixa = case_when(
+                    faixa == "de 0 a 14 anos" ~ 1,
+                    faixa == "de 15 a 29 anos" ~ 2,
+                    faixa == "de 30 a 59 anos" ~ 3,
+                    faixa == "acima de 60 anos" ~ 4))
 
 pop_brasil_tratado <-
   pop_brasil_tratado |> 
@@ -795,17 +895,11 @@ pop_coberta_br <-
   left_join(cobertura_sb, by = c("ibge_sb" = "ibge",
                                  "id_faixa" = "id_faixa")) |> 
   select(ibge, ibge_sb, municipio.x, faixa, id_faixa, 
-         total, procedimento, cobertura, cod_municipiodv, cod_mun_loc) |> 
+         total, procedimento, cobertura, 
+         cod_municipiodv, cod_mun_loc) |> 
   mutate(populacao_coberta = cobertura * total) |> 
   mutate(populacao_coberta = round(populacao_coberta, 2))
 
-# Calculando necessidade
-producao_normativa_br <- 
-  read_excel("~/saude_bucal/01_dados/cobertura sb.xlsx", 
-    sheet = "Produção normativa", col_types = c("text", 
-        "text", "text", "text", "numeric", 
-        "numeric", "numeric", "numeric")) |>  
-                mutate(ibge = substr(ibge, 1, 6))
 
 producao_brasil <- producao_normativa_br |> 
                       select(-municipio, -li_cobertura,
@@ -821,35 +915,12 @@ necessidades_servicos_br <- pop_coberta_br |>
 necessidades_prof_br <- necessidades_servicos_br |>
                           mutate(nec_prof = 
                                    (nec_servicos * tempo/60)/ttd) |> 
-                          mutate(nivel = if_else(procedimento == "Atenção Básica","APS","AES")) |> 
-                          group_by(ibge, municipio.x, nivel, cod_municipiodv, cod_mun_loc) |> 
+                          mutate(nivel = 
+                                   if_else(procedimento == "Atenção Básica","APS","AES")) |> 
+                          group_by(ibge, municipio.x, nivel,
+                                   cod_municipiodv, cod_mun_loc) |> 
                           summarise(necessidade = sum(nec_prof))
-DT::datatable(necessidades_prof_br) 
 
-
-# codigo para acessar dados de um datalake 
-
-dremio_host <- Sys.getenv("endereco")
-dremio_port <- Sys.getenv("port")
-dremio_uid <- Sys.getenv("uid")
-dremio_pwd <- Sys.getenv("datalake")
-
-
-channel <- odbcDriverConnect(sprintf("DRIVER=Dremio Connector;
-                                     HOST=%s;
-                                     PORT=%s;
-                                     UID=%s;
-                                     PWD=%s;
-                                     AUTHENTICATIONTYPE=Basic Authentication;
-                                     CONNECTIONTYPE=Direct", 
-                         dremio_host, 
-                         dremio_port, 
-                         dremio_uid, 
-                         dremio_pwd))
-
-query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB e cirurgiões dentistas em APS e AES"'
-oferta <- sqlQuery(channel, query, 
-                     as.is = TRUE)
 
 
 oferta$FTE40 <- as.numeric(oferta$FTE40)
@@ -926,6 +997,5 @@ for (list_ttd in list_ttd) {
 # Combina os resultados em um único data frame
 gap_resultado <- do.call(rbind, resultado)
 
-# Exibir o resultado final
-print(gap_resultado)
+
 ```
