@@ -34,6 +34,10 @@ library(sf)
 library(ggplot2)
 library(geobr)
 library(scales)
+library(sf) 
+library(ggrepel) 
+library(ggspatial) 
+library(geojsonio)
 
 ```
 
@@ -786,7 +790,7 @@ Agora vamos comparar a força de trabalho disponível com a necessidade. Para is
 
 #### 7.3.1. Resultados para cirurgiões-dentistas
 
-O script a seguir calcula os resultados para Cirurgiões dentistas.
+O script a seguir calcula os resultados para Cirurgiões dentistas **por município**.
 
 ```{r}
 oferta_brasil_cd <- oferta_brasil |> 
@@ -841,6 +845,8 @@ mun2 <- cd_oferta_vs_demanda_br |>
   
 mun_sf <- st_as_sf(mun2)
 
+estados_br <- read_state(year = 2020)
+
 ggplot() +
   geom_sf(data = mun_sf, aes(fill = rr), 
           color = NA) +
@@ -849,8 +855,11 @@ ggplot() +
                                   "#ADBF69"), 
                        values = rescale(c(0, 
                                           100, 
-                                          300)), 
+                                          400)), 
                        limits = c(0, 600)) +  
+   geom_sf(data = estados_br, 
+            fill = NA, 
+            color = "#B8B8B8", size = 0.1) +
   labs(fill = "Taxa RR") +  
   theme_void() + 
   facet_grid(~nivel)
@@ -861,25 +870,90 @@ De acordo com os resultados das tabelas e do mapa, nós temos alguns poucos muni
 
 Isso ocorre geralmente em municípios muito pequenos. O município de Cachoeira Dourada - MG possui apenas 2706 habitantes. Com bases nos cálculos, a necessidade é de 0,31 profissionais para atenção especializada. No entanto, o município conta com 1,92 profissionais. Por isso a diferença elevada.
 
-Calculando o gap por UF para ter uma noção de quais estados possuem as maiores lacunas de profissionais.
+Mas também podemos incluir outras formas de agregação da informação, a exemplo dos dados apresentados por **região de saúde**.
+
+```{r}
+#| warning: false
+
+hierarquia_municipios <- 
+  read_csv("~/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv")
+
+
+
+hierarquia <- 
+          hierarquia_municipios |> 
+          select(cod_municipiodv, 
+                 uf_sigla, 
+                 regiao,
+                 cod_regsaud,
+                 regiao_saude)
+
+hierarquia$cod_municipiodv <- as.character(hierarquia$cod_municipiodv)
+
+cd_oferta_vs_demanda_regiao_saude <- 
+  cd_oferta_vs_demanda_br |>
+    left_join(hierarquia, by = c("cod_mun_loc"="cod_municipiodv")) |> 
+    group_by(nivel, cod_regsaud, uf_sigla,
+             regiao_saude) |> 
+    summarise(necessidade = sum(necessidade),
+              oferta = sum(FTE_40_linha)) |> 
+    mutate(ra = oferta - necessidade, 
+         rr = (oferta/necessidade) * 100) |> 
+    mutate(ra = round(ra, 2),
+         rr = round(rr, 2))
+    
+
+```
+
+Script para criar o mapa de regiões de saúde.
 
 ```{r}
 
-hierarquia_municipios <- read_csv("~/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv")
+estados_br <- read_state(year = 2020)
 
-uf <- hierarquia_municipios |> 
-          select(cod_municipiodv, uf_sigla, regiao)
+spdf <- 
+  geojson_read("~/GitHub/saude_bucal/01_dados/shape file regioes saude.json", what = "sp") 
 
-uf$cod_municipiodv <- as.character(uf$cod_municipiodv)
+spdf_fortified <- sf::st_as_sf(spdf)
 
-cd_oferta_vs_demanda_br |>
-    filter(rr < 200) |> 
-    left_join(uf, by = c("cod_mun_loc"="cod_municipiodv")) |> 
-    ggplot(aes(x = rr, 
-               y = fct_reorder(uf_sigla,rr),
-               fill = regiao)) + 
-      geom_boxplot() + facet_wrap(~nivel) + 
-    theme_minimal()
+
+# Definir limites de longitude e latitude para focar no Brasil
+limite_long <- c(-75, -28)  # limites de longitude
+limite_lat <- c(-33, 4)     # limites de latitude
+
+# Criar o mapa
+
+mapa_rs <-
+  cd_oferta_vs_demanda_regiao_saude |>
+  left_join(spdf_fortified, 
+            by = c("cod_regsaud"="reg_id")) 
+
+# Adicionar geometria se não existir
+if (!"geometry" %in% names(mapa_rs)) {
+  mapa_rs <- st_as_sf(mapa_rs, 
+                      coords = c("longitude", "latitude"), 
+                      crs = 4326) 
+}
+
+
+ggplot() +
+  geom_sf(data = mapa_rs, 
+          aes(fill = rr, geometry = geometry), 
+          color = NA) +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#B8B8B8", 
+          size = 0.1) + 
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#ADBF69",
+                                  "#F2C744"), 
+                       values = rescale(c(0, 
+                                          60, 
+                                          160)), 
+                       limits = c(0, 160)) +  
+  labs(fill = "Taxa RR") +  
+  theme_void() + 
+  facet_grid(~nivel)
 
 ```
 
@@ -888,7 +962,7 @@ cd_oferta_vs_demanda_br |>
 Uma das últimas etapas do desenvolvimento de metodologias consiste na
 
 ```{r}
-
+#| warning: false
 
 gap_necessidade_demanda <- 
   function(tempo, ttd, pd, pl){
@@ -1045,7 +1119,84 @@ for (list_ttd in list_ttd) {
 # Combina os resultados em um único data frame
 gap_resultado <- do.call(rbind, resultado)
 
+```
 
+```{r}
+
+teste <- gap_necessidade_demanda(35, 1776, 0.8, 0.8)
+#CRIANDO LISTAS DE VETORES
+
+list_ttd <- as.numeric(c("1676", "1776", "1876"))
+list_tempo <- as.numeric(c("25", "35", "45", "55"))
+list_pd <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
+list_pl <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
+
+
+# EXECUTANDO LOOP DA FUNÇÃO COM AS LISTAS DE VETORES
+resultado <- list()
+
+for (list_ttd in list_ttd) {
+  for (list_tempo in list_tempo) {
+    for (list_pd in list_pd) {
+      for (list_pl in list_pl) { 
+        
+        res <- 
+          gap_necessidade_demanda(tempo = list_tempo, 
+                                  ttd = list_ttd, 
+                                  pd = list_pd, 
+                                  pl = list_pl)
+        
+        res <- cbind(res, 
+                     ttd = list_ttd, 
+                     tempo = list_tempo, 
+                     pd = list_pd, 
+                     pl = list_pl)
+        
+        res$atributos <- paste(list_ttd, 
+                               list_tempo, 
+                               list_pd, 
+                               list_pl, sep = "_")
+        
+        resultado[[length(resultado) + 1]] <- res
+      }
+    }
+  }
+}
+
+
+# Combina os resultados em um único data frame
+gap_resultado <- do.call(rbind, resultado)
+
+
+```
+
+### 5.1.1. Plano de saúde
+
+Também é possível fazer um exercício para deduzir uma parcela da população que é beneficiária de plano odontológico e eventualmente utilizaria serviços privados.
+
+```{r eval=FALSE, include=FALSE}
+
+plano_de_saude <- 
+  read_csv("~/GitHub/saude_bucal/01_dados/plano_de_saude.csv", 
+           col_types = cols(CD_MUNICIPIO = col_character()))
+
+plano_odontologico <-    
+                      plano_de_saude |>      
+                            filter(FAIXA_CORRIGIDA != "nada") |>      
+                            filter(FAIXA_CORRIGIDA != "Inconsistente") |>      
+                            mutate(taxa = (PLANO_ODONTO/POP) * 100) |>                             filter(taxa < 100) |>      
+                            mutate(id_faixa = case_whe(FAIXA_CORRIGIDA == "de 0 a 14 anos" ~ 1,                        
+                                                       FAIXA_CORRIGIDA == "de 15 a 29 anos" ~ 2,                        
+                                                       FAIXA_CORRIGIDA == "de 30 a 59 anos" ~ 3,                        
+                                                       FAIXA_CORRIGIDA == "acima de 60 anos" ~ 4))   
+
+
+pop_brasil_tratado <-    
+  pop_brasil_tratado |>    
+  left_join(plano_odontologico, by = c("ibge"="CD_MUNICIPIO",                                        "id_faixa")) 
+
+pop_brasil_tratado$taxa[is.na(pop_brasil_tratado$taxa)] <- 0     pop_brasil_tratado <- pop_brasil_tratado |>    
+  mutate(pop_dependente = total - (total * (taxa/100)))   
 ```
 
 # Referências
