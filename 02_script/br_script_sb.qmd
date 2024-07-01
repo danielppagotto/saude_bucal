@@ -144,13 +144,12 @@ cobertura_sb <-
   read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx") |>  
   mutate(ibge = substr(ibge, 1, 6))
 
-# filtrando para Palmas-TO e apresentando dados em formato de tabela interativa
+# filtrando para Palmas-TO 
 
 cobertura_sb |> 
   filter(ibge == "172100") |> 
   select(-li_cobertura, 
-         -ls_cobertura) |> 
-  datatable()
+         -ls_cobertura) 
   
 ```
 
@@ -171,13 +170,12 @@ pop_coberta_palmas <-
   mutate(populacao_coberta = cobertura * total) |> 
   mutate(populacao_coberta = round(populacao_coberta, 2))
 
-# visualizando tabela interativa
+# visualizando 
 
 pop_coberta_palmas |> 
   select(ibge, municipio, faixa, 
          total, procedimento, 
-         cobertura, populacao_coberta) |> 
-  datatable()
+         cobertura, populacao_coberta) 
 
 ```
 
@@ -292,7 +290,7 @@ necessidades_prof_palmas <-
                           summarise(necessidade = sum(nec_prof)) |> 
                           mutate(necessidade = round(necessidade, 2))
                           
-DT::datatable(necessidades_prof_palmas)       
+necessidades_prof_palmas      
   
 ```
 
@@ -517,15 +515,15 @@ oferta_vs_demanda <-
   mutate(ra = round(ra, 2),
          rr = round(rr, 2))
 
-# apresentando resultados em formato interativo
+# apresentando parte dos resultados
 
 oferta_vs_demanda |>
   mutate(necessidade = round(necessidade, 2)) |>
   mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
   select(ibge, municipio, 
          nivel, necessidade, 
-         FTE_40_linha, rr, ra) |> 
-  datatable()  
+         FTE_40_linha, rr, ra) 
+
 ```
 
 ### 4.4. Implicações de resultados em termos financeiros
@@ -540,8 +538,7 @@ custo_palmas <-
   select(ibge, municipio, nivel, CATEGORIA,
          custo)
   
-custo_palmas |> 
-  DT::datatable()
+custo_palmas 
 
 ```
 
@@ -628,12 +625,11 @@ cobertura_sb <-
             sheet = "Cobertura") |>  
   mutate(ibge = substr(ibge, 1, 6))
 
-# apresentando dados em formato de tabela interativa
+# apresentando dados
 
 cobertura_sb |>
   select(-li_cobertura, 
-         -ls_cobertura) |> 
-  datatable()
+         -ls_cobertura) 
 ```
 
 No script abaixo, juntamos a população de cada município à respectiva cobertura.
@@ -709,8 +705,7 @@ necessidades_servicos_br <- pop_coberta_br |>
 
 necessidades_servicos_br |> 
   select(cod_municipiodv, municipio, 
-         procedimento, faixa, nec_servicos) |> 
-  datatable()
+         procedimento, faixa, nec_servicos) 
 
 ```
 
@@ -736,7 +731,7 @@ necessidades_prof_br <-
                           summarise(necessidade = sum(nec_prof)) |> 
                           mutate(necessidade = round(necessidade, 2))
                           
-DT::datatable(necessidades_prof_br) 
+necessidades_prof_br 
 
 ```
 
@@ -858,8 +853,7 @@ cd_oferta_vs_demanda_br <-
          FTE_40_linha, rr, ra, cod_municipiodv, 
          cod_mun_loc)
 
-cd_oferta_vs_demanda_br |> 
-  DT::datatable()
+cd_oferta_vs_demanda_br 
 ```
 
 Vamos gerar a visualização usando um mapa cloroplético.
