@@ -658,7 +658,7 @@ In the script below, we combine the population of each municipality with its res
 ```{r}
 #| warning: false
 
-# tratando os dados devido ao padrao de codigo IBGE de 7 digitos em algumas bases
+# processing data due to the 7-digit IBGE code standard in some databases
 
 pop_brasil_tratado <-
   pop_brasil_tratado |> 
@@ -672,7 +672,7 @@ pop_brasil_tratado <-
 
 cobertura_sb$ibge <- as.character(cobertura_sb$ibge)
 
-# juntando base de populacao e cobertura de saude bucal
+# bringing together population base and oral health coverage
 
 pop_coberta_br <- 
   pop_brasil_tratado |> 
@@ -924,7 +924,7 @@ However, we can also include other ways of aggregating information, such as data
 ```{r}
 #| warning: false
 
-# lendo a base de hierarquia de localidades para juntar os municipios as respectivas regioes de saude e assim agregar os dados por regiao de saude
+# Reading the locality hierarchy database to match municipalities with their respective health regions and thus aggregate data by health region.
 
 hierarquia_municipios <- 
   read_csv("~/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv")
@@ -969,18 +969,18 @@ spdf <-
 spdf_fortified <- sf::st_as_sf(spdf)
 
 
-# Definir limites de longitude e latitude para focar no Brasil
+# Setting longitude and latitude boundaries to focus on Brazil
 limite_long <- c(-75, -28)  # limites de longitude
 limite_lat <- c(-33, 4)     # limites de latitude
 
-# Criar o mapa
+# Creating map
 
 mapa_rs <-
   cd_oferta_vs_demanda_regiao_saude |>
   left_join(spdf_fortified, 
             by = c("cod_regsaud"="reg_id")) 
 
-# Adicionar geometria se não existir
+# Add geometry if it does not exist
 if (!"geometry" %in% names(mapa_rs)) {
   mapa_rs <- st_as_sf(mapa_rs, 
                       coords = c("longitude", "latitude"), 
@@ -990,6 +990,158 @@ if (!"geometry" %in% names(mapa_rs)) {
 
 ggplot() +
   geom_sf(data = mapa_rs, 
+          aes(fill = rr, geometry = geometry), 
+          color = NA) +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#B8B8B8", 
+          size = 0.1) + 
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#ADBF69",
+                                  "#F2C744"), 
+                       values = rescale(c(0, 
+                                          60, 
+                                          160)), 
+                       limits = c(0, 160)) +  
+  labs(fill = "Taxa RR") +  
+  theme_void() + 
+  facet_grid(~nivel)
+
+```
+
+#### 7.3.2. Results for Oral Health Technician and Assistant
+
+```{r}
+oferta_brasil_tsb_asb <- 
+          oferta_brasil |> 
+              filter(CATEGORIA == "Técnico ou Auxiliar de Saúde Bucal")
+
+cd_oferta_vs_demanda_br_tsb_asb <-
+  necessidades_prof_br |> 
+  left_join(oferta_brasil_tsb_asb, 
+            by = c("cod_municipiodv"="CODUFMUN",
+                   "nivel" = "NIVEL")) 
+
+
+cd_oferta_vs_demanda_br_tsb_asb$FTE_40_linha[is.na(cd_oferta_vs_demanda_br_tsb_asb$FTE_40_linha)] <- 0
+
+
+cd_oferta_vs_demanda_br_tsb_asb$FTE40[is.na(cd_oferta_vs_demanda_br_tsb_asb$FTE40)] <- 0
+
+
+cd_oferta_vs_demanda_br_tsb_asb$FTE_40_direto[is.na(cd_oferta_vs_demanda_br_tsb_asb$FTE_40_direto)] <- 0
+
+
+cd_oferta_vs_demanda_br_tsb_asb <- 
+  cd_oferta_vs_demanda_br_tsb_asb |> 
+  mutate(ra = FTE_40_linha - necessidade, 
+         rr = (FTE_40_linha/necessidade) * 100) |> 
+  mutate(ra = round(ra, 2),
+         rr = round(rr, 2)) |> 
+  mutate(necessidade = round(necessidade, 2)) |>
+  mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
+  select(ibge, municipio, 
+         nivel, necessidade, 
+         FTE_40_linha, rr, ra, cod_municipiodv, 
+         cod_mun_loc)
+
+cd_oferta_vs_demanda_br_tsb_asb 
+```
+
+```{r message=FALSE, warning=FALSE}
+#| warning: false
+
+
+mun2_tsb_asb <- cd_oferta_vs_demanda_br_tsb_asb |> 
+    left_join(mun, by= c("cod_mun_loc" = "code_muni"))
+  
+mun_sf_tsb_asb <- st_as_sf(mun2_tsb_asb)
+
+estados_br <- read_state(year = 2020,
+                         showProgress = FALSE)
+
+ggplot() +
+  geom_sf(data = mun_sf_tsb_asb, aes(fill = rr), 
+          color = NA) +
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#ADBF69", 
+                                  "#F2C744"), 
+                       values = rescale(c(0, 
+                                          50, 
+                                          200)), 
+                       limits = c(0, 200)) +  
+   geom_sf(data = estados_br, 
+            fill = NA, 
+            color = "#B8B8B8", size = 0.1) +
+  labs(fill = "Taxa RR") +  
+  theme_void() + 
+  facet_grid(~nivel)
+```
+
+```{r}
+#| warning: false
+
+# Reading the locality hierarchy database to match municipalities with their respective health regions and thus aggregate data by health region.
+
+hierarquia_municipios <- 
+  read_csv("~/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv")
+
+
+hierarquia <- 
+          hierarquia_municipios |> 
+          select(cod_municipiodv, 
+                 uf_sigla, 
+                 regiao,
+                 cod_regsaud,
+                 regiao_saude)
+
+hierarquia$cod_municipiodv <- 
+  as.character(hierarquia$cod_municipiodv)
+
+cd_oferta_vs_demanda_regiao_saude_tsb_asb <- 
+  cd_oferta_vs_demanda_br_tsb_asb |>
+    left_join(hierarquia, 
+              by = c("cod_mun_loc"="cod_municipiodv")) |> 
+    group_by(nivel, cod_regsaud, uf_sigla,
+             regiao_saude) |> 
+    summarise(necessidade = sum(necessidade),
+              oferta = sum(FTE_40_linha)) |> 
+    mutate(ra = oferta - necessidade, 
+           rr = (oferta/necessidade) * 100) |> 
+    mutate(ra = round(ra, 2),
+           rr = round(rr, 2))
+```
+
+```{r message=FALSE, warning=FALSE}
+#| warning: false
+
+spdf <- 
+  geojson_read("C:/Users/alefs/OneDrive/Documentos/saude_bucal/01_dados/shape_file_regioes_saude.json", what = "sp") 
+
+spdf_fortified <- sf::st_as_sf(spdf)
+
+
+# Setting longitude and latitude boundaries to focus on Brazil
+limite_long <- c(-75, -28)  # limites de longitude
+limite_lat <- c(-33, 4)     # limites de latitude
+
+# Creating map
+
+mapa_rs_tsb_asb <-
+  cd_oferta_vs_demanda_regiao_saude_tsb_asb |>
+  left_join(spdf_fortified, 
+            by = c("cod_regsaud"="reg_id")) 
+
+# Add geometry if it does not exist
+if (!"geometry" %in% names(mapa_rs_tsb_asb)) {
+  mapa_rs_tsb_asb <- st_as_sf(mapa_rs_tsb_asb, 
+                      coords = c("longitude", "latitude"), 
+                      crs = 4326) 
+}
+
+
+ggplot() +
+  geom_sf(data = mapa_rs_tsb_asb, 
           aes(fill = rr, geometry = geometry), 
           color = NA) +
   geom_sf(data = estados_br, 
