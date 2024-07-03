@@ -830,7 +830,7 @@ oferta_brasil
 
 ```
 
-### 7.3. Results implications
+### 7.3. Implications of results in quantitative terms
 
 Now let's compare the available workforce with the demand. For this, we use two references: the workforce.
 
@@ -964,7 +964,7 @@ Script to create the health regions map.
 estados_br <- read_state(year = 2020)
 
 spdf <- 
-  geojson_read("~/GitHub/saude_bucal/01_dados/shape file regioes saude.json", what = "sp") 
+  geojson_read("C:/Users/alefs/OneDrive/Documentos/saude_bucal/01_dados/shape_file_regioes_saude.json", what = "sp") 
 
 spdf_fortified <- sf::st_as_sf(spdf)
 
@@ -1011,6 +1011,8 @@ ggplot() +
 
 #### 7.3.2. Results for Oral Health Technician and Assistant
 
+Below we will calculate the Absolute and Relative Result for oral health technicians and assistants (TSB/ASB), assuming a supply ratio of 1 to 1 with Dental Surgeons.
+
 ```{r}
 oferta_brasil_tsb_asb <- 
           oferta_brasil |> 
@@ -1048,6 +1050,8 @@ cd_oferta_vs_demanda_br_tsb_asb <-
 cd_oferta_vs_demanda_br_tsb_asb 
 ```
 
+Let's generate the visualization using a choropleth map.
+
 ```{r message=FALSE, warning=FALSE}
 #| warning: false
 
@@ -1077,6 +1081,8 @@ ggplot() +
   theme_void() + 
   facet_grid(~nivel)
 ```
+
+According to the results related to oral health technicians and assistants (TSB/ASB), the municipality of Cachoeira Dourada - MG also represents the highest relative result among Brazilian municipalities, at 800% in specialized care with 2.56 professionals for a need of 0.31. Out of the 5,572 Brazilian municipalities, only 491 have their population fully covered by oral health professionals in primary and/or specialized care levels. Considering that nearly half (225) of these covered municipalities are concentrated in the state of Minas Gerais.
 
 ```{r}
 #| warning: false
@@ -1111,6 +1117,8 @@ cd_oferta_vs_demanda_regiao_saude_tsb_asb <-
     mutate(ra = round(ra, 2),
            rr = round(rr, 2))
 ```
+
+Script to create the map of health regions.
 
 ```{r message=FALSE, warning=FALSE}
 #| warning: false
@@ -1159,6 +1167,42 @@ ggplot() +
   theme_void() + 
   facet_grid(~nivel)
 
+```
+
+### 7.4. Implications of results in financial terms
+
+Repeating the calculation of the financial impact as done for Palmas-TO, scaling it to all Brazilian municipalities. We will use average income data according to the Continuous National Household Sample Survey (PNADc) from the Brazilian Institute of Geography and Statistics (IBGE). Firstly, for Dental Surgeons, and finally, for oral health technicians and assistants (TSB/ASB).
+
+#### 7.4.1. Results for dental surgeons
+
+```{r}
+rend_medio <- read_excel("C:/Users/alefs/OneDrive/Documentos/saude_bucal/01_dados/rendimento_saudebocal.xlsx")
+
+custo_sb <- rend_medio |> 
+  mutate(custo_dentista = rend_dentista * 1.42) |> 
+  mutate(custo_aux_sb = rend_aux_sb * 1.42) |> 
+  select(-rend_dentista, -rend_aux_sb)
+
+custo_dentistas <- mun2 |> 
+  left_join(custo_sb, by = c("abbrev_state" = "UF")) |>
+  select(-custo_aux_sb)
+
+custo_dentistas <- custo_dentistas |> 
+  mutate(custo_dent = ra*custo_dentista) |> 
+  select(-custo_dentista)
+```
+
+#### 7.4.2. Results for oral health technicians and assistants (TSB/ASB)
+
+```{r}
+
+custo_tsb_asb <- mun2_tsb_asb |> 
+  left_join(custo_sb, by = c("abbrev_state" = "UF")) |>
+  select(-custo_dentista)
+
+custo_tsb_asb <- custo_tsb_asb |> 
+  mutate(custo_aux = ra*custo_aux_sb) |> 
+  select(-custo_aux_sb)
 ```
 
 ## 8. Sensitivity Analysis
@@ -1291,17 +1335,17 @@ oferta_vs_demanda <- oferta_vs_demanda |>
 
 We use a list of values ​​to iterate as shown in the table below.
 
-+---------------------------------------+-----------+----------------------------------------------+
-| Parâmetro                             | Sigla     | Valores                                      |
-+=======================================+===========+==============================================+
-| Total available time                  | TTD       | in hours: 1576; 1676; 1776; 1876             |
-+---------------------------------------+-----------+----------------------------------------------+
-| Procedure time                        | T         | in minutes: 25, 35, 45, 55                   |
-+---------------------------------------+-----------+----------------------------------------------+
-| Percentage of direct activities       | PD        | in percentage unit: 50%, 60%, 80%, 90%, 100% |
-+---------------------------------------+-----------+----------------------------------------------+
-| Percentage of care pathway activities | PL        | in percentage unit: 50%, 60%, 80%, 90%, 100% |
-+---------------------------------------+-----------+----------------------------------------------+
++---------------------------------------+-------------+----------------------------------------------+
+| Parâmetro                             | Sigla       | Valores                                      |
++=======================================+=============+==============================================+
+| Total available time                  | TTD         | in hours: 1576; 1676; 1776; 1876             |
++---------------------------------------+-------------+----------------------------------------------+
+| Procedure time                        | T           | in minutes: 25, 35, 45, 55                   |
++---------------------------------------+-------------+----------------------------------------------+
+| Percentage of direct activities       | PD          | in percentage unit: 50%, 60%, 80%, 90%, 100% |
++---------------------------------------+-------------+----------------------------------------------+
+| Percentage of care pathway activities | PL          | in percentage unit: 50%, 60%, 80%, 90%, 100% |
++---------------------------------------+-------------+----------------------------------------------+
 
 ```{r}
 #| warning: false
