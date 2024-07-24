@@ -5,9 +5,9 @@ editor: visual
 toc: true
 ---
 
-## Methodological Procedures
+## Methodology
 
-The construction of the Workforce Planning Model (WPM) for oral health based on needs was developed following the guidelines of Asamani et al. (2021), who suggest several steps that will be described in more detail below:
+The construction of a needs-based Workforce Planning Model for oral health was developed following the guidelines of Asamani et al. (2021), who suggest several steps that will be described below:
 
 1.  Definition of the scope of the methodology in terms of jurisdictional coverage, objectives, and time horizon;
 2.  Analysis of oral health needs based on aspects of demography, epidemiology, and the services intended for the local population;
@@ -41,17 +41,17 @@ library(geojsonio)
 
 ```
 
-We will work with two applications (A and B). In part A, for didactic purposes, we applied it to only one municipality. Following that, in section B, we expanded the application to the entire national territory.
+We will present two applications (A and B). In part A, for didactic purposes, presented the application for just one municipality. Following that, in section B, we expanded the application to the entire national territory.
 
 # A) Reduced Application for One Municipality
 
 ## 1. Scope Definition
 
-The methodology aims to estimate the current and required workforce of dentists, dental technicians, and oral health assistants for primary care services in Brazilian municipalities. This includes individual procedures as well as three specialized procedures: endodontics, prosthodontics, and periodontics.
+The methodology aims to estimate the current and required workforce of dentists, dental technicians, and oral health assistants for primary care services in just one municipality (Palmas-TO). This includes individual procedures as well as three specialized procedures: endodontics, prosthodontics, and periodontics.
 
-## 2. Análise das necessidades de saúde bucal
+## 2. Oral Health Needs Analysis
 
-The analysis of oral health needs (NSB) was constructed based on three elements: population distribution by age group (P), prevalence of oral health conditions (H), and procedures per capita (S).
+The oral health needs analysis (OHNA) was constructed based on three elements: population distribution by age group (P), prevalence of oral health conditions (H), and procedures per capita (S).
 
 ![](figuras/equacao1_sb.png){fig-align="center" width="344"}
 
@@ -62,16 +62,17 @@ Where:
 -   H = Prevalence of oral health conditions leading to the need for type t procedures by age group i within locality l;
 -   S = Procedures per capita of type t, for each age group i within locality l.
 
-### 2.1. Raising the age group (P)
+### 2.1. Distribution of age groups (P)
 
-The age group distribution was built based on data from the latest census (2022), available on the IBGE website. For the purpose of illustrating section A, we will focus on just one municipality as an example: Palmas (TO).
+The age group distribution was built based on data from the Brazilian latest census (IBGE, 2022). As mentioned before, we will focus on just one municipality as an example: Palmas (TO).
 
 ```{r}
 # Reading population data
-pop_tocantins <- read_excel("~/GitHub/saude_bucal/01_dados/pop_tocantins.xlsx")
+pop_tocantins <- 
+  read_excel("~/GitHub/saude_bucal/01_dados/pop_tocantins.xlsx")
 
 
-# Filtering Palmas data, stacking age group variable, and creating an ID representing each age group
+# Filtering Palmas-TO city data, stacking age group variable, and creating an ID representing each age group
 pop_palmas <- pop_tocantins |> 
                   filter(ibge == "1721000") |> 
                   select(ibge, Município, de_0_a_14_anos,
@@ -90,7 +91,7 @@ pop_palmas <- pop_tocantins |>
 
 ```
 
-We note that the age group from 30 to 59 years has a higher frequency compared to others, as shown in the graph below.
+We note that the age group from 30 to 59 years has the highest frequency, as shown in the graph below.
 
 ```{r}
 
@@ -102,38 +103,48 @@ ordem <- c("de 0 a 14 anos",
 pop_palmas$faixa <- factor(pop_palmas$faixa, levels = ordem)
 
 
-pop_palmas |> 
+pop_palmas |>
+  mutate(faixa = 
+           case_when(
+             faixa == "de 0 a 14 anos" ~ "from 0 to 14 years old",
+             faixa == "de 15 a 29 anos" ~ "from 15 to 29 years old",
+             faixa == "de 30 a 59 anos" ~ "from 30 to 59 years old",
+             faixa == "acima de 60 anos" ~ "over 60 years old")) |> 
   ggplot(aes(x = faixa, y = total)) + geom_col() +
   theme_minimal() + coord_flip() + 
+  xlab(" ") +
   theme(axis.title.x = element_text(size = 16),
         axis.title.y = element_text(size = 16),
         axis.text = element_text(size = 16)) + 
-  ggtitle("Distribuição de faixa etária por município")
-
+  ggtitle("Population distribution by age group")
 
 ```
 
-The census includes other age group divisions. We used these to standardize with the data for the next parameter H, calculated from the SB 2010 survey (next subsection).
+### 2.2. Oral health coverage based in some conditions (H)
 
-### 2.2. Prevalence of oral health conditions (H)
+The Brazilian Ministry of Health provides several parameters regarding oral health (Brasil, 2021). One of these parameters is the coverage of oral health services, calculated according to Brazil's most importante oral health survey (SB 2010). There are parameters for each age group and type of procedure, as explained below.
 
-The Ministry of Health, through the document "Assistance Parameters for Ambulatory and Hospital Programing under SUS" (Brazil, 2021), regulated by Consolidation Ordinance No. 1 of 2017, provides a series of parameters regarding oral health. One of these parameters is the coverage of health services, calculated based on the SB 2010 survey for each age group and type of procedure, as explained below. It's important to note that due to the structure of the SB 2010 survey, these parameters were calculated for state capitals or regional interior areas.
+Given SB 2010's structure, these parameters were calculated for each state capital and countryside municipalities.
 
-+--------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Área                     | Expressões usadas para cálculo de cobertura                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-+==========================+=============================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
-| Primary care             | NT_1 (Number of teeth needing restoration of 1 surface) + NT_2 (Number of teeth needing restoration of 2 or more surfaces) + NT_6 (Number of teeth needing extraction) + NT_7 (Number of teeth needing control of white lesions) + NT_8 (Number of teeth needing sealant) + P_CALC (Calculation prevalence) + P_BR (Prevalence of shallow pockets). Then, the variable COB_AB was created. If COB_AB = 0, the individual does not require basic care procedures; if COB_AB = 1, they do require. The coverage of basic care was then estimated by the percentage of people with COB_AB = 1. |
-+--------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Endodontics              | The coverage of endodontics was calculated using the variable NT_5 (Number of teeth needing pulp treatment + restoration). A variable ENDO was created where ENDO = 0 if NT_5 = 0 and ENDO = 1 if NT_5 ≠ 0. Thus, the coverage of endodontics was estimated by the percentage of people with ENDO = 1.                                                                                                                                                                                                                                                                                      |
-+--------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Specialized periodontics | The coverage of specialized periodontics was estimated by the percentage of people with the variable P_BP (Prevalence of deep pockets) = 1.                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-+--------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Prosthodontics           | The coverage of prosthodontics was calculated by the percentage of people with the variable NECPROT (General need for prosthesis) ≠ 0.                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-+--------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++--------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Área                     | Oral Health Coverage                                                                                                                                                                                                                                                                                                                                                                     |
++==========================+==========================================================================================================================================================================================================================================================================================================================================================================================+
+| Primary care             | NT_1 (Number of teeth needing restoration of 1 surface) + NT_2 (Number of teeth needing restoration of 2 or more surfaces) + NT_6 (Number of teeth needing extraction) + NT_7 (Number of teeth needing control of white lesions) + NT_8 (Number of teeth needing sealant) + P_CALC (Calculation prevalence) + P_BR (Prevalence of shallow pockets) results in a variable called COB_AB.  |
+|                          |                                                                                                                                                                                                                                                                                                                                                                                          |
+|                          | If COB_AB = 0, the individual does not require primary care procedures; if COB_AB = 1, the individual does require. The coverage of basic care was then estimated by the percentage of people with COB_AB = 1.                                                                                                                                                                           |
++--------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Endodontics              | The coverage of endodontics was calculated using the variable NT_5 (Number of teeth needing pulp treatment + restoration).                                                                                                                                                                                                                                                               |
+|                          |                                                                                                                                                                                                                                                                                                                                                                                          |
+|                          | A variable ENDO was created where ENDO = 0 if NT_5 = 0 and ENDO = 1 if NT_5 ≠ 0. Thus, the coverage of endodontics was estimated by the percentage of people with ENDO = 1.                                                                                                                                                                                                              |
++--------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Specialized periodontics | The coverage of specialized periodontics was estimated by the percentage of people with the variable P_BP (Prevalence of deep periodontal pockets) = 1.                                                                                                                                                                                                                                  |
++--------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Prosthodontics           | The coverage of prosthodontics was calculated by the percentage of people with the variable NECPROT (General need for prosthesis) ≠ 0.                                                                                                                                                                                                                                                   |
++--------------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
-: Source: Brazil (2021)
+: Source: Brasil (2021)
 
-The document "Assistance Parameters for Ambulatory and Hospital Programing under SUS" (Brazil, 2021) already provides these calculated data for the coverage of each type of procedure and age group.
+The coverage for each age group .
 
 ```{r}
 #| warning: false
@@ -148,7 +159,13 @@ cobertura_sb <-
 
 cobertura_sb |> 
   filter(ibge == "172100") |> 
-  select(-li_cobertura, 
+  rename(municipality = municipio,
+         procedure = procedimento, 
+         age_group = faixa_etaria,
+         coverage = cobertura) |> 
+  select(-ibge,
+         -id_faixa,
+         -li_cobertura, 
          -ls_cobertura) 
   
 ```
@@ -173,30 +190,35 @@ pop_coberta_palmas <-
 # View
 
 pop_coberta_palmas |> 
-  select(ibge, municipio, faixa, 
+  select(municipio, faixa, 
          total, procedimento, 
-         cobertura, populacao_coberta) 
+         cobertura, populacao_coberta) |> 
+  rename(municipality = municipio,
+         procedure = procedimento, 
+         age_group = faixa,
+         coverage = cobertura,
+         covered_pop = populacao_coberta)
 
 ```
 
 ### 2.3. Normative parameters of procedures per capita (S)
 
-The calculations of normative need per procedure per capita (S) were also estimated in the parameters handbook according to the following table.
+The calculations of normative need for procedures per capita (S) were also estimated based on the parameters of the Brazilian oral health survey (SB 2010).
 
 +----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Area           | Procedures                                                                                                                                                                                                                                                                                  |
 +================+=============================================================================================================================================================================================================================================================================================+
-| Primary care   | In the SB BRASIL 2010 project database, the codes 0 (healthy), A (not examined), and X (excluded) for the variables CPI17, CPI11, CPI27, CPI37, CPI31, and CPI47 were transformed into 0, and codes 2 (calculus) and 3 (shallow pocket) were transformed into 1 for these variables.        |
+| Primary care   | In SB 2010 database, the codes 0 (healthy), A (not examined), and X (excluded) for the variables CPI17, CPI11, CPI27, CPI37, CPI31, and CPI47 were transformed into 0, and codes 2 (calculus) and 3 (shallow pocket) were transformed into 1 for these variables.                           |
 |                |                                                                                                                                                                                                                                                                                             |
 |                | Subsequently, these variables were summed, and the variable NECPERIO_AB was created to store this sum.                                                                                                                                                                                      |
 |                |                                                                                                                                                                                                                                                                                             |
-|                | The values for variables NT_1, NT_2, NT_6, NT_7, and NT_8 were summed to form the variable NEC_AB. Finally, NECPERIO_AB and NEC_AB were summed to obtain the variable NEC_AB_TOTAL.                                                                                                         |
+|                | The values for variables NT_1, NT_2, NT_6, NT_7, and NT_8 were summed and stored into the variable NEC_AB. Finally, NECPERIO_AB and NEC_AB were summed to obtain the variable NEC_AB_TOTAL.                                                                                                 |
 |                |                                                                                                                                                                                                                                                                                             |
-|                | The average of the variable NEC_AB_TOTAL was then obtained, stratified by age and geographic domains (capitals and interior).                                                                                                                                                               |
+|                | The average of the variable NEC_AB_TOTAL was then obtained, stratified by age and geographic domains (state capitals and countryside).                                                                                                                                                      |
 +----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 | Endodontics    | The average of the variable NT_5 (Number of teeth needing pulp treatment + restoration) was obtained, stratified by age and geographic domains (capitals and interior).                                                                                                                     |
 +----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Periodontics   | In the SB BRASIL 2010 project database, the codes 0 (healthy), A (not examined), and X (excluded) for the variables CPI17, CPI11, CPI27, CPI37, CPI31, and CPI47 were transformed into 0, and codes 4 (deep pocket) were transformed into 1 for these variables.                            |
+| Periodontics   | In SB 2010 database, the codes 0 (healthy), A (not examined), and X (excluded) for the variables CPI17, CPI11, CPI27, CPI37, CPI31, and CPI47 were transformed into 0, and codes 4 (deep pocket) were transformed into 1 for these variables.                                               |
 |                |                                                                                                                                                                                                                                                                                             |
 |                | Subsequently, these variables were summed, and the variable NECPERIO_ESPEC was created to store this sum.                                                                                                                                                                                   |
 |                |                                                                                                                                                                                                                                                                                             |
@@ -225,7 +247,7 @@ The calculations of normative need per procedure per capita (S) were also estima
 
 : Source: Brazil (2021)
 
-he code below accesses normative production data in Palmas, TO.
+The code below accesses normative production data in Palmas, TO.
 
 ```{r}
 #| warning: false
@@ -262,7 +284,7 @@ necessidades_servicos <- pop_coberta_palmas |>
 
 ## 3. Converting the number of services into the number of required professionals
 
-Step 3 consists of translating the number of services, calculated by equation 1, into the number of required professionals (NPSB). For this, two elements must be considered: productivity (T) and total available time (TTD).
+Step 3 consists of translating the number of services, calculated by equation 1, into the number of required professionals (NPSB). For this, two elements must be considered: productivity (T) and available working time (AWT or TTD in portuguese).
 
 ![](figuras/eq2_sb.png){fig-align="center" width="260"}
 
@@ -276,9 +298,9 @@ Where:
 
 -   TTD = Total available time for a professional over a year.
 
-We will use an average consultation time (T) of 25 minutes. This value was based on a time-motion study conducted to measure the average time of procedures performed by oral health teams in basic health units in São Paulo, Brazil (Bellotti et al., 2024).
+We will use an average consultation time (T) of 25 minutes. This value was based on a time-motion study conducted to measure the average time of procedures performed by oral health teams in primary care health units in São Paulo, Brazil (Bellotti et al., 2024).
 
-Total available time (TTD) corresponds to a professional's time minus programmed absences (e.g., vacations, holidays) and non-programmed absences (e.g., sick leave). We will use an estimated TTD of 1576 hours, often used for nurses as a reference. Unfortunately, we couldn't find studies that have specifically measured TTD for dentists in Brazil.
+Available Working Time corresponds to a professional's time considering programmed absences (e.g., vacations, holidays) and non-programmed absences (e.g., absence due to health reason). We will use an estimated TTD of 1576 hours, often used for nurses since we don't have any TTD measured for dentists in Brazil.
 
 This result indicates how many dentists per month are needed over a year to meet the population's oral health needs.
 
@@ -299,7 +321,12 @@ necessidades_prof_palmas <-
                           summarise(necessidade = sum(nec_prof)) |> 
                           mutate(necessidade = round(necessidade, 2))
                           
-necessidades_prof_palmas      
+necessidades_prof_palmas  |> 
+  ungroup() |> 
+  select(-ibge) |> 
+  rename(municipality = municipio,
+         level = nivel, 
+         need = necessidade)
   
 ```
 
@@ -315,7 +342,7 @@ The next steps consist of several stages:
 
 ### 4.1. Obtaining the supply of professionals
 
-To access the supply of professionals, it was necessary to query the National Register of Health Establishments - Professionals Table (CNES-PF). Since professionals may have multiple affiliations, the counting was standardized using Full-time Equivalent (FTE), based on the contracted workload.
+To access the supply of professionals, we accessed the National Register of Health Establishments - Professionals Table (*Cadastro Nacional de Estabelecimentos de Saúde*, CNES-PF, in portuguese). Since professionals may have multiple affiliations, the counting was standardized using Full-time Equivalent (FTE), based on the professional's contracted workload.
 
 ```{r}
 # Code to access data from our own datalake 
@@ -347,7 +374,7 @@ oferta <- sqlQuery(channel, query,
 
 ```
 
-The SQL query that generated the query is described below. We accessed data from all municipalities for the COMPETEN (month and year) of January 2024. Data were accessed for Dentists and Oral Health Technicians and Assistants. We accessed records of professionals working in the Unified Health System (SUS) and supplementary health care, starting from the variable PROF_SUS. For an initial analysis, we will simulate only for the subset of SUS professionals.
+The SQL query that generated this dataset is described below. We accessed data from all municipalities for the COMPETEN (month and year) of January 2024. Data were accessed for Dentists and Oral Health Technicians and Assistants. We accessed records of professionals working in the Unified Health System (SUS) and supplementary health care, starting from the variable PROF_SUS. For an initial analysis, we will simulate only for the subset of SUS professionals.
 
 Data was accessed from the following types of units (TP_UNID):
 
@@ -357,9 +384,9 @@ Primary Health Care (PHC)
 
 -   02 - Health Center/Basic Unit
 
--   32 - River Mobile Unit
+-   32 - River Mobile Health Unit
 
--   40 - Land Mobile Unit
+-   40 - Land Mobile Health Unit
 
 Specialized Health Care (SHC)
 
@@ -369,11 +396,9 @@ Specialized Health Care (SHC)
 
 -   04 - Polyclinic
 
--   22 - Isolated Office
+-   22 - Isolated Clinic
 
-Workforce operating in hospitals was not included, given the scope of the methodology.
-
-3.5
+Hospital workforce was not included, given the scope of the methodology.
 
 ``` sql
 
@@ -441,7 +466,7 @@ SELECT p.CODUFMUN,
                 ON CAST(P.CODUFMUN AS INTEGER) = q.cod_municipio 
 ```
 
-Vamos filtrar apenas para acessar dados de Palmas (TO) e profissionais atuando no SUS.
+The following script filters data from Palmas (TO) and SUS workforce.
 
 ```{r}
 #| warning: false
@@ -466,7 +491,7 @@ oferta_palmas <-
 
 ### 4.2. Calculation of net offering value
 
-The calculation of the net value of the offer is done using formula 3:
+The calculation of the net value of the supply is performed according to equation 3:
 
 ![](figuras/eq3_sb.png){fig-align="center" width="260"}
 
@@ -477,7 +502,7 @@ Where:
 -   AD = Percentage of workload dedicated to direct activities (%);
 -   FC = Percentage of workload dedicated to a clinical focus (%).
 
-We do not have numbers associated with AD and FC. We will use the values ​​below, however, thinking about the simulation later.
+We do not have numbers associated with AD and FC. We will use the values ​​below, however, it is important to simulate them.
 
 ```{r}
 
@@ -487,17 +512,23 @@ oferta_palmas <-
   mutate(FTE_40_direto = FTE40 * 0.80) |> 
   mutate(FTE_40_linha = FTE_40_direto * 0.80)
 
-oferta_palmas
+oferta_palmas |> 
+  select(-CODUFMUN) |> 
+  rename(health_professional = CATEGORIA,
+         level = NIVEL,
+         direct_care_fte40 = FTE_40_direto,
+         clinical_focus_fte40 = FTE_40_linha) 
+         
 
 ```
 
 ### 4.3. Implications of results in quantitative terms
 
-Finally, calculations are made between supply and demand. Two metrics are applied:
+Finally, calculations are made to compare supply and need. Two metrics are applied:
 
--   Absolute Result (RA), which refers to the difference between supply and demand, according to equation 4;
+-   Absolute Result (RA), which refers to the difference between supply and need, according to equation 4;
 
--   Relative Result (RR) refers to the percentage difference between supply and demand, according to equation 5.
+-   Relative Result (RR) refers to the percentage difference between supply and need, according to equation 5.
 
 ![](figuras/eq4_sb.png){fig-align="center" width="260"}
 
@@ -541,15 +572,21 @@ oferta_vs_demanda <-
 oferta_vs_demanda |>
   mutate(necessidade = round(necessidade, 2)) |>
   mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
-  select(ibge, municipio, 
+  select(municipio, 
          nivel, necessidade, 
-         FTE_40_linha, rr, ra) 
+         FTE_40_linha, rr, ra) |> 
+  rename(municipality = municipio,
+         level = nivel, 
+         need = necessidade, 
+         FTE40_focus = FTE_40_linha,
+         relative_result = rr,
+         absolute_result = ra)
 
 ```
 
-### 4.4. Implications of results in financial terms
+### 4.4. Financial implications of results
 
-Finally, it is suggested to calculate the financial impact of this gap. This can be done by multiplying the RA by the average salary of dental surgeons in Palmas-TO added to a labor cost. According to data from the continuous National Household Sampling Survey (PNADc) of the Brazilian Institute of Geography and Statistics (IBGE), the average salary is in the order of 4000. Added to a factor to calculate the labor cost (1.42), it has see the results in the following table.
+Finally, it is suggested to calculate the financial impact of this gap. The average salary of dental surgeons in Palmas-TO is R\$ 4000 according to Continuous National Household Sampling Survey (PNADc) of the Brazilian Institute of Geography and Statistics (IBGE). We added a multiplicative factor for labor costs (1.42). These procedure result in the following table.
 
 ```{r}
 
@@ -559,28 +596,32 @@ custo_palmas <-
   select(ibge, municipio, nivel, CATEGORIA,
          custo)
   
-custo_palmas 
+custo_palmas |> 
+  rename(municipality = municipio,
+         level = nivel, 
+         professional = CATEGORIA,
+         cost = custo)
 
 ```
 
-# B) Aplication for Brazil
+# B) Application for Brazil
 
-The same methodology used for the municipality of Palmas-TO will be scaled for each Brazilian municipality. Below we detail the analysis structured in stages.
+The same methodology will be scaled for each Brazilian municipality. Below we detail the analysis structured in stages.
 
 ## 5. Analysis of oral health needs for Brazil
 
-The analysis of oral health needs (NSB) was constructed from three elements: distribution of the population by age group (P), prevalence of oral health conditions (H) and procedures per capita (S).
+The analysis of oral health needs (NSB) was built based on three elements: distribution of the population by age group (P), prevalence of oral health conditions (H) and procedures per capita (S).
 
-### 5.1. Raising the age group (P) - Brazil
+### 5.1. Distribution of age groups (P) - Brazil
 
-The distribution by age group (P) was constructed based on data from the last census (2022) and is available on the IBGE page.
+The distribution by age group (P) was based on Brazil's last census (2022).
 
 ```{r}
 
 # reading census data 
 pop_brasil <- read_excel("~/GitHub/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
 
-# trying to adjust each age group
+# adjust each age group
 pop_brasil_tratado <- pop_brasil |>
                   select(cod_municipiodv, 
                          ibge_sb, municipio, 
@@ -621,20 +662,29 @@ pop_brasil_tratado$faixa <- factor(pop_brasil_tratado$faixa,
 
 
 pop_brasil_tratado |> 
-  ggplot(aes(x = faixa, 
-             y = total)) + 
-  geom_col() +
-  theme_minimal() + 
-  coord_flip() + 
+mutate(faixa = 
+           case_when(
+             faixa == "de 0 a 14 anos" ~ "from 0 to 14 years old",
+             faixa == "de 15 a 29 anos" ~ "from 15 to 29 years old",
+             faixa == "de 30 a 59 anos" ~ "from 30 to 59 years old",
+             faixa == "acima de 60 anos" ~ "over 60 years old")) |> 
+  ggplot(aes(x = faixa, y = total)) + geom_col() +
+  theme_minimal() + coord_flip() + 
+  xlab(" ") +
   theme(axis.title.x = element_text(size = 16),
         axis.title.y = element_text(size = 16),
         axis.text = element_text(size = 16)) + 
-  ggtitle("Distribuição de faixa etária por município")
+  ggtitle("Population distribution by age group")
+
 ```
 
-### 5.2. Prevalence of oral health conditions (H) - Brazil.
+### 5.2. Oral health coverage based on conditions (H) - Brazil
 
-Let's read the procedure coverage data for each age group across all municipalities in Brazil to subsequently calculate the prevalence of oral health conditions (H). As observed in the table, the capitals of all states have associated coverage values. However, municipalities in the interior do not have individualized coverage but rather a parameter corresponding to the interior of the region (e.g., the municipality of Formosa-GO is in the interior of the Midwest Region, so we use the parameter for the interior of the Midwest Region).
+The script below is used to read the oral health coverage (H) for each age group across all municipalities in Brazil.
+
+The capitals of all states have associated coverage values. However, municipalities in the countryside do not have individualized coverage but rather a parameter corresponding to the region.
+
+The municipality of Formosa is located in the state of Goiás, which is part of the Midwest Region, so we use the parameter for the countryside of the Midwest Region).
 
 ```{r}
 #| warning: false
@@ -1335,17 +1385,17 @@ oferta_vs_demanda <- oferta_vs_demanda |>
 
 We use a list of values ​​to iterate as shown in the table below.
 
-+---------------------------------------+-------------+----------------------------------------------+
-| Parâmetro                             | Sigla       | Valores                                      |
-+=======================================+=============+==============================================+
-| Total available time                  | TTD         | in hours: 1576; 1676; 1776; 1876             |
-+---------------------------------------+-------------+----------------------------------------------+
-| Procedure time                        | T           | in minutes: 25, 35, 45, 55                   |
-+---------------------------------------+-------------+----------------------------------------------+
-| Percentage of direct activities       | PD          | in percentage unit: 50%, 60%, 80%, 90%, 100% |
-+---------------------------------------+-------------+----------------------------------------------+
-| Percentage of care pathway activities | PL          | in percentage unit: 50%, 60%, 80%, 90%, 100% |
-+---------------------------------------+-------------+----------------------------------------------+
++---------------------------------------+--------------+----------------------------------------------+
+| Parâmetro                             | Sigla        | Valores                                      |
++=======================================+==============+==============================================+
+| Total available time                  | TTD          | in hours: 1576; 1676; 1776; 1876             |
++---------------------------------------+--------------+----------------------------------------------+
+| Procedure time                        | T            | in minutes: 25, 35, 45, 55                   |
++---------------------------------------+--------------+----------------------------------------------+
+| Percentage of direct activities       | PD           | in percentage unit: 50%, 60%, 80%, 90%, 100% |
++---------------------------------------+--------------+----------------------------------------------+
+| Percentage of care pathway activities | PL           | in percentage unit: 50%, 60%, 80%, 90%, 100% |
++---------------------------------------+--------------+----------------------------------------------+
 
 ```{r}
 #| warning: false
