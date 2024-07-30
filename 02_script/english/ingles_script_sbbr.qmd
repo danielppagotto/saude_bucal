@@ -1,0 +1,1524 @@
+---
+title: "Saúde Bucal - material suplementar"
+format: html
+editor: visual
+toc: true
+---
+
+## Methodology
+
+The construction of a needs-based Workforce Planning Model for oral health was developed following the guidelines of Asamani et al. (2021), who suggest several steps that will be described below:
+
+1.  Definition of the scope of the methodology in terms of jurisdictional coverage, objectives, and time horizon;
+2.  Analysis of oral health needs based on aspects of demography, epidemiology, and the services intended for the local population;
+3.  Translation of the number of services into the number of professionals needed;
+4.  Exploration of the implications in terms of resources, such as the current supply of professionals and costs;
+5.  Sensitivity analysis for simulating uncertainty parameters;
+6.  Model validation through stakeholder consultation.
+
+## Setting Up the R Environment
+
+Loading R packages.
+
+```{r}
+#| warning: false
+
+options(scipen = 999)
+
+library(readxl)
+library(tidyverse)
+library(DT)
+library(RODBC)
+library(dplyr)
+library(sf)
+library(ggplot2)
+library(geobr)
+library(scales)
+library(sf) 
+library(ggrepel) 
+library(ggspatial) 
+library(geojsonio)
+
+```
+
+This document has two sections: A and B. Section A is a reduced application for just one municipality. Section B describes an application to 5570 municipalities of the whole national territory.
+
+# A) Reduced Application for One Municipality
+
+## 1. Scope Definition
+
+This methodology aims to estimate the current and required workforce of dentists, dental technicians and oral health assistants for primary care and specialized services (endodontics, prosthodontics, and periodontics) in just one municipality, Palmas which is the capital of Tocantins (TO) state.
+
+## 2. Oral Health Needs Analysis
+
+The oral health needs analysis (OHNA) was calculated based on three elements: population distribution by age group (P), prevalence of oral health conditions (H), and per capita services (S).
+
+![](images/equacao1_sb.png){fig-align="center"}
+
+Where:
+
+-   NSB = Oral health need is the number of type t services delivered to population of age group i and locality l;
+-   P = Population by age group i in a locality l;
+-   H = Prevalence of oral health conditions leading to the need for type t procedures by age group i within locality l;
+-   S = Procedures per capita of type t, for each age group i within locality l.
+
+### 2.1. Distribution of age groups (P)
+
+The age group distribution was built based on data from the last Brazilian census (IBGE, 2022). We will filter the municipality of Palmas (TO).
+
+```{r}
+# Reading population data
+
+pop_tocantins <- 
+  read_excel("~/GitHub/saude_bucal/01_dados/pop_tocantins.xlsx")
+
+
+# Filtering Palmas-TO city data, stacking age group variable, and creating an ID representing each age group
+pop_palmas <- pop_tocantins |> 
+                  filter(ibge == "1721000") |> 
+                  select(ibge, Município, de_0_a_14_anos,
+                         de_15_a_29_anos, de_30_a_59_anos,
+                         acima_de_60_anos) |> 
+                  gather(key = "faixa", 
+                         value = "total",
+                         3:6) |> 
+                  mutate(faixa = gsub("_"," ",faixa)) |> 
+                  mutate(ibge = as.character(ibge)) |> 
+                  mutate(ibge = substr(ibge, 1, 6)) |> 
+                  mutate(id_faixa = case_when(faixa == "de 0 a 14 anos" ~ 1,
+                                              faixa == "de 15 a 29 anos" ~ 2,
+                                              faixa == "de 30 a 59 anos" ~ 3,
+                                              faixa == "acima de 60 anos" ~ 4))
+
+```
+
+We note that the age group from 30 to 59 years has the highest frequency, as shown in the graph below.
+
+```{r}
+
+ordem <- c("de 0 a 14 anos",
+           "de 15 a 29 anos",
+           "de 30 a 59 anos",
+           "acima de 60 anos")
+
+pop_palmas$faixa <- factor(pop_palmas$faixa, levels = ordem)
+
+
+pop_palmas |>
+  mutate(faixa = 
+           case_when(
+             faixa == "de 0 a 14 anos" ~ "from 0 to 14 years old",
+             faixa == "de 15 a 29 anos" ~ "from 15 to 29 years old",
+             faixa == "de 30 a 59 anos" ~ "from 30 to 59 years old",
+             faixa == "acima de 60 anos" ~ "over 60 years old")) |> 
+  ggplot(aes(x = faixa, 
+             y = total)) + geom_col() +
+  theme_minimal() + coord_flip() + 
+  xlab(" ") +
+  theme(axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text = element_text(size = 16)) + 
+  ggtitle("Population distribution by age group")
+
+```
+
+### 2.2. Oral health coverage (H)
+
+The Brazilian Ministry of Health provides several parameters regarding oral health services (Brasil, 2021). One of these parameters is the coverage of oral health services, calculated according to Brazil's most importante oral health survey (SB 2010). There are parameters for each age group and type of procedure, as explained below.
+
+Given SB 2010's structure, these parameters were calculated for each state capital and countryside municipalities.
+
++--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Área                     | Oral Health Coverage                                                                                                                                                                                                                                                                                                                                                                    |
++==========================+=========================================================================================================================================================================================================================================================================================================================================================================================+
+| Primary care             | NT_1 (Number of teeth needing restoration of 1 surface) + NT_2 (Number of teeth needing restoration of 2 or more surfaces) + NT_6 (Number of teeth needing extraction) + NT_7 (Number of teeth needing control of white lesions) + NT_8 (Number of teeth needing sealant) + P_CALC (Calculation prevalence) + P_BR (Prevalence of shallow pockets) results in a variable called COB_AB. |
+|                          |                                                                                                                                                                                                                                                                                                                                                                                         |
+|                          | If COB_AB = 0, the individual does not require primary care procedures; if COB_AB = 1, the individual does require. The coverage of basic care was then estimated by the percentage of people with COB_AB = 1.                                                                                                                                                                          |
++--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Endodontics              | The coverage of endodontics was calculated using the variable NT_5 (Number of teeth needing pulp treatment + restoration).                                                                                                                                                                                                                                                              |
+|                          |                                                                                                                                                                                                                                                                                                                                                                                         |
+|                          | A variable ENDO was created where ENDO = 0 if NT_5 = 0 and ENDO = 1 if NT_5 ≠ 0. Thus, the coverage of endodontics was estimated by the percentage of people with ENDO = 1.                                                                                                                                                                                                             |
++--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Specialized periodontics | The coverage of specialized periodontics was estimated by the percentage of people with the variable P_BP (Prevalence of deep periodontal pockets) = 1.                                                                                                                                                                                                                                 |
++--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Prosthodontics           | The coverage of prosthodontics was calculated by the percentage of people with the variable NECPROT (General need for prosthesis) ≠ 0.                                                                                                                                                                                                                                                  |
++--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+: Source: Brasil (2021)
+
+The oral health coverage for each age group and oral health condition is presented below.
+
+```{r}
+#| warning: false
+
+# Reading coverage data for each oral health procedure
+
+cobertura_sb <-
+  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx") |>  
+  mutate(ibge = substr(ibge, 1, 6))
+
+# Filtering for Palmas, TO
+
+cobertura_sb |> 
+  filter(ibge == "172100") |> 
+  rename(municipality = municipio,
+         procedure = procedimento, 
+         age_group = faixa_etaria,
+         coverage = cobertura) |> 
+  select(-ibge,
+         -id_faixa,
+         -li_cobertura, 
+         -ls_cobertura) 
+  
+```
+
+Considering the population (P) and oral health coverage (H) for each condition, we have the following results:
+
+```{r}
+
+# Combining through left_join the population (IBGE) and coverage tables for each type of service (H).
+
+pop_coberta_palmas <- 
+  pop_palmas |> 
+  left_join(cobertura_sb, 
+            by = c("ibge","id_faixa")) |> 
+  select(ibge, municipio, 
+         faixa, id_faixa, 
+         total, procedimento, 
+         cobertura) |> 
+  mutate(populacao_coberta = cobertura * total) |> 
+  mutate(populacao_coberta = round(populacao_coberta, 2))
+
+# Showing results
+
+pop_coberta_palmas |> 
+  select(municipio, faixa, 
+         total, procedimento, 
+         cobertura, populacao_coberta) |> 
+  rename(municipality = municipio,
+         procedure = procedimento, 
+         age_group = faixa,
+         coverage = cobertura,
+         covered_pop = populacao_coberta)
+
+```
+
+### 2.3. Normative parameters of procedures per capita (S)
+
+The calculations of normative need for procedures per capita (S) were also estimated based on the parameters of the Brazilian oral health survey (SB 2010).
+
++----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Area           | Procedures                                                                                                                                                                                                                                                                                  |
++================+=============================================================================================================================================================================================================================================================================================+
+| Primary care   | In SB 2010 database, the codes 0 (healthy), A (not examined), and X (excluded) for the variables CPI17, CPI11, CPI27, CPI37, CPI31, and CPI47 were transformed into 0, and codes 2 (calculus) and 3 (shallow pocket) were transformed into 1 for these variables.                           |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | Subsequently, these variables were summed, and the variable NECPERIO_AB was created to store this sum.                                                                                                                                                                                      |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | The values for variables NT_1, NT_2, NT_6, NT_7, and NT_8 were summed and stored into the variable NEC_AB. Finally, NECPERIO_AB and NEC_AB were summed to obtain the variable NEC_AB_TOTAL.                                                                                                 |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | The average of the variable NEC_AB_TOTAL was then obtained, stratified by age and geographic domains (state capitals and countryside).                                                                                                                                                      |
++----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Endodontics    | The average of the variable NT_5 (Number of teeth needing pulp treatment + restoration) was obtained, stratified by age and geographic domains (capitals and interior).                                                                                                                     |
++----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Periodontics   | In SB 2010 database, the codes 0 (healthy), A (not examined), and X (excluded) for the variables CPI17, CPI11, CPI27, CPI37, CPI31, and CPI47 were transformed into 0, and codes 4 (deep pocket) were transformed into 1 for these variables.                                               |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | Subsequently, these variables were summed, and the variable NECPERIO_ESPEC was created to store this sum.                                                                                                                                                                                   |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | The average of the variable NECPERIO_ESPEC was then obtained, stratified by age and geographic domains (capitals and interior). For ages 5 and 12 years, this variable was not measured in the SB BRASIL 2010 project, so there is no normative need data available for the 0-14 age group. |
++----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Prosthodontics | The variable NECPROT was transformed into NUMPROT (number of prostheses) as specified below:                                                                                                                                                                                                |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | -   If NECPROT = 0 (Does not need), then NUMPROT = 0                                                                                                                                                                                                                                        |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | -   If NECPROT = 1 (Partial 1 upper jaw), then NUMPROT = 1                                                                                                                                                                                                                                  |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | -   If NECPROT = 2 (Partial 2 upper jaws), then NUMPROT = 2                                                                                                                                                                                                                                 |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | -   If NECPROT = 3 (Total 1 upper jaw), then NUMPROT = 3                                                                                                                                                                                                                                    |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | -   If NECPROT = 4 (Partial + total), then NUMPROT = 2                                                                                                                                                                                                                                      |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | -   If NECPROT = 5 (Total 2 upper jaws), then NUMPROT = 2                                                                                                                                                                                                                                   |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | -   If NECPROT = 9 (No information), then NUMPROT = 0                                                                                                                                                                                                                                       |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | Then, the average of the variable NUMPROT was obtained, stratified by age and geographic domains (capitals and interior).                                                                                                                                                                   |
+|                |                                                                                                                                                                                                                                                                                             |
+|                | For ages 5 and 12 years, this variable was not measured in the SB BRASIL 2010 project, so there is no normative need data available for the 0-14 age group.                                                                                                                                 |
++----------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+: Source: Brazil (2021)
+
+The code below accesses normative production data in Palmas, TO.
+
+```{r}
+#| warning: false
+
+# Reading the data
+producao_normativa <- 
+  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx",
+    sheet = "Produção normativa", 
+    col_types = c("text","text", "text", 
+                  "text", "numeric","numeric", 
+                  "numeric", "numeric")) |>  
+  mutate(ibge = substr(ibge, 1, 6))
+
+# Filtring Palmas-TO
+producao_palmas <- producao_normativa |> 
+                      filter(ibge == "172100") |> 
+                      select(-municipio, 
+                             -li_cobertura,
+                             -ls_cobertura,
+                             -faixa_etaria)
+
+# Merging the table of normative production (S) to calculate NSB by multiplying covered population and production per capita.
+
+necessidades_servicos <- pop_coberta_palmas |> 
+                            left_join(producao_palmas, 
+                                      by = c("ibge",
+                                             "id_faixa",
+                                             "procedimento")) |> 
+                            mutate(nec_servicos = 
+                                  populacao_coberta * producao_pc) |> 
+                            mutate(nec_servicos = 
+                                  round(nec_servicos, 2))
+```
+
+## 3. Translating the number of services into the number of required professionals
+
+Step 3 consists of translating the number of services, calculated by equation 1, into the number of required professionals (NPSB). For this, two elements must be considered: productivity (T) and available working time (AWT or TTD in portuguese).
+
+![](images/eq2_sb.png){fig-align="center" width="321"}
+
+Where:
+
+-   NPSB = Oral health professionals needed;
+
+-   NSB = Oral health need measured by the number of type t services aimed at serving population age group i and locality l;
+
+-   T = Average service time for type t;
+
+-   TTD = Total available time for a professional over a year.
+
+We will use an average consultation time (T) of 25 minutes. This value was based on a time-motion study conducted to measure the average time of procedures performed by oral health teams in primary care health units in São Paulo, Brazil (Bellotti et al., 2024).
+
+Available Working Time corresponds to a professional's time considering programmed absences (e.g., vacations, holidays) and non-programmed absences (e.g., absence due to health reason). We will use an estimated TTD of 1576 hours, often used for nurses since we don't have any TTD measured for dentists in Brazil.
+
+This result indicates how many dentists per month are needed over a year to meet the population's oral health needs.
+
+```{r}
+#| warning: false
+
+# Calculating the need for professionals using the parameters of time and TTD.
+
+necessidades_prof_palmas <- 
+                    necessidades_servicos |>
+                          mutate(nec_prof = 
+                                   (nec_servicos * 25/60)/1576) |> 
+                          mutate(nivel = if_else(
+                            procedimento == "Atenção Básica",
+                                            "APS",
+                                            "AES")) |> 
+                          group_by(ibge, municipio, nivel) |> 
+                          summarise(necessidade = sum(nec_prof)) |> 
+                          mutate(necessidade = round(necessidade, 2))
+                          
+necessidades_prof_palmas  |> 
+  ungroup() |> 
+  select(-ibge) |> 
+  rename(municipality = municipio,
+         level = nivel, 
+         need = necessidade)
+  
+```
+
+## 4. Exploring the implications in terms of resources, such as current supply of professionals and costs
+
+The next steps consist of several stages:
+
+1.  Obtaining the supply of professionals.
+
+2.  Calculating the net value of the supply.
+
+3.  Comparing the supply with the needs.
+
+### 4.1. Obtaining the supply of professionals
+
+The supply of professionals was accessed on National Register of Health Establishments - Professionals Table (*Cadastro Nacional de Estabelecimentos de Saúde*, CNES-PF, in portuguese).
+
+Since professionals may have multiple affiliations, we applied the Full-time Equivalent (FTE) standard.
+
+```{r}
+# Code to access data from our own datalake 
+
+dremio_host <- Sys.getenv("endereco")
+dremio_port <- Sys.getenv("port")
+dremio_uid <- Sys.getenv("uid")
+dremio_pwd <- Sys.getenv("datalake")
+
+
+channel <- odbcDriverConnect(sprintf("DRIVER=Dremio Connector;
+                                     HOST=%s;
+                                     PORT=%s;
+                                     UID=%s;
+                                     PWD=%s;
+                                     AUTHENTICATIONTYPE=Basic Authentication;
+                                     CONNECTIONTYPE=Direct", 
+                         dremio_host, 
+                         dremio_port, 
+                         dremio_uid, 
+                         dremio_pwd))
+
+query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB e cirurgiões dentistas em APS e AES"'
+
+
+
+oferta <- sqlQuery(channel, query, 
+                     as.is = TRUE) 
+
+```
+
+The SQL query that built this dataset is described below. We accessed data from all municipalities for the month and year (COMPETEN) of January 2024. Data were accessed for Dentists and Oral Health Technicians and Assistants. We accessed records of professionals working in the Unified Health System (SUS) and supplementary health care. For this analysis, we will simulate only for the subset of SUS professionals.
+
+Data was accessed from the following types of units (TP_UNID):
+
+Primary Health Care (PHC)
+
+-   01 - Health Post
+
+-   02 - Health Center/Basic Unit
+
+-   32 - River Mobile Health Unit
+
+-   40 - Land Mobile Health Unit
+
+Specialized Health Care (SHC)
+
+-   36 - Clinic/Specialty Center
+
+-   73 - Emergency Room
+
+-   04 - Polyclinic
+
+-   22 - Isolated Clinic
+
+Hospital workforce was not included, given the scope of the methodology.
+
+``` sql
+
+WITH CH_PROFISSIONAIS AS(
+
+    SELECT CODUFMUN, 
+           COMPETEN, 
+           PROF_SUS,
+           NIVEL, 
+           CATEGORIA, 
+           HORAAMBULATORIAL,
+           HORAHOSPITALAR,
+           HORAOUTRO,
+           HORAAMBULATORIAL + HORAHOSPITALAR + HORAOUTRO AS HORA 
+    FROM(
+            SELECT CODUFMUN, 
+                COMPETEN, 
+                PROF_SUS, 
+                    CASE     
+                        WHEN TP_UNID = '01' OR 
+                             TP_UNID = '02' OR 
+                             TP_UNID = '32' OR
+                             TP_UNID = '40' THEN  'APS'
+                        WHEN TP_UNID = '36' OR
+                             TP_UNID = '73' OR
+                             TP_UNID = '04' OR
+                             TP_UNID = '22' THEN 'ESPECIALIZADO'
+                    END NIVEL,
+                    CASE 
+                        WHEN substr(CBO, 1, 4) = '2232' THEN 'Cirurgião-dentista'
+                        WHEN substr(CBO, 1, 4) = '3224' THEN 'Técnico ou Auxiliar de Saúde Bucal'
+                    END CATEGORIA,
+                    SUM(HORA_AMB) AS HORAAMBULATORIAL, 
+                    SUM(HORAHOSP) AS HORAHOSPITALAR, 
+                    SUM(HORAOUTR) AS HORAOUTRO  
+
+            FROM Dados.cnes.PF 
+                            
+            WHERE (substr(CBO, 1, 4) = '2232' OR 
+                    substr(CBO, 1, 4) = '3224') AND
+                    COMPETEN = '202401'
+            GROUP BY CODUFMUN, COMPETEN, NIVEL, PROF_SUS, CBO
+    )
+)
+
+SELECT p.CODUFMUN, 
+       q.municipio, 
+       q.uf_sigla, 
+       q.latitude, 
+       q.longitude, 
+       q.cod_regsaud, 
+       q.cod_macrorregiao, 
+       q.regiao_saude, 
+       q.macrorregiao_pad, 
+       p.COMPETEN, 
+       p.PROF_SUS,
+       p.NIVEL, 
+       p.CATEGORIA,
+       p.HORA, 
+       p.HORA/40 AS FTE40 
+   FROM CH_PROFISSIONAIS p
+   LEFT JOIN 
+   "Analytics Layer".Territorial."Municípios - Hierarquia Completa" q
+                ON CAST(P.CODUFMUN AS INTEGER) = q.cod_municipio 
+```
+
+The following script filters data from Palmas (TO) and SUS workforce.
+
+```{r}
+#| warning: false
+
+oferta$FTE40 <- as.numeric(oferta$FTE40)
+
+# filtro para Palmas-TO e profissionais atuando no SUS
+
+oferta_palmas <- 
+  oferta |> 
+  filter(CODUFMUN == "172100" & 
+         PROF_SUS == "1") |> 
+  group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
+  summarise(FTE40 = sum(FTE40)) |> 
+  filter(NIVEL != "NA") |> 
+  mutate(NIVEL = if_else(NIVEL == "APS",
+                                  "APS",
+                                  "AES"))  
+
+
+```
+
+### 4.2. Calculation of supply value
+
+The calculation of the net value of the supply is performed according to equation 3:
+
+![](images/eq3_sb.png){fig-align="center"}
+
+Where:
+
+-   O = Supply of professionals in a given location l;
+-   E = Total number of professionals working in healthcare services in a given location l;
+-   AD = Percentage of workload dedicated to direct activities (%);
+-   FC = Percentage of workload dedicated to a clinical focus (%).
+
+We do not have numbers associated with AD and FC. We will use the values ​​below, however, it is important to simulate them.
+
+```{r}
+
+# Calculating the supply of professionals after deducting the workload dedicated to direct activities and the clinical focus.
+oferta_palmas <- 
+  oferta_palmas |> 
+  mutate(FTE_40_direto = FTE40 * 0.80) |> 
+  mutate(FTE_40_linha = FTE_40_direto * 0.80)
+
+oferta_palmas |> 
+  select(-CODUFMUN) |> 
+  rename(health_professional = CATEGORIA,
+         level = NIVEL,
+         direct_care_fte40 = FTE_40_direto,
+         clinical_focus_fte40 = FTE_40_linha) 
+         
+
+```
+
+### 4.3. Implications of results in quantitative terms
+
+Finally, calculations are made to compare supply and need. Two metrics are applied:
+
+-   Absolute Result (RA), which refers to the difference between supply and need, according to equation 4;
+
+-   Relative Result (RR) refers to the percentage difference between supply and need, according to equation 5.
+
+![](images/eq4_sb.png){fig-align="center"}
+
+Where:
+
+-   RA = Absolute result;
+-   O = Supply of dental surgeons in a given location l;
+-   NPSB = Dental surgeon needs in a given location;
+
+![](images/eq5_sb.png){fig-align="center"}
+
+Where:
+
+-   RR = Relative result;
+-   O = Supply of dental surgeons in a given location l;
+-   NPSB = Dental surgeon needs in a given location;
+
+Calculations are performed according to the following scripts:
+
+```{r}
+
+# accessing offer only for dentists
+
+oferta_palmas_cd <- oferta_palmas |> 
+                        filter(CATEGORIA == "Cirurgião-dentista")
+
+# bringing together the results of need and supply based on the municipality and level of care variables. In sequence, comparing need and supply
+
+oferta_vs_demanda <-
+  necessidades_prof_palmas |> 
+  left_join(oferta_palmas_cd, 
+            by = c("ibge"="CODUFMUN",
+                   "nivel" = "NIVEL")) |> 
+  mutate(ra = FTE_40_linha - necessidade, 
+         rr = (FTE_40_linha/necessidade) * 100) |> 
+  mutate(ra = round(ra, 2),
+         rr = round(rr, 2))
+
+# presenting part of the results
+
+oferta_vs_demanda |>
+  mutate(necessidade = round(necessidade, 2)) |>
+  mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
+  select(municipio, 
+         nivel, necessidade, 
+         FTE_40_linha, rr, ra) |> 
+  rename(municipality = municipio,
+         level = nivel, 
+         need = necessidade, 
+         FTE40_focus = FTE_40_linha,
+         relative_result = rr,
+         absolute_result = ra)
+
+```
+
+### 4.4. Financial implications of results
+
+Finally, it is suggested to calculate the financial impact of this gap. The average salary of dentists in Palmas -TO is R\$ 4000 according to Continuous National Household Sampling Survey (PNADc) of the Brazilian Institute of Geography and Statistics (IBGE). We added a multiplicative factor for labor costs (1.42). These procedure result in the following table.
+
+```{r}
+
+custo_palmas <- 
+  oferta_vs_demanda |> 
+  mutate(custo = ra * (-1) * (4000 * 1.42)) |> 
+  select(ibge, municipio, nivel, CATEGORIA,
+         custo)
+  
+custo_palmas |> 
+  rename(municipality = municipio,
+         level = nivel, 
+         professional = CATEGORIA,
+         cost = custo)
+
+```
+
+# B) Application for Brazil
+
+The same methodology will be scaled for each Brazilian municipality. Below we detail the analysis structured in stages.
+
+## 5. Analysis of oral health needs for Brazil
+
+The analysis of oral health needs (NSB) was built based on three elements: distribution of the population by age group (P), prevalence of oral health conditions (H) and procedures per capita (S).
+
+### 5.1. Distribution of age groups (P) - Brazil
+
+The distribution by age group (P) was based on Brazil's last census (2022).
+
+```{r}
+
+# reading census data 
+pop_brasil <- read_excel("~/GitHub/saude_bucal/01_dados/populacao_municipio_censo_completa.xlsx")
+
+# adjust each age group
+pop_brasil_tratado <- pop_brasil |>
+                  select(cod_municipiodv, 
+                         ibge_sb, municipio, 
+                         de_0_a_14_anos,
+                         de_15_a_29_anos, 
+                         de_30_a_59_anos,
+                         acima_de_60_anos) |> 
+                  gather(key = "faixa", 
+                         value = "total",
+                         4:7) |> 
+                  mutate(faixa = gsub("_"," ",
+                                      faixa)) |> 
+                  mutate(ibge = as.character(ibge_sb)) |> 
+                  mutate(ibge = substr(ibge_sb, 1, 6)) |> 
+                  mutate(cod_municipiodv = 
+                           as.character(cod_municipiodv)) |> 
+                  mutate(cod_mun_loc = cod_municipiodv) |> 
+                  mutate(cod_municipiodv = 
+                           substr(cod_municipiodv, 1, 6)) |> 
+                  mutate(id_faixa = 
+                           case_when(faixa == "de 0 a 14 anos" ~ 1,
+                                     faixa == "de 15 a 29 anos" ~ 2,
+                                     faixa == "de 30 a 59 anos" ~ 3,
+                                     faixa == "acima de 60 anos" ~ 4))
+
+```
+
+Plotting age group information. The most frequent age group is 30 to 59 years old.
+
+```{r}
+ordem <- c("de 0 a 14 anos",
+           "de 15 a 29 anos",
+           "de 30 a 59 anos",
+           "acima de 60 anos")
+
+pop_brasil_tratado$faixa <- factor(pop_brasil_tratado$faixa, 
+                                   levels = ordem)
+
+
+pop_brasil_tratado |> 
+mutate(faixa = 
+           case_when(
+             faixa == "de 0 a 14 anos" ~ "from 0 to 14 years old",
+             faixa == "de 15 a 29 anos" ~ "from 15 to 29 years old",
+             faixa == "de 30 a 59 anos" ~ "from 30 to 59 years old",
+             faixa == "acima de 60 anos" ~ "over 60 years old")) |> 
+  ggplot(aes(x = faixa, y = total)) + geom_col() +
+  theme_minimal() + coord_flip() + 
+  xlab(" ") +
+  theme(axis.title.x = element_text(size = 16),
+        axis.title.y = element_text(size = 16),
+        axis.text = element_text(size = 16)) + 
+  ggtitle("Population distribution by age group")
+
+```
+
+### 5.2. Oral health prevalence based on conditions (H) - Brazil
+
+The script below is used to read the oral health coverage (H) data for each age group in all Brazilian municipalities.
+
+The capitals of each state have coverage values. However, municipalities in the countryside do not have individualized coverage but rather a parameter corresponding to the region. The municipality of Formosa is located in the state of Goiás, which is part of the Midwest Region, so we use the parameter for the countryside of the Midwest Region).
+
+```{r}
+#| warning: false
+
+# Reading data
+
+cobertura_sb <-
+  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx",
+            sheet = "Cobertura") |>  
+  mutate(ibge = substr(ibge, 1, 6))
+
+# Viewing data
+
+cobertura_sb |>
+  select(-ibge,
+         -id_faixa,
+         -li_cobertura, 
+         -ls_cobertura) |> 
+  rename(municipality = municipio, 
+         service = procedimento, 
+         age_group = faixa_etaria, 
+         coverage = cobertura)
+```
+
+We now merge the population of each municipality with its respective coverage.
+
+```{r}
+#| warning: false
+
+# converting municipality's ID (IBGE_SB) to 6-digit code standard
+
+pop_brasil_tratado <-
+  pop_brasil_tratado |> 
+    mutate(ibge_sb = 
+             as.character(ibge_sb)) |> 
+    mutate(ibge_sb = 
+             str_sub(ibge_sb, 
+                     start = 1, 
+                     end = 6)) 
+    
+
+cobertura_sb$ibge <- as.character(cobertura_sb$ibge)
+
+# Merging population database and oral health coverage
+
+pop_coberta_br <- 
+  pop_brasil_tratado |> 
+  left_join(cobertura_sb, 
+            by = c("ibge_sb" = "ibge",
+                   "id_faixa" = "id_faixa")) |> 
+  select(ibge, ibge_sb, 
+         municipio.x, 
+         faixa, id_faixa, 
+         total, procedimento, cobertura, 
+         cod_municipiodv, cod_mun_loc) |> 
+  rename(municipio = municipio.x) |> 
+  mutate(populacao_coberta = cobertura * total) |> 
+  mutate(populacao_coberta = round(populacao_coberta, 2))
+
+
+```
+
+### 5.3. Normative parameters of procedures per capita (S) - BRAZIL
+
+The next step involves merging the datasets of oral health coverage and service requirements for each type of procedure (S). This will result in the oral health need (NSB), corresponding to the total services required to meet each age group.
+
+```{r}
+# reading of normative production data (S)
+producao_normativa_br <- 
+  read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx", 
+    sheet = "Produção normativa", 
+    col_types = c("text","text",
+                  "text","text",
+                  "numeric","numeric",
+                  "numeric","numeric")) |>  
+    mutate(ibge = substr(ibge, 1, 6))
+
+producao_brasil <- producao_normativa_br |> 
+                      select(-municipio, 
+                             -li_cobertura,
+                             -ls_cobertura,
+                             -faixa_etaria)
+
+# Combining covered population and normative production to calculate the total required services.
+
+necessidades_servicos_br <- 
+                      pop_coberta_br |> 
+                          left_join(producao_brasil, 
+                                    by = c("ibge" = "ibge",
+                                           "id_faixa",
+                                           "procedimento")) |> 
+                          mutate(nec_servicos = 
+                                 populacao_coberta * producao_pc) |> 
+                          mutate(nec_servicos = 
+                                 round(nec_servicos, 2))
+
+necessidades_servicos_br |> 
+  select(municipio, 
+         procedimento, faixa, nec_servicos) |> 
+  rename(municipality = municipio, 
+         service = procedimento,
+         age_group = faixa,
+         service_need = nec_servicos)
+
+```
+
+## 6. Translation of the number of services into the number of required professionals - BRAZIL
+
+Once we have the oral health need (NSB) based on population distribution by age group (P), oral health coverage (H), and services per capita (S), we can translate the number of services into required professionals.
+
+```{r}
+
+# calculating the need for professionals based on services standard time and available working time. 
+
+necessidades_prof_br <- 
+            necessidades_servicos_br |>
+                          mutate(nec_prof = 
+                                (nec_servicos * 25/60)/1576) |> 
+                          mutate(nivel = if_else(
+                            procedimento == "Atenção Básica",
+                                           "APS",
+                                           "AES")) |> 
+                          group_by(ibge, municipio, 
+                                   nivel, cod_municipiodv, 
+                                   cod_mun_loc) |> 
+                          summarise(necessidade = sum(nec_prof)) |> 
+                          mutate(necessidade = round(necessidade, 2))
+                          
+necessidades_prof_br |> 
+  ungroup() |> 
+  select(municipio, nivel, necessidade) |> 
+  rename(municipality = municipio, 
+         level = nivel, 
+         need = necessidade)
+
+```
+
+## 7. Exploration of implications in terms of resources, such as current supply of professionals and costs
+
+The next step consists of a few steps, namely:
+
+1.  Calculating the current supply of professionals;
+2.  Calculating of the supply considering direct activities and ;
+3.  Comparison of supply with needs;
+
+### 7.1. Calculating the current supply of professionals
+
+The code below provides the script for accessing data from CNES-PF for dentists and dental health technicians/assistants.
+
+```{r}
+#| warning: false
+
+# code to access data from a our own datalake
+
+dremio_host <- Sys.getenv("endereco")
+dremio_port <- Sys.getenv("port")
+dremio_uid <- Sys.getenv("uid")
+dremio_pwd <- Sys.getenv("datalake")
+
+
+channel <- odbcDriverConnect(sprintf("DRIVER=Dremio Connector;
+                                     HOST=%s;
+                                     PORT=%s;
+                                     UID=%s;
+                                     PWD=%s;
+                                     AUTHENTICATIONTYPE=Basic Authentication;
+                                     CONNECTIONTYPE=Direct", 
+                         dremio_host, 
+                         dremio_port, 
+                         dremio_uid, 
+                         dremio_pwd))
+
+query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB e cirurgiões dentistas em APS e AES"'
+
+
+
+oferta <- sqlQuery(channel, query, 
+                     as.is = TRUE)
+```
+
+The script below groups the total workforce by level of service and municipality. For instance, we will keep only SUS professionals.
+
+```{r}
+#| warning: false
+
+oferta$FTE40 <- as.numeric(oferta$FTE40)
+
+oferta_brasil <- 
+  oferta |> 
+  filter(PROF_SUS == "1") |> 
+  group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
+  summarise(FTE40 = sum(FTE40)) |> 
+  filter(NIVEL != "NA") |> 
+  mutate(NIVEL = if_else(NIVEL == "APS","APS","AES")) 
+```
+
+### 7.2. Calculating of the net value of the supply
+
+The next step involves deducing the workforce associated with indirect activities, as well as the percentage associated with the clinical focus. The values used were 80%. However this percentage will be simulated.
+
+The following table represents of the total supply and also a supply considering the percentage of direct care (FTE40_dc) and clinical focus deduced (FTE40_cf).
+
+```{r}
+
+oferta_brasil <- 
+  oferta_brasil |> 
+  mutate(FTE_40_direto = FTE40 * 0.80) |> 
+  mutate(FTE_40_linha = FTE_40_direto * 0.80)
+
+oferta_brasil |> 
+  ungroup() |> 
+  select(CATEGORIA, NIVEL, FTE40, 
+         FTE_40_direto, FTE_40_linha) |> 
+  rename(professional = CATEGORIA, 
+         level = NIVEL, 
+         FTE40_dc = FTE_40_direto,
+         FTE40_cf = FTE_40_linha)
+
+```
+
+### 7.3. Implications of results in quantitative terms
+
+The next step is performed to compare needs and supply.
+
+#### 7.3.1. Results for dental surgeons
+
+The following script calculates the results for dentists by municipality.
+
+```{r}
+#| warning: false
+
+oferta_brasil_cd <- 
+          oferta_brasil |> 
+              filter(CATEGORIA == "Cirurgião-dentista")
+
+cd_oferta_vs_demanda_br <-
+  necessidades_prof_br |> 
+  left_join(oferta_brasil_cd, 
+            by = c("cod_municipiodv"="CODUFMUN",
+                   "nivel" = "NIVEL")) 
+
+
+cd_oferta_vs_demanda_br$FTE_40_linha[is.na(cd_oferta_vs_demanda_br$FTE_40_linha)] <- 0
+
+
+cd_oferta_vs_demanda_br$FTE40[is.na(cd_oferta_vs_demanda_br$FTE40)] <- 0
+
+
+cd_oferta_vs_demanda_br$FTE_40_direto[is.na(cd_oferta_vs_demanda_br$FTE_40_direto)] <- 0
+
+
+cd_oferta_vs_demanda_br <- 
+  cd_oferta_vs_demanda_br |> 
+  mutate(ra = FTE_40_linha - necessidade, 
+         rr = (FTE_40_linha/necessidade) * 100) |> 
+  mutate(ra = round(ra, 2),
+         rr = round(rr, 2)) |> 
+  mutate(necessidade = round(necessidade, 2)) |>
+  mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
+  select(ibge, municipio, 
+         nivel, necessidade, 
+         FTE_40_linha, rr, ra, cod_municipiodv, 
+         cod_mun_loc)
+
+cd_oferta_vs_demanda_br |>
+  ungroup() |> 
+  select(municipio, nivel, necessidade, FTE_40_linha, rr, ra) |> 
+  rename(municipality = municipio,
+         level = nivel, 
+         need = necessidade, 
+         FTE40_cf = FTE_40_linha)
+```
+
+Let's visualize these results in a map of Brazil.
+
+```{r message=FALSE, warning=FALSE}
+#| warning: false
+
+mun <- read_municipality(code_muni="all", 
+                         year=2022,
+                         showProgress = FALSE)
+
+mun <- mun |> 
+  mutate(code_muni = 
+           as.character(code_muni))
+
+mun2 <- cd_oferta_vs_demanda_br |> 
+    left_join(mun, by= c("cod_mun_loc" = "code_muni"))
+  
+mun_sf <- st_as_sf(mun2)
+
+estados_br <- read_state(year = 2020,
+                         showProgress = FALSE)
+
+ggplot() +
+  geom_sf(data = mun_sf, aes(fill = rr), 
+          color = NA) +
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#F2C744", 
+                                  "#293D09"), 
+                       values = rescale(c(0, 
+                                          50, 
+                                          200)), 
+                       limits = c(0, 200)) +  
+   geom_sf(data = estados_br, 
+            fill = NA, 
+            color = "#484D50", size = 0.1) +
+  labs(fill = "Taxa RR") +  
+  theme_void() + 
+  facet_grid(~nivel)
+
+```
+
+According to the results from the tables, we have a few municipalities with a very high relative result, around 600%. This means that the supply greatly exceeds the demand. This typically occurs in very small municipalities. For example, Cachoeira Dourada - MG has only 2,706 inhabitants. Based on calculations, the need is for 0.31 professionals for specialized care. However, the municipality has 1.92 professionals, hence the high difference. In the map above, we restricted the view to results up to 200% relative.
+
+However, we can also include other ways of aggregating information, such as data presented by health region.
+
+```{r}
+#| warning: false
+
+# Reading the locality hierarchy database to match municipalities with their respective health regions and thus aggregate data by health region.
+
+hierarquia_municipios <- 
+  read_csv("~/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv")
+
+
+hierarquia <- 
+          hierarquia_municipios |> 
+          select(cod_municipiodv, 
+                 uf_sigla, 
+                 regiao,
+                 cod_regsaud,
+                 regiao_saude)
+
+hierarquia$cod_municipiodv <- 
+  as.character(hierarquia$cod_municipiodv)
+
+cd_oferta_vs_demanda_regiao_saude <- 
+  cd_oferta_vs_demanda_br |>
+    left_join(hierarquia, 
+              by = c("cod_mun_loc"="cod_municipiodv")) |> 
+    group_by(nivel, cod_regsaud, uf_sigla,
+             regiao_saude) |> 
+    summarise(necessidade = sum(necessidade),
+              oferta = sum(FTE_40_linha)) |> 
+    mutate(ra = oferta - necessidade, 
+           rr = (oferta/necessidade) * 100) |> 
+    mutate(ra = round(ra, 2),
+           rr = round(rr, 2))
+
+```
+
+Script to create the health regions map.
+
+```{r message=FALSE, warning=FALSE}
+#| warning: false
+
+estados_br <- read_state(year = 2020)
+
+spdf <- 
+  geojson_read("~/GitHub/saude_bucal/01_dados/shape_file_regioes_saude.json", what = "sp") 
+
+spdf_fortified <- sf::st_as_sf(spdf)
+
+
+# Setting longitude and latitude boundaries to focus on Brazil
+limite_long <- c(-75, -28)  # limites de longitude
+limite_lat <- c(-33, 4)     # limites de latitude
+
+# Creating map
+
+mapa_rs <-
+  cd_oferta_vs_demanda_regiao_saude |>
+  left_join(spdf_fortified, 
+            by = c("cod_regsaud"="reg_id")) 
+
+# Add geometry if it does not exist
+if (!"geometry" %in% names(mapa_rs)) {
+  mapa_rs <- st_as_sf(mapa_rs, 
+                      coords = c("longitude", "latitude"), 
+                      crs = 4326) 
+}
+
+
+ggplot() +
+  geom_sf(data = mapa_rs, 
+          aes(fill = rr, geometry = geometry), 
+          color = NA) +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#B8B8B8", 
+          size = 0.1) + 
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#ADBF69",
+                                  "#F2C744"), 
+                       values = rescale(c(0, 
+                                          60, 
+                                          160)), 
+                       limits = c(0, 160)) +  
+  labs(fill = "Taxa RR") +  
+  theme_void() + 
+  facet_grid(~nivel)
+
+```
+
+#### 7.3.2. Results for Oral Health Technician and Assistant
+
+Below we will calculate the Absolute and Relative Result for oral health technicians and assistants (TSB/ASB), assuming a supply ratio of 1 to 1 with Dental Surgeons.
+
+```{r}
+oferta_brasil_tsb_asb <- 
+          oferta_brasil |> 
+              filter(CATEGORIA == "Técnico ou Auxiliar de Saúde Bucal")
+
+cd_oferta_vs_demanda_br_tsb_asb <-
+  necessidades_prof_br |> 
+  left_join(oferta_brasil_tsb_asb, 
+            by = c("cod_municipiodv"="CODUFMUN",
+                   "nivel" = "NIVEL")) 
+
+
+cd_oferta_vs_demanda_br_tsb_asb$FTE_40_linha[is.na(cd_oferta_vs_demanda_br_tsb_asb$FTE_40_linha)] <- 0
+
+
+cd_oferta_vs_demanda_br_tsb_asb$FTE40[is.na(cd_oferta_vs_demanda_br_tsb_asb$FTE40)] <- 0
+
+
+cd_oferta_vs_demanda_br_tsb_asb$FTE_40_direto[is.na(cd_oferta_vs_demanda_br_tsb_asb$FTE_40_direto)] <- 0
+
+
+cd_oferta_vs_demanda_br_tsb_asb <- 
+  cd_oferta_vs_demanda_br_tsb_asb |> 
+  mutate(ra = FTE_40_linha - necessidade, 
+         rr = (FTE_40_linha/necessidade) * 100) |> 
+  mutate(ra = round(ra, 2),
+         rr = round(rr, 2)) |> 
+  mutate(necessidade = round(necessidade, 2)) |>
+  mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
+  select(ibge, municipio, 
+         nivel, necessidade, 
+         FTE_40_linha, rr, ra, cod_municipiodv, 
+         cod_mun_loc)
+
+cd_oferta_vs_demanda_br_tsb_asb 
+```
+
+Let's generate the visualization using a choropleth map.
+
+```{r message=FALSE, warning=FALSE}
+#| warning: false
+
+
+mun2_tsb_asb <- cd_oferta_vs_demanda_br_tsb_asb |> 
+    left_join(mun, by= c("cod_mun_loc" = "code_muni"))
+  
+mun_sf_tsb_asb <- st_as_sf(mun2_tsb_asb)
+
+estados_br <- read_state(year = 2020,
+                         showProgress = FALSE)
+
+ggplot() +
+  geom_sf(data = mun_sf_tsb_asb, aes(fill = rr), 
+          color = NA) +
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#ADBF69", 
+                                  "#F2C744"), 
+                       values = rescale(c(0, 
+                                          50, 
+                                          200)), 
+                       limits = c(0, 200)) +  
+   geom_sf(data = estados_br, 
+            fill = NA, 
+            color = "#B8B8B8", size = 0.1) +
+  labs(fill = "Taxa RR") +  
+  theme_void() + 
+  facet_grid(~nivel)
+```
+
+According to the results related to oral health technicians and assistants (TSB/ASB), the municipality of Cachoeira Dourada - MG also represents the highest relative result among Brazilian municipalities, at 800% in specialized care with 2.56 professionals for a need of 0.31. Out of the 5,572 Brazilian municipalities, only 491 have their population fully covered by oral health professionals in primary and/or specialized care levels. Considering that nearly half (225) of these covered municipalities are concentrated in the state of Minas Gerais.
+
+```{r}
+#| warning: false
+
+# Reading the locality hierarchy database to match municipalities with their respective health regions and thus aggregate data by health region.
+
+hierarquia_municipios <- 
+  read_csv("~/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv")
+
+
+hierarquia <- 
+          hierarquia_municipios |> 
+          select(cod_municipiodv, 
+                 uf_sigla, 
+                 regiao,
+                 cod_regsaud,
+                 regiao_saude)
+
+hierarquia$cod_municipiodv <- 
+  as.character(hierarquia$cod_municipiodv)
+
+cd_oferta_vs_demanda_regiao_saude_tsb_asb <- 
+  cd_oferta_vs_demanda_br_tsb_asb |>
+    left_join(hierarquia, 
+              by = c("cod_mun_loc"="cod_municipiodv")) |> 
+    group_by(nivel, cod_regsaud, uf_sigla,
+             regiao_saude) |> 
+    summarise(necessidade = sum(necessidade),
+              oferta = sum(FTE_40_linha)) |> 
+    mutate(ra = oferta - necessidade, 
+           rr = (oferta/necessidade) * 100) |> 
+    mutate(ra = round(ra, 2),
+           rr = round(rr, 2))
+```
+
+Script to create the map of health regions.
+
+```{r message=FALSE, warning=FALSE}
+#| warning: false
+
+spdf <- 
+  geojson_read("~/GitHub/saude_bucal/01_dados/shape_file_regioes_saude.json", what = "sp") 
+
+spdf_fortified <- sf::st_as_sf(spdf)
+
+
+# Setting longitude and latitude boundaries to focus on Brazil
+limite_long <- c(-75, -28)  # limites de longitude
+limite_lat <- c(-33, 4)     # limites de latitude
+
+# Creating map
+
+mapa_rs_tsb_asb <-
+  cd_oferta_vs_demanda_regiao_saude_tsb_asb |>
+  left_join(spdf_fortified, 
+            by = c("cod_regsaud"="reg_id")) 
+
+# Add geometry if it does not exist
+if (!"geometry" %in% names(mapa_rs_tsb_asb)) {
+  mapa_rs_tsb_asb <- st_as_sf(mapa_rs_tsb_asb, 
+                      coords = c("longitude", "latitude"), 
+                      crs = 4326) 
+}
+
+
+ggplot() +
+  geom_sf(data = mapa_rs_tsb_asb, 
+          aes(fill = rr, geometry = geometry), 
+          color = NA) +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#B8B8B8", 
+          size = 0.1) + 
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#ADBF69",
+                                  "#F2C744"), 
+                       values = rescale(c(0, 
+                                          60, 
+                                          160)), 
+                       limits = c(0, 160)) +  
+  labs(fill = "Taxa RR") +  
+  theme_void() + 
+  facet_grid(~nivel)
+
+```
+
+### 7.4. Implications of results in financial terms
+
+Repeating the calculation of the financial impact as done for Palmas-TO, scaling it to all Brazilian municipalities. We will use average income data according to the Continuous National Household Sample Survey (PNADc) from the Brazilian Institute of Geography and Statistics (IBGE). Firstly, for Dental Surgeons, and finally, for oral health technicians and assistants (TSB/ASB).
+
+#### 7.4.1. Results for dental surgeons
+
+```{r}
+rend_medio <- read_excel("~/GitHub/saude_bucal/01_dados/rendimento_saudebocal.xlsx")
+
+custo_sb <- rend_medio |> 
+  mutate(custo_dentista = rend_dentista * 1.42) |> 
+  mutate(custo_aux_sb = rend_aux_sb * 1.42) |> 
+  select(-rend_dentista, -rend_aux_sb)
+
+custo_dentistas <- mun2 |> 
+  left_join(custo_sb, by = c("abbrev_state" = "UF")) |>
+  select(-custo_aux_sb)
+
+custo_dentistas <- custo_dentistas |> 
+  mutate(custo_dent = ra*custo_dentista) |> 
+  select(-custo_dentista)
+```
+
+#### 7.4.2. Results for oral health technicians and assistants (TSB/ASB)
+
+```{r}
+
+custo_tsb_asb <- mun2_tsb_asb |> 
+  left_join(custo_sb, by = c("abbrev_state" = "UF")) |>
+  select(-custo_dentista)
+
+custo_tsb_asb <- custo_tsb_asb |> 
+  mutate(custo_aux = ra*custo_aux_sb) |> 
+  select(-custo_aux_sb)
+```
+
+## 8. Sensitivity Analysis
+
+One of the final stages in methodology development involves sensitivity analysis. This step is conducted because parameters are not always certain. Therefore, sensitivity analysis is used to simulate the methodology with different parameters.
+
+We have created a function to iterate over various values. This will allow us to visualize the impact of changes in these parameters.
+
+```{r}
+#| warning: false
+
+gap_necessidade_demanda <- 
+  function(tempo, ttd, pd, pl){
+
+          pop_brasil_tratado <- 
+                  pop_brasil |>
+                  select(cod_municipiodv, 
+                         ibge_sb, municipio, de_0_a_14_anos,
+                         de_15_a_29_anos, de_30_a_59_anos,
+                         acima_de_60_anos) |> 
+                  gather(key = "faixa", 
+                         value = "total",
+                         4:7) |> 
+                  mutate(faixa = gsub("_"," ",faixa)) |> 
+                  mutate(ibge = as.character(ibge_sb)) |> 
+                  mutate(ibge = substr(ibge_sb, 1, 6)) |> 
+                  mutate(cod_municipiodv = 
+                           as.character(cod_municipiodv)) |> 
+                  mutate(cod_mun_loc = cod_municipiodv) |> 
+                  mutate(cod_municipiodv = 
+                           substr(cod_municipiodv, 1, 6)) |> 
+                  mutate(id_faixa = case_when(
+                    faixa == "de 0 a 14 anos" ~ 1,
+                    faixa == "de 15 a 29 anos" ~ 2,
+                    faixa == "de 30 a 59 anos" ~ 3,
+                    faixa == "acima de 60 anos" ~ 4))
+
+pop_brasil_tratado <-
+  pop_brasil_tratado |> 
+    mutate(ibge_sb = as.character(ibge_sb)) |> 
+    mutate(ibge_sb = str_sub(ibge_sb, start = 1, end = 6))
+
+cobertura_sb$ibge <- as.character(cobertura_sb$ibge)
+
+pop_coberta_br <- 
+  pop_brasil_tratado |> 
+  left_join(cobertura_sb, by = c("ibge_sb" = "ibge",
+                                 "id_faixa" = "id_faixa")) |> 
+  select(ibge, ibge_sb, municipio.x, 
+         faixa, id_faixa, 
+         total, procedimento, cobertura, 
+         cod_municipiodv, cod_mun_loc) |> 
+  mutate(populacao_coberta = cobertura * total) |> 
+  mutate(populacao_coberta = round(populacao_coberta, 2))
+
+
+producao_brasil <- producao_normativa_br |> 
+                      select(-municipio, 
+                             -li_cobertura,
+                             -ls_cobertura,
+                             -faixa_etaria)
+
+necessidades_servicos_br <- 
+                      pop_coberta_br |> 
+                      left_join(producao_brasil, 
+                                  by = 
+                                  c("ibge" = "ibge",
+                                    "id_faixa","procedimento")) |> 
+                      mutate(nec_servicos = 
+                               populacao_coberta * producao_pc) |> 
+                      mutate(nec_servicos = 
+                               round(nec_servicos, 2))
+  
+
+necessidades_prof_br <- 
+                  necessidades_servicos_br |>
+                    mutate(nec_prof = 
+                             (nec_servicos * tempo/60)/ttd) |> 
+                    mutate(nivel = 
+                             if_else(procedimento == "Atenção Básica","APS","AES")) |> 
+                          group_by(ibge, municipio.x, 
+                                   nivel, cod_municipiodv, cod_mun_loc) |> 
+                          summarise(necessidade = 
+                                      sum(nec_prof))
+
+
+
+oferta$FTE40 <- as.numeric(oferta$FTE40)
+
+oferta_brasil <- 
+  oferta |> 
+  filter(PROF_SUS == "1") |> 
+  group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
+  summarise(FTE40 = sum(FTE40)) |> 
+  filter(NIVEL != "NA") |> 
+  mutate(NIVEL = if_else(NIVEL == "APS","APS","AES")) 
+  
+
+oferta_brasil <- 
+  oferta_brasil |> 
+  mutate(FTE_40_direto = FTE40 * pd) |> 
+  mutate(FTE_40_linha = FTE_40_direto * pl)
+
+
+oferta_brasil_cd <- oferta_brasil |> 
+                        filter(CATEGORIA == "Cirurgião-dentista")
+
+oferta_vs_demanda <-
+  necessidades_prof_br |> 
+  left_join(oferta_brasil_cd, 
+            by = c("cod_municipiodv"="CODUFMUN",
+                   "nivel" = "NIVEL")) |> 
+  mutate(ra = FTE_40_linha - necessidade, 
+         rr = (FTE_40_linha/necessidade) * 100) |> 
+  mutate(ra = round(ra, 2),
+         rr = round(rr, 2)) |> 
+  filter(CATEGORIA != "NA")
+
+oferta_vs_demanda <- oferta_vs_demanda |>
+  mutate(necessidade = round(necessidade, 2)) |>
+  mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
+  select(ibge, municipio.x, 
+         nivel, necessidade, 
+         FTE_40_linha, rr, ra, cod_municipiodv, cod_mun_loc)
+
+}
+```
+
+#### 8.1. Running the function for a set of values
+
+We use a list of values ​​to iterate as shown in the table below.
+
++---------------------------------------+-------------+----------------------------------------------+
+| Parâmetro                             | Sigla       | Valores                                      |
++=======================================+=============+==============================================+
+| Total available time                  | TTD         | in hours: 1576; 1676; 1776; 1876             |
++---------------------------------------+-------------+----------------------------------------------+
+| Procedure time                        | T           | in minutes: 25, 35, 45, 55                   |
++---------------------------------------+-------------+----------------------------------------------+
+| Percentage of direct activities       | PD          | in percentage unit: 50%, 60%, 80%, 90%, 100% |
++---------------------------------------+-------------+----------------------------------------------+
+| Percentage of care pathway activities | PL          | in percentage unit: 50%, 60%, 80%, 90%, 100% |
++---------------------------------------+-------------+----------------------------------------------+
+
+```{r}
+#| warning: false
+
+# Creating list of vectors for each parameter
+list_ttd <- as.numeric(c("1576","1676", "1776", "1876"))
+list_tempo <- as.numeric(c("25", "35", "45", "55"))
+list_pd <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
+list_pl <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
+
+
+# Running list and saving to a list
+
+resultado <- list()
+
+for (list_ttd in list_ttd) {
+  for (list_tempo in list_tempo) {
+    for (list_pd in list_pd) {
+      for (list_pl in list_pl) { 
+        
+        res <- 
+          gap_necessidade_demanda(tempo = list_tempo, 
+                                  ttd = list_ttd, 
+                                  pd = list_pd, 
+                                  pl = list_pl)
+        
+        res <- cbind(res, 
+                     ttd = list_ttd, 
+                     tempo = list_tempo, 
+                     pd = list_pd, 
+                     pl = list_pl)
+        
+        res$atributos <- paste(list_ttd, 
+                               list_tempo, 
+                               list_pd, 
+                               list_pl, sep = "_")
+        
+        resultado[[length(resultado) + 1]] <- res
+      }
+    }
+  }
+}
+
+
+# Combines results into a single data frame
+gap_resultado <- do.call(rbind, resultado)
+
+#writexl::write_xlsx(gap_resultado, "resultados_saudebucal.xlsx")
+
+```
+
+# Other pathways
+
+If deemed relevant, we can later explore other possibilities (e.g., deducting a portion of the population covered by dental plans), as outlined below. Compare this with the supply of dentists without restrictions on those working within the SUS.
+
+```{r eval=FALSE, include=FALSE}
+#| warning: false
+
+plano_de_saude <- 
+  read_csv("~/GitHub/saude_bucal/01_dados/plano_de_saude.csv", 
+           col_types = cols(CD_MUNICIPIO = col_character()))
+
+plano_odontologico <-    
+            plano_de_saude |>      
+                filter(FAIXA_CORRIGIDA != "nada") |>      
+                filter(FAIXA_CORRIGIDA != "Inconsistente") |>                  mutate(taxa = (PLANO_ODONTO/POP) * 100) |>                     filter(taxa < 100) |>      
+                mutate(id_faixa = 
+                       case_when(
+                         FAIXA_CORRIGIDA == "de 0 a 14 anos" ~ 1,
+                         FAIXA_CORRIGIDA == "de 15 a 29 anos" ~ 2,
+                         FAIXA_CORRIGIDA == "de 30 a 59 anos" ~ 3,
+                         FAIXA_CORRIGIDA == "acima de 60 anos" ~ 4))   
+
+
+pop_brasil_tratado <-    
+  pop_brasil_tratado |>    
+  left_join(plano_odontologico, 
+            by = c("ibge"="CD_MUNICIPIO",                                        "id_faixa")) 
+
+pop_brasil_tratado$taxa[is.na(pop_brasil_tratado$taxa)] <- 0  
+
+pop_brasil_tratado <- 
+            pop_brasil_tratado |>    
+            mutate(pop_dependente = 
+                     total - (total * (taxa/100)))   
+```
+
+# References
+
+Asamani, J. A., Christmals, C. D., & Reitsma, G. M. (2021). The needs-based health workforce planning method: a systematic scoping review of analytical applications. *Health Policy and Planning*, *36*(8), 1325-1343.
+
+Belotti, L., Maito, S., Vesga-Varela, A. L., de Almeida, L. Y., da Silva, M. T., Haddad, A. E., ... & Bonfim, D. (2024). Activities of the oral health teams in primary health care: a time-motion study. *BMC Health Services Research*, *24*(1), 617.
+
+Brasil (2017). Portaria de Consolidação nº 1, 28 de setembro de 2017. *Consolidação das normas sobre os direitos e deveres dos usuários da saúde, a organização e o funcionamento do Sistema Único de Saúde. Diário Oficial da União*.
