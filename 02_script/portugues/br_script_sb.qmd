@@ -270,7 +270,7 @@ necessidades_servicos <-
 
 A etapa 3 consiste na tradução do número de serviços, calculado pela equação 1, em número de profissionais necessários (NPSB). Para isso, devem ser considerados dois elementos: produtividade (T) e o tempo total disponível (TTD).
 
-![](images/eq2_sb.png){fig-align="center" width="334"}
+![](images/eq2_sb.png){fig-align="center"}
 
 Onde:
 
@@ -504,7 +504,7 @@ Onde:
 -   O = Oferta de cirurgiões-dentistas em dada localidade l;
 -   NPSB = Necessidade de cirurgiões-dentistas em dada localidade l;
 
-![](images/eq5_sb-01.png){fig-align="center"}
+![](images/eq5_sb.png){fig-align="center"}
 
 Onde:
 
@@ -1430,9 +1430,6 @@ resultado_final <-
                         necessidade, ttd,
                         tempo, pd, pl, atributos,
                         FTE_40_linha, rr, ra)
-
-
-
 
 #write.csv2(resultado_final, "resultado_final_1600.csv")
 #arrow::write_parquet(resultado_final, "resultado_final_1600.parquet")
