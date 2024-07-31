@@ -1197,7 +1197,7 @@ Criamos uma função para iterar sobre alguns valores. Isso permitirá visualiza
 #| warning: false
 
 gap_necessidade_oferta <- 
-  function(tempo, ttd, pd, pl){
+  function(tempo, ttd, pd, pl, sus, categoria){
 
           pop_brasil_tratado <- 
                   pop_brasil |>
@@ -1275,13 +1275,23 @@ necessidades_prof_br <-
 oferta$FTE40 <- as.numeric(oferta$FTE40)
 
 oferta_brasil <- 
+  if(todos == sus)
+  {
+    
+    oferta |> 
+      filter(PROF_SUS == "1") |> 
+      group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
+      summarise(FTE40 = sum(FTE40)) |> 
+      filter(NIVEL != "NA") |> 
+      mutate(NIVEL = if_else(NIVEL == "APS","APS","AES")) 
+  } else{
   oferta |> 
-  filter(PROF_SUS == "1") |> 
-  group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
-  summarise(FTE40 = sum(FTE40)) |> 
-  filter(NIVEL != "NA") |> 
-  mutate(NIVEL = if_else(NIVEL == "APS","APS","AES")) 
+    group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
+    summarise(FTE40 = sum(FTE40)) |> 
+    filter(NIVEL != "NA") |> 
+    mutate(NIVEL = if_else(NIVEL == "APS","APS","AES")) 
   
+}
 
 oferta_brasil <- 
   oferta_brasil |> 
@@ -1290,7 +1300,9 @@ oferta_brasil <-
 
 
 oferta_brasil_cd <- oferta_brasil |> 
-                        filter(CATEGORIA == "Técnico ou Auxiliar de Saúde Bucal")
+                        filter(CATEGORIA == categoria)
+
+# Cirurgião-dentista
 
 oferta_vs_demanda <-
   necessidades_prof_br |> 
@@ -1315,70 +1327,97 @@ oferta_vs_demanda <- oferta_vs_demanda |>
 
 #### 8.1. Executando a função para um conjunto de valores
 
-Utilizamos uma lista de valores para iterar conforme a tabela abaixo.
+Utilizamos uma lista de valores para iterar conforme a tabela abaixo. Estas combinações resultaram em 1600 combinações de resultados.
 
-+----------------------------------------------+-------------+-------------------------------------------------+
-| Parâmetro                                    | Sigla       | Valores                                         |
-+==============================================+=============+=================================================+
-| Tempo total disponível                       | TTD         | em horas: 1576; 1676; 1776; 1876                |
-+----------------------------------------------+-------------+-------------------------------------------------+
-| Tempo de procedimentos                       | T           | em minutos: 25, 35, 45, 55                      |
-+----------------------------------------------+-------------+-------------------------------------------------+
-| Percentual de atividades diretas             | PD          | em unidade percentual: 50%, 60%, 80%, 90%, 100% |
-+----------------------------------------------+-------------+-------------------------------------------------+
-| Percentual de atividades da linha de cuidado | PL          | em unidade percentual: 50%, 60%, 80%, 90%, 100% |
-+----------------------------------------------+-------------+-------------------------------------------------+
++----------------------------------------------+-------------+------------------------------------------------------------------------------------------+
+| Parâmetro                                    | Sigla       | Valores                                                                                  |
++==============================================+=============+==========================================================================================+
+| Tempo total disponível                       | TTD         | em horas: 1576; 1676; 1776; 1876                                                         |
++----------------------------------------------+-------------+------------------------------------------------------------------------------------------+
+| Tempo de procedimentos                       | T           | em minutos: 25, 35, 45, 55                                                               |
++----------------------------------------------+-------------+------------------------------------------------------------------------------------------+
+| Percentual de atividades diretas             | PD          | em unidade percentual: 50%, 60%, 80%, 90%, 100%                                          |
++----------------------------------------------+-------------+------------------------------------------------------------------------------------------+
+| Percentual de atividades da linha de cuidado | PL          | em unidade percentual: 50%, 60%, 80%, 90%, 100%                                          |
++----------------------------------------------+-------------+------------------------------------------------------------------------------------------+
+| Categoria profissional                       | CAT         | Cirurgião-dentista e Técnico/Auxiliar de Saúde Bucal                                     |
++----------------------------------------------+-------------+------------------------------------------------------------------------------------------+
+| Recorte de Profissionais                     | SUS         | TRUE (pegar todos profissionais, SUS e não SUS) ou FALSE (pegar só os profissionais SUS) |
++----------------------------------------------+-------------+------------------------------------------------------------------------------------------+
 
-```{r}
+```{r eval=FALSE}
 #| warning: false
 
-#Criando lista de vetores para cada parâmetro
+# Criando lista de vetores para cada parâmetro
 list_ttd <- as.numeric(c("1576","1676", "1776", "1876"))
 list_tempo <- as.numeric(c("25", "35", "45", "55"))
 list_pd <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
 list_pl <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
-
+list_cat <- c("Cirurgião-dentista","Técnico ou Auxiliar de Saúde Bucal")
+list_sus <- c(TRUE, FALSE) # pegar todos os profissionais ou só SUS (false)
 
 # Executando lista e guardando em uma lista 
 
 resultado <- list()
 
-for (list_ttd in list_ttd) {
-  for (list_tempo in list_tempo) {
-    for (list_pd in list_pd) {
-      for (list_pl in list_pl) { 
-        
+for (ttd in list_ttd) {
+  for (tempo in list_tempo) {
+    for (pd in list_pd) {
+      for (pl in list_pl) { 
+        for(sus in list_sus){
+          for(cat in list_cat){
+            
         res <- 
           gap_necessidade_oferta(
-                  tempo = list_tempo, 
-                  ttd = list_ttd, 
-                  pd = list_pd, 
-                  pl = list_pl)
+                  tempo = tempo, 
+                  ttd = ttd, 
+                  pd = pd, 
+                  pl = pl,
+                  sus = sus, 
+                  cat = cat)
         
         res <- cbind(res, 
-                     ttd = list_ttd, 
-                     tempo = list_tempo, 
-                     pd = list_pd, 
-                     pl = list_pl)
+                     ttd = ttd, 
+                     tempo = tempo, 
+                     pd = pd, 
+                     pl = pl,
+                     sus = sus,
+                     cat = cat)
         
-        res$atributos <- paste(list_ttd, 
-                               list_tempo, 
-                               list_pd, 
-                               list_pl, sep = "_")
+        res$atributos <- paste(ttd, 
+                               tempo, 
+                               pd, 
+                               pl, 
+                               sus,
+                               cat, 
+                               sep = "_")
         
         resultado[[length(resultado) + 1]] <- res
+          
+          }
+        }
       }
     }
   }
 }
 
+# Verificando o tamanho da lista resultado
+length(resultado)
+
+resultado_teste <- 
+                do.call(rbind, resultado) 
+
+```
+
+Depois de fazer as 1600 iterações, agregamos as colunas que identificam a região de saúde e salvamos o resultado em um dataframe, chamado `resultado_final`.
+
+```{r eval=FALSE}
+
 hierarquia_municipios$cod_municipio <- as.character(hierarquia_municipios$cod_municipio)
 
-# Combina os resultados em um único data frame
 
-resultado_dentista <- 
-                do.call(rbind, resultado) |> 
-                    mutate(categoria = "Dentista") |> 
+resultado_final <- 
+                resultado_teste |> 
                     left_join(hierarquia_municipios, 
                               by = c("cod_municipiodv"=
                                      "cod_municipio")) |> 
@@ -1393,29 +1432,10 @@ resultado_dentista <-
                         FTE_40_linha, rr, ra)
 
 
-resultado_tsb <- 
-                do.call(rbind, resultado) |> 
-                    mutate(categoria = "TSB") |> 
-                    left_join(hierarquia_municipios, 
-                              by = c("cod_municipiodv"=
-                                     "cod_municipio")) |> 
-                 ungroup() |> 
-                 select(cod_municipiodv, 
-                        regiao, cod_uf, uf_sigla,
-                        cod_regsaud, regiao_saude,
-                        municipio, latitude,
-                        longitude, nivel, 
-                        necessidade, ttd,
-                        tempo, pd, pl, atributos,
-                        FTE_40_linha, rr, ra)
 
 
-resultado_geral <- 
-  rbind(resultado_tsb, 
-        resultado_dentista)
-
-#writexl::write_xlsx(resultado_geral, "resultados_saudebucal.xlsx")
-#write.csv(resultado_geral, "resultado_saudebucal.csv")
+#write.csv2(resultado_final, "resultado_final_1600.csv")
+#arrow::write_parquet(resultado_final, "resultado_final_1600.parquet")
 
 ```
 
