@@ -343,7 +343,7 @@ channel <- odbcDriverConnect(sprintf("DRIVER=Dremio Connector;
                          dremio_uid, 
                          dremio_pwd))
 
-query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB e cirurgiões dentistas em APS e AES"'
+query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB e dentistas por municipio"'
 
 
 
@@ -374,75 +374,62 @@ Não foi incluída a força de trabalho atuante em hospitais, tendo em vista o e
 ``` sql
 
 
-WITH CH_PROFISSIONAIS AS(
+WITH PROF AS(
 
-    SELECT CODUFMUN, 
-           COMPETEN, 
-           PROF_SUS,
-           NIVEL, 
-           CATEGORIA, 
-           HORAAMBULATORIAL,
-           HORAHOSPITALAR,
-           HORAOUTRO,
-           HORAAMBULATORIAL + HORAHOSPITALAR + HORAOUTRO AS HORA 
-    FROM(
-            SELECT CODUFMUN, 
-                COMPETEN, 
-                PROF_SUS, 
-                    CASE     
-                        WHEN TP_UNID = '01' OR 
-                             TP_UNID = '02' OR 
-                             TP_UNID = '32' OR
-                             TP_UNID = '40' THEN  'APS'
-                        WHEN TP_UNID = '36' OR
-                             TP_UNID = '73' OR
-                             TP_UNID = '04' OR
-                             TP_UNID = '22' THEN 'ESPECIALIZADO'
-                    END NIVEL,
-                    CASE 
-                        WHEN substr(CBO, 1, 4) = '2232' THEN 'Cirurgião-dentista'
-                        WHEN substr(CBO, 1, 4) = '3224' THEN 'Técnico ou Auxiliar de Saúde Bucal'
-                    END CATEGORIA,
-                    SUM(HORA_AMB) AS HORAAMBULATORIAL, 
-                    SUM(HORAHOSP) AS HORAHOSPITALAR, 
-                    SUM(HORAOUTR) AS HORAOUTRO  
+    SELECT 
+        CNES,
+        CODUFMUN, 
+        COMPETEN, 
+        PROF_SUS, 
+            CASE     
+                WHEN TP_UNID = '01' OR 
+                        TP_UNID = '02' OR 
+                        TP_UNID = '32' OR
+                        TP_UNID = '40' THEN  'APS'
+                WHEN TP_UNID = '36' OR
+                        TP_UNID = '73' OR
+                        TP_UNID = '04' OR
+                        TP_UNID = '22' THEN 'AES'
+            END NIVEL,
+            SUBSTR(CBO, 1, 4) AS FAM_CBO,
+            CASE 
+                WHEN substr(CBO, 1, 4) = '2232' 
+                  THEN 'Cirurgião-dentista'
+                WHEN substr(CBO, 1, 4) = '3224' 
+                  THEN 'Técnico ou Auxiliar de Saúde Bucal'
+            END CATEGORIA,
+            (HORAOUTR + HORAHOSP + HORA_AMB) AS ch_total,
+            CAST((CAST(HORAOUTR + HORAHOSP + HORA_AMB AS FLOAT)/CAST(40 AS FLOAT)) AS FLOAT) AS fte40
 
-            FROM Dados.cnes.PF 
-                            
-            WHERE (substr(CBO, 1, 4) = '2232' OR 
-                    substr(CBO, 1, 4) = '3224') AND
-                    COMPETEN = '202401'
-            GROUP BY CODUFMUN, COMPETEN, NIVEL, PROF_SUS, CBO
-    )
+    FROM Dados.cnes.PF pf
+                    
+    WHERE (substr(CBO, 1, 4) = '2232' OR 
+            substr(CBO, 1, 4) = '3224') AND
+            COMPETEN = '202401' AND 
+            NIVEL IS NOT NULL
+
 )
 
-SELECT p.CODUFMUN, 
-       q.municipio, 
-       q.uf_sigla, 
-       q.latitude, 
-       q.longitude, 
-       q.cod_regsaud, 
-       q.cod_macrorregiao, 
-       q.regiao_saude, 
-       q.macrorregiao_pad, 
-       p.COMPETEN, 
-       p.PROF_SUS,
-       p.NIVEL, 
-       p.CATEGORIA,
-       p.HORA, 
-       p.HORA/40 AS FTE40 
-   FROM CH_PROFISSIONAIS p
-   LEFT JOIN 
-   "Analytics Layer".Territorial."Municípios - Hierarquia Completa" q
-                ON CAST(P.CODUFMUN AS INTEGER) = q.cod_municipio 
+SELECT CODUFMUN, 
+       PROF_SUS, 
+       NIVEL, 
+       FAM_CBO, 
+       CATEGORIA,
+       SUM(ch_total) AS CH,
+       ROUND(SUM(fte40),2) AS fte40 
+FROM PROF
+GROUP BY 
+       CODUFMUN, 
+       PROF_SUS, 
+       NIVEL, 
+       FAM_CBO, 
+       CATEGORIA
 ```
 
 Vamos filtrar apenas para acessar dados de Palmas (TO) e profissionais atuando no SUS.
 
 ```{r}
 #| warning: false
-
-oferta$FTE40 <- as.numeric(oferta$FTE40)
 
 # filtro para Palmas-TO e profissionais atuando no SUS
 
@@ -451,7 +438,7 @@ oferta_palmas <-
   filter(CODUFMUN == "172100" & 
          PROF_SUS == "1") |> 
   group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
-  summarise(FTE40 = sum(FTE40)) |> 
+  summarise(FTE40 = sum(fte40)) |> 
   filter(NIVEL != "NA") |> 
   mutate(NIVEL = if_else(NIVEL == "APS",
                                   "APS",
@@ -801,28 +788,64 @@ channel <- odbcDriverConnect(sprintf("DRIVER=Dremio Connector;
                          dremio_uid, 
                          dremio_pwd))
 
-query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB/ASB e cirurgiões dentistas em APS e AES"'
+query <- 'SELECT * FROM "Analytics Layer".Infraestrutura.Profissionais."TSB e dentistas por municipio"'
 
 
 
 oferta <- sqlQuery(channel, query, 
                      as.is = TRUE)
+
+dim(oferta)
 ```
 
-O script abaixo agrupa o total da força de trabalho por nível de atenção e município.
+O script abaixo fazer alguns tratamentos em relação à oferta, pois nem todos os municípios terão profissionais em atenção especializada, por exemplo.
+
+Temos que assegurar que tenhamos 44560 linhas na tabela (5570 municípios x dois níveis de atenção x duas categorias profissionais x dois tipos de vínculo, SUS e não SUS). Por isso é feito o tratamento abaixo.
 
 ```{r}
 #| warning: false
 
-oferta$FTE40 <- as.numeric(oferta$FTE40)
+# Definindo o vetor com 5570 município
+vetor <- unique(necessidades_prof_br$cod_municipiodv)
+
+# Cada elemento do vetor será repetido 8 vezes (2 valores para 'nível', 2 valores para 'profissional' e 2 valores para 'SUS')
+vetor_duplicado <- rep(vetor, each = 8)
+
+# Criando a coluna 'nível' com valores alternados entre 'APS' e 'AES'
+nivel <- rep(c("APS", "AES"), each = 4, length.out = length(vetor_duplicado))
+
+# Criando a coluna 'profissional' com valores alternados entre 'dentista' e 'TSB'
+profissional <- rep(c("2232", "3224"), each = 2, length.out = length(vetor_duplicado))
+
+# Criando a coluna 'SUS' com valores alternados entre 0 e 1
+SUS <- rep(c('0', '1'), length.out = length(vetor_duplicado))
+
+# Criando o DataFrame
+df <- 
+  data.frame(
+            elemento = vetor_duplicado, 
+            nivel = nivel, 
+            profissional = profissional, 
+            SUS = SUS
+            )
+
+
+df <- df |> rename(ibge = elemento)
+
+df$ibge <- as.character(df$ibge)
+
 
 oferta_brasil <- 
-  oferta |> 
-  filter(PROF_SUS == "1") |> 
-  group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
-  summarise(FTE40 = sum(FTE40)) |> 
-  filter(NIVEL != "NA") |> 
-  mutate(NIVEL = if_else(NIVEL == "APS","APS","AES")) 
+    df |>  
+    left_join(oferta, by = c("ibge"="CODUFMUN",
+                             "nivel"="NIVEL",
+                             "SUS" = "PROF_SUS",
+                             "profissional" = "FAM_CBO"))
+
+oferta_brasil$fte40[is.na(oferta_brasil$fte40)] <- 0
+oferta_brasil$CH[is.na(oferta_brasil$CH)] <- 0
+
+dim(oferta_brasil)
 ```
 
 ### 7.2. Cálculo de valor líquido da oferta
@@ -833,13 +856,8 @@ O próximo passo consiste na deducação da força de trabalho associada a ativi
 
 oferta_brasil <- 
   oferta_brasil |> 
-  mutate(FTE_40_direto = FTE40 * 0.80) |> 
+  mutate(FTE_40_direto = fte40 * 0.80) |> 
   mutate(FTE_40_linha = FTE_40_direto * 0.80)
-
-oferta_brasil |> 
-  ungroup() |> 
-  select(CATEGORIA, NIVEL, FTE40, 
-         FTE_40_direto, FTE_40_linha)
 
 ```
 
@@ -849,26 +867,27 @@ Agora vamos comparar a força de trabalho disponível com a necessidade. Primeir
 
 #### 7.3.1. Resultados para cirurgiões-dentistas
 
-O script a seguir calcula os resultados para Cirurgiões dentistas **por município**.
+O script a seguir calcula os resultados para Cirurgiões dentistas **por município**. No momento vamos pegar apenas os profissionais atuantes no SUS.
 
 ```{r}
 #| warning: false
 
 oferta_brasil_cd <- 
           oferta_brasil |> 
-              filter(CATEGORIA == "Cirurgião-dentista")
+              filter(profissional == "2232" & 
+                     SUS == "1")
 
 cd_oferta_vs_demanda_br <-
   necessidades_prof_br |> 
   left_join(oferta_brasil_cd, 
-            by = c("cod_municipiodv"="CODUFMUN",
-                   "nivel" = "NIVEL")) 
+            by = c("cod_municipiodv"="ibge",
+                   "nivel" = "nivel")) 
 
 
 cd_oferta_vs_demanda_br$FTE_40_linha[is.na(cd_oferta_vs_demanda_br$FTE_40_linha)] <- 0
 
 
-cd_oferta_vs_demanda_br$FTE40[is.na(cd_oferta_vs_demanda_br$FTE40)] <- 0
+cd_oferta_vs_demanda_br$fte40[is.na(cd_oferta_vs_demanda_br$fte40)] <- 0
 
 
 cd_oferta_vs_demanda_br$FTE_40_direto[is.na(cd_oferta_vs_demanda_br$FTE_40_direto)] <- 0
@@ -930,7 +949,7 @@ ggplot() +
 
 ```
 
-De acordo com os resultados das tabelas, nós temos alguns poucos municípios que possuem um resultado relativo muito elevado, na ordem de 600%. Isso significa que a oferta é muito superior à necessidade. Isso ocorre geralmente em municípios muito pequenos. O município de Cachoeira Dourada - MG possui apenas 2706 habitantes. Com bases nos cálculos, a necessidade é de 0,31 profissionais para atenção especializada. No entanto, o município conta com 1,92 profissionais. Por isso a diferença elevada. No mapa acima, restringimos apenas até 100% de resultado relativo.
+De acordo com os resultados das tabelas, nós temos alguns poucos municípios que possuem um resultado relativo muito elevado, na ordem de 400%. Isso significa que a oferta é muito superior à necessidade. Isso ocorre geralmente em municípios muito pequenos. O município de Cedro de Abaeté - MG possui apenas 1.081 habitantes. Com bases nos cálculos, a necessidade é de 0,49 profissionais para APS. No entanto, o município conta com 1,98 profissionais. Por isso a diferença elevada. No mapa acima, restringimos apenas até 100% de resultado r
 
 Mas também podemos incluir outras formas de agregação da informação, a exemplo dos dados apresentados por **região de saúde**.
 
@@ -966,7 +985,7 @@ cd_oferta_vs_demanda_regiao_saude <-
            rr = (oferta/necessidade) * 100) |> 
     mutate(ra = round(ra, 2),
            rr = round(rr, 2))
-
+  
 ```
 
 Script para criar o mapa de regiões de saúde.
@@ -977,10 +996,11 @@ Script para criar o mapa de regiões de saúde.
 estados_br <- read_state(year = 2020)
 
 spdf <- 
-  geojson_read("~/GitHub/saude_bucal/01_dados/shape_file_regioes_saude.json", what = "sp") 
+  geojson_read("~/GitHub/saude_bucal/01_dados/shape_file_regioes_saude.json", 
+               what = "sp") 
 
-spdf_fortified <- sf::st_as_sf(spdf)
-
+spdf_fortified <- 
+  sf::st_as_sf(spdf)
 
 # Definir limites de longitude e latitude para focar no Brasil
 limite_long <- c(-75, -28)  # limites de longitude
@@ -995,8 +1015,10 @@ mapa_rs <-
 
 # Adicionar geometria se não existir
 if (!"geometry" %in% names(mapa_rs)) {
+  
   mapa_rs <- st_as_sf(mapa_rs, 
-                      coords = c("longitude", "latitude"), 
+                      coords = c("longitude", 
+                                 "latitude"), 
                       crs = 4326) 
 }
 
@@ -1021,7 +1043,7 @@ ggplot() +
 
 ```
 
-#### 7.3.2. Results for Oral Health Technician and Assistant
+#### 7.3.2. Resultados para TSB/ASB
 
 Abaixo vamos calcular os percentuais absolutos e relativos para TSB e ASB assumindo uma necessidade de um profissional desta categoria para cada cirurgião dentista.
 
@@ -1029,20 +1051,21 @@ Abaixo vamos calcular os percentuais absolutos e relativos para TSB e ASB assumi
 
 oferta_brasil_tsb_asb <- 
           oferta_brasil |> 
-              filter(CATEGORIA == "Técnico ou Auxiliar de Saúde Bucal")
+              filter(profissional == "3224" & 
+                     SUS == "1")
 
 cd_oferta_vs_demanda_br_tsb_asb <-
   
   necessidades_prof_br |> 
   left_join(oferta_brasil_tsb_asb, 
-            by = c("cod_municipiodv"="CODUFMUN",
-                   "nivel" = "NIVEL")) 
+            by = c("cod_municipiodv"="ibge",
+                   "nivel" = "nivel")) 
 
 
 cd_oferta_vs_demanda_br_tsb_asb$FTE_40_linha[is.na(cd_oferta_vs_demanda_br_tsb_asb$FTE_40_linha)] <- 0
 
 
-cd_oferta_vs_demanda_br_tsb_asb$FTE40[is.na(cd_oferta_vs_demanda_br_tsb_asb$FTE40)] <- 0
+cd_oferta_vs_demanda_br_tsb_asb$fte40[is.na(cd_oferta_vs_demanda_br_tsb_asb$fte40)] <- 0
 
 
 cd_oferta_vs_demanda_br_tsb_asb$FTE_40_direto[is.na(cd_oferta_vs_demanda_br_tsb_asb$FTE_40_direto)] <- 0
@@ -1069,7 +1092,7 @@ cd_oferta_vs_demanda_br_tsb_asb |>
 
 ```
 
-Gerando o mapa cloroplético por município para TSB/ASB. Alguns municípios não estão coloridos, pois possuem percentuais superiores a 100%.
+Gerando o mapa cloroplético por município para TSB/ASB. Alguns municípios não estão coloridos, pois possuem percentuais superiores a 100% ou se o valor for igual 0%.
 
 ```{r message=FALSE, warning=FALSE}
 #| warning: false
@@ -1104,11 +1127,7 @@ ggplot() +
 
 ```
 
-O município de Cachoeira Dourada - MG representa o maior resultado relativo entre os municípios brasileiros.
-
-De 5570 municípios brasileiros, temos 491 que temos um percentual de 100% ou mais. Quase metade deste valor está no estado de Minas Gerais.
-
-Mas também podemos incluir outras formas de agregação da informação, a exemplo dos dados apresentados por **região de saúde**.
+Também podemos incluir outras formas de agregação da informação, a exemplo dos dados apresentados por **região de saúde**.
 
 ```{r}
 #| warning: false
@@ -1187,6 +1206,8 @@ ggplot() +
 
 ```
 
+As implicações financeiras serão feitas diretamente em um dashboard.
+
 ## 8. Análise de Cenário
 
 Uma das últimas etapas do desenvolvimento de metodologias consiste na análise de cenário. Esta etapa é realizada, pois nem sempre temos parâmetros certos. Portanto, a análise é usada para simular a metodologia com diferentes parâmetros.
@@ -1197,6 +1218,7 @@ Criamos uma função para iterar sobre alguns valores. Isso permitirá visualiza
 #| warning: false
 
 gap_necessidade_oferta <- 
+  
   function(tempo, ttd, pd, pl, sus, categoria){
 
           pop_brasil_tratado <- 
@@ -1359,6 +1381,9 @@ list_sus <- c(TRUE, FALSE) # pegar todos os profissionais ou só SUS (false)
 # Executando lista e guardando em uma lista 
 
 resultado <- list()
+iteracao <- 0
+total_iteracoes <- length(list_ttd) * length(list_tempo) * length(list_pd) * length(list_pl) * length(list_cat) * length(list_sus)
+
 
 for (ttd in list_ttd) {
   for (tempo in list_tempo) {
@@ -1367,32 +1392,35 @@ for (ttd in list_ttd) {
         for(sus in list_sus){
           for(cat in list_cat){
             
-        res <- 
-          gap_necessidade_oferta(
-                  tempo = tempo, 
-                  ttd = ttd, 
-                  pd = pd, 
-                  pl = pl,
-                  sus = sus, 
-                  cat = cat)
+            iteracao <- iteracao + 1
+            cat("Iteração:", iteracao, "de", total_iteracoes, "\n")
         
-        res <- cbind(res, 
-                     ttd = ttd, 
-                     tempo = tempo, 
-                     pd = pd, 
-                     pl = pl,
-                     sus = sus,
-                     cat = cat)
-        
-        res$atributos <- paste(ttd, 
-                               tempo, 
-                               pd, 
-                               pl, 
-                               sus,
-                               cat, 
-                               sep = "_")
-        
-        resultado[[length(resultado) + 1]] <- res
+            res <- 
+              gap_necessidade_oferta(
+                      tempo = tempo, 
+                      ttd = ttd, 
+                      pd = pd, 
+                      pl = pl,
+                      sus = sus, 
+                      cat = cat)
+            
+            res <- cbind(res, 
+                         ttd = ttd, 
+                         tempo = tempo, 
+                         pd = pd, 
+                         pl = pl,
+                         sus = sus,
+                         cat = cat)
+            
+            res$atributos <- paste(ttd, 
+                                   tempo, 
+                                   pd, 
+                                   pl, 
+                                   sus,
+                                   cat, 
+                                   sep = "_")
+            
+            resultado[[length(resultado) + 1]] <- res
           
           }
         }
@@ -1428,11 +1456,11 @@ resultado_final <-
                         municipio, latitude,
                         longitude, nivel, 
                         necessidade, ttd,
-                        tempo, pd, pl, atributos,
+                        tempo, pd, pl, cat, sus,  atributos,
                         FTE_40_linha, rr, ra)
 
-#write.csv2(resultado_final, "resultado_final_1600.csv")
-#arrow::write_parquet(resultado_final, "resultado_final_1600.parquet")
+write.csv2(resultado_final, "resultado_final_1600.csv")
+arrow::write_parquet(resultado_final, "resultado_final_1600.parquet")
 
 ```
 
