@@ -2,11 +2,13 @@
 
 gap_necessidade_oferta <- 
   
-  function(tempo, ttd, pd, pl, sus, categoria){
+  function(tempo, ttd, 
+           pd, pl, sus, 
+           categoria){
     
     pop_brasil_tratado <- 
       pop_brasil |>
-      filter(cod_municipiodv == '4209508') |> 
+      mutate(uf = substr(cod_municipiodv, 1, 2)) |> 
       select(cod_municipiodv, 
              ibge_sb, municipio, de_0_a_14_anos,
              de_15_a_29_anos, de_30_a_59_anos,
@@ -31,7 +33,9 @@ gap_necessidade_oferta <-
     pop_brasil_tratado <-
       pop_brasil_tratado |> 
       mutate(ibge_sb = as.character(ibge_sb)) |> 
-      mutate(ibge_sb = str_sub(ibge_sb, start = 1, end = 6))
+      mutate(ibge_sb = str_sub(ibge_sb, 
+                               start = 1, 
+                               end = 6))
     
     cobertura_sb$ibge <- as.character(cobertura_sb$ibge)
     
@@ -45,8 +49,7 @@ gap_necessidade_oferta <-
              cod_municipiodv, cod_mun_loc) |> 
       mutate(populacao_coberta = cobertura * total) |> 
       mutate(populacao_coberta = round(populacao_coberta, 2))
-    
-    
+  
     producao_brasil <- producao_normativa_br |> 
       select(-municipio, 
              -li_cobertura,
@@ -64,7 +67,6 @@ gap_necessidade_oferta <-
       mutate(nec_servicos = 
                round(nec_servicos, 2))
     
-    
     necessidades_prof_br <- 
       necessidades_servicos_br |>
       mutate(nec_prof = 
@@ -72,99 +74,66 @@ gap_necessidade_oferta <-
       mutate(nivel = 
                if_else(procedimento == "Atenção Básica","APS","AES")) |> 
       group_by(ibge, municipio.x, 
-               nivel, cod_municipiodv, cod_mun_loc) |> 
-      summarise(necessidade = 
-                  sum(nec_prof))
+               nivel, cod_municipiodv, 
+               cod_mun_loc) |> 
+      summarise(necessidade = sum(nec_prof))
     
+    oferta_prof <- oferta_brasil |> 
+                    filter(profissional == categoria)
     
+    todos <- TRUE
     
-    oferta$FTE40 <- as.numeric(oferta$FTE40)
-    
-    oferta_brasil <- 
+    oferta_temp <- 
       if(todos == sus)
       {
-        oferta |> 
-          filter(PROF_SUS == "1") |> 
-          group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
-          summarise(FTE40 = sum(FTE40)) |> 
-          filter(NIVEL != "NA") |> 
-          mutate(NIVEL = if_else(NIVEL == "APS","APS","AES")) 
-      } else{
-        oferta |> 
-          group_by(CODUFMUN, CATEGORIA, NIVEL) |> 
-          summarise(FTE40 = sum(FTE40)) |> 
-          filter(NIVEL != "NA") |> 
-          mutate(NIVEL = if_else(NIVEL == "APS","APS","AES")) 
+        oferta_prof |> 
+          filter(SUS == "1") 
+      } 
+      else
+      {
+        oferta_prof |> 
+          group_by(ibge, profissional, nivel) |> 
+          summarise(fte40 = sum(fte40)) |> 
+          ungroup()
         
       }
     
-    oferta_brasil <- 
-      oferta_brasil |> 
-      mutate(FTE_40_direto = FTE40 * pd) |> 
+    oferta_temp$fte40[is.na(oferta_temp$fte40)] <- 0
+
+    oferta_temp <- 
+      oferta_temp |> 
+      mutate(FTE_40_direto = fte40 * pd) |> 
       mutate(FTE_40_linha = FTE_40_direto * pl)
+
+    oferta_temp$FTE_40_direto[is.na(oferta_temp$FTE_40_direto)] <- 0
+    oferta_temp$FTE_40_linha[is.na(oferta_temp$FTE_40_linha)] <- 0
     
-    
-    oferta_brasil_cd <- oferta_brasil |> 
-      filter(CATEGORIA == categoria)
-    
-    # Cirurgião-dentista
-    
+
     oferta_vs_demanda <-
       necessidades_prof_br |> 
-      left_join(oferta_brasil_cd, 
-                by = c("cod_municipiodv"="CODUFMUN",
-                       "nivel" = "NIVEL")) |> 
+      left_join(oferta_temp, 
+                by = c("cod_municipiodv"="ibge",
+                       "nivel" = "nivel")) |> 
       mutate(ra = FTE_40_linha - necessidade, 
              rr = (FTE_40_linha/necessidade) * 100) |> 
       mutate(ra = round(ra, 2),
-             rr = round(rr, 2)) |> 
-      filter(CATEGORIA != "NA")
-    
-    
-    oferta_vs_demanda$FTE_40_linha[is.na(oferta_vs_demanda$FTE_40_linha)] <- 0
-    
-    
-    oferta_vs_demanda$FTE40[is.na(oferta_vs_demanda$FTE40)] <- 0
-    
-    
-    oferta_vs_demanda$FTE_40_direto[is.na(oferta_vs_demanda$FTE_40_direto)] <- 0
+             rr = round(rr, 2)) 
     
     oferta_vs_demanda <- oferta_vs_demanda |>
       mutate(necessidade = round(necessidade, 2)) |>
-      mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
-      select(ibge, municipio.x, 
-             nivel, necessidade, 
-             FTE_40_linha, rr, ra, cod_municipiodv, cod_mun_loc)
+      mutate(FTE_40_linha = round(FTE_40_linha, 2)) 
     
   }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # Criando lista de vetores para cada parâmetro
-list_ttd <- as.numeric(c("1576"))
-list_tempo <- as.numeric(c("25"))
-list_pd <- as.numeric(c("0.50"))
-list_pl <- as.numeric(c("0.50"))
-list_cat <- c("Cirurgião-dentista","Técnico ou Auxiliar de Saúde Bucal")
-list_sus <- c(TRUE, FALSE) # pegar todos os profissionais ou só SUS (false)
+list_ttd <- as.numeric(c("1576", "1676", "1776", "1876"))
+list_tempo <- as.numeric(c("25","35", "45", "55"))
+list_pd <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
+list_pl <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
+list_cat <- c("2232","3224")
+list_sus <- c(TRUE, FALSE) # pegar todos os profissionais (FALSE) ou só SUS (TRUE)
 
 resultado1 <- list()
 iteracao1 <- 0
@@ -177,7 +146,7 @@ for (ttd in list_ttd) {
         for(sus in list_sus){
           for(cat in list_cat){
             iteracao1 <- iteracao1 + 1
-            cat("Iteração:", iteracao, "de", total_iteracoes1, "\n")
+            cat("Iteração:", iteracao1, "de", total_iteracoes1, "\n")
             
             res1 <- 
               gap_necessidade_oferta(
@@ -216,11 +185,25 @@ for (ttd in list_ttd) {
 length(resultado1)
 
 resultado_teste1 <- 
-  do.call(rbind, resultado1)
+  do.call(rbind, resultado1) 
+
+hierarquia_municipios$cod_municipio <- 
+  as.character(hierarquia_municipios$cod_municipio)
+
+resultado <- 
+  resultado_teste1 |>
+  mutate(categoria = if_else(profissional == '2232',"Dentista","TSB/ASB")) |> 
+  mutate(sus = if_else(sus == TRUE, "Apenas SUS", "Todos")) |> 
+  ungroup() |> 
+  left_join(hierarquia_municipios, by = c("cod_municipiodv"="cod_municipio")) |> 
+  select(cod_municipiodv, regiao, uf_sigla, uf, municipio, 
+         regiao_saude, cod_regsaud, nivel, profissional, 
+         categoria, sus, necessidade, fte40, FTE_40_direto, 
+         FTE_40_linha, ra, rr, ttd, tempo, pd, pl, atributos)
 
 
-a <- resultado_final |> 
-        group_by(cod_municipiodv, municipio) |> 
+a <- resultado |> 
+        group_by(cod_municipiodv) |> 
         count()
 
 
@@ -229,6 +212,8 @@ a <- resultado_final |>
 
 
 
+
+# tratamento da oferta ----------------------------------------------------
 
 
 # Definindo o vetor com 5570 elementos
@@ -241,7 +226,7 @@ vetor_duplicado <- rep(vetor, each = 8)
 nivel <- rep(c("APS", "ESPECIALIZADO"), each = 4, length.out = length(vetor_duplicado))
 
 # Criando a coluna 'profissional' com valores alternados entre 'dentista' e 'TSB'
-profissional <- rep(c("Cirurgião-dentista", "Técnico ou Auxiliar de Saúde Bucal"), each = 2, length.out = length(vetor_duplicado))
+profissional <- rep(c("2232", "3224"), each = 2, length.out = length(vetor_duplicado))
 
 # Criando a coluna 'SUS' com valores alternados entre 0 e 1
 SUS <- rep(c('0', '1'), length.out = length(vetor_duplicado))
@@ -264,11 +249,15 @@ teste_oferta_aps_aes <-
     left_join(oferta, by = c("ibge"="CODUFMUN",
                              "nivel"="NIVEL",
                              "SUS" = "PROF_SUS",
-                             "profissional" = "CATEGORIA"))
+                             "profissional" = "FAM_CBO"))
+
+
+teste_oferta_aps_aes$fte40[is.na(teste_oferta_aps_aes$fte40)] <- 0
+teste_oferta_aps_aes$CH[is.na(teste_oferta_aps_aes$CH)] <- 0
 
 
 
-
+teste_oferta_aps_aes
 
 
 
