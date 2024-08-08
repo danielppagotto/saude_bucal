@@ -207,9 +207,10 @@ a <- resultado |>
         count()
 
 
+#write.csv2(resultado, "resultado_final_1600.csv")
+#arrow::write_parquet(resultado, "resultado_final_1600.parquet")
 
-
-
+describe(resultado)
 
 
 
