@@ -127,12 +127,17 @@ O Ministério da Saúde traz uma série de parâmetros para planejamento dos ser
 
 Cabe destacar que, devido à estrutura da SB2010, estes parâmetros foram calculados para capitais de cada estado ou interior da região.
 
-| Área                      | Expressões usadas para cálculo de cobertura                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Atenção básica            | NT_1 (Número de dentes necessitando de restauração de 1 superfície) + NT_2 (Número de dentes necessitando de restauração de 2 ou mais superfícies) + NT_6 (Número de dentes necessitando de extração) + NT_7 (Número de dentes necessitando de controle de lesão branca) + NT_8 (Número de dentes necessitando de selante) + P_CALC (Prevalência de cálculo) + P_BR (Prevalência de bolsa rasa). Foi então criada a variável COB_AB. Se COB_AB = 0 o indivíduo não necessita de procedimentos de atenção básica, se COB_AB =1 ele necessita. A cobertura de atenção básica foi então estimada pelo percentual de pessoas com COB_AB=1 |
-| Endodontia                | A cobertura de endodontia foi calculada a partir da variável NT_5 (Número de dentes necessitando de tratamento pulpar + restauração). Foi criada a variável ENDO onde ENDO=0 se NT_5=0 e ENDO=1 se NT_5≠0. Desta forma, a cobertura de endodontia foi então estimada pelo percentual de pessoas com ENDO=1                                                                                                                                                                                                                                                                                                                            |
-| Periodontia especializada | A cobertura de periodontia especializada foi estimada pelo percentual de pessoas com a variável P_BP (Prevalência de bolsa profunda) = 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| Prótese                   | A cobertura de prótese foi calculada pelo percentual de pessoas com a variável NECPROT (Necessidade geral de prótese) ≠ 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
++-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Área                              | Expressões usadas para cálculo de cobertura                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
++===================================+=======================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
+| Atenção básica                    | NT_1 (Número de dentes necessitando de restauração de 1 superfície) + NT_2 (Número de dentes necessitando de restauração de 2 ou mais superfícies) + NT_6 (Número de dentes necessitando de extração) + NT_7 (Número de dentes necessitando de controle de lesão branca) + NT_8 (Número de dentes necessitando de selante) + P_CALC (Prevalência de cálculo) + P_BR (Prevalência de bolsa rasa). Foi então criada a variável COB_AB. Se COB_AB = 0 o indivíduo não necessita de procedimentos de atenção básica, se COB_AB =1 ele necessita. A cobertura de atenção básica foi então estimada pelo percentual de pessoas com COB_AB=1 |
++-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Endodontia                        | A cobertura de endodontia foi calculada a partir da variável NT_5 (Número de dentes necessitando de tratamento pulpar + restauração). Foi criada a variável ENDO onde ENDO=0 se NT_5=0 e ENDO=1 se NT_5≠0. Desta forma, a cobertura de endodontia foi então estimada pelo percentual de pessoas com ENDO=1                                                                                                                                                                                                                                                                                                                            |
++-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Periodontia especializada         | A cobertura de periodontia especializada foi estimada pelo percentual de pessoas com a variável P_BP (Prevalência de bolsa profunda) = 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
++-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Prótese                           | A cobertura de prótese foi calculada pelo percentual de pessoas com a variável NECPROT (Necessidade geral de prótese) ≠ 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
++-----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 : Fonte: Brasil (2021)
 
@@ -146,6 +151,8 @@ A cobertura de saúde bucal para cada condição e faixa etária são apresentad
 cobertura_sb <-
   read_excel("~/GitHub/saude_bucal/01_dados/cobertura sb.xlsx") |>  
   mutate(ibge = substr(ibge, 1, 6))
+
+
 
 # filtrando para Palmas-TO 
 
@@ -161,6 +168,7 @@ cobertura_sb |>
 Considerando os dados de população (P) e de cobertura (H), temos os seguintes resultados para população coberta.
 
 ```{r}
+
 
 # combinando por meio de left_join as tabelas de populacao (IBGE) e cobertura para cada tipo de servico (H)
 
@@ -613,6 +621,72 @@ pop_brasil_tratado |>
   ggtitle("Distribuição de faixa etária por município")
 ```
 
+#### 5.1.1. Plano de Saúde - Brasil
+
+A seguir é feito um levantamento de plano de saúde por região de saúde de acordo com dados da ANS.
+
+```{r}
+#|warning: FALSE
+
+hierarquia_municipios <- 
+  read_csv("~/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv") |> 
+  mutate(cod_municipio = as.character(cod_municipio))
+
+
+plano_de_saude <- 
+  read_delim("~/GitHub/saude_bucal/01_dados/plano_de_saude.csv", 
+    delim = ",", 
+    escape_double = FALSE, 
+    trim_ws = TRUE) |> 
+  mutate(id_faixa = 
+           case_when(
+                FAIXA_CORRIGIDA == "de 0 a 14 anos" ~ 1,
+                FAIXA_CORRIGIDA == "de 15 a 29 anos" ~ 2,
+                FAIXA_CORRIGIDA == "de 30 a 59 anos" ~ 3,
+                FAIXA_CORRIGIDA == "acima de 60 anos" ~ 4)) |> 
+  filter(id_faixa != "NA") |> 
+  mutate(CD_MUNICIPIO = as.character(CD_MUNICIPIO)) |> 
+  select(CD_MUNICIPIO, id_faixa, PLANO_ODONTO, POP) |> 
+  janitor::clean_names() 
+
+plano_odontologico_rs <- 
+                  plano_de_saude |> 
+                      left_join(hierarquia_municipios,
+                                by = c("cd_municipio"="cod_municipio")) |> 
+                      group_by(uf, uf_sigla, 
+                               cod_regsaud,
+                               regiao_saude,
+                               id_faixa) |> 
+                      summarise(benef = sum(plano_odonto),
+                                pop = sum(pop)) |> 
+                      mutate(cobertura_plano = benef/pop) |> 
+                      filter(pop != 0)
+
+```
+
+Vamos agora unir à tabela de população possui.
+
+```{r}
+
+relacao_municipio_rs <- hierarquia_municipios |> 
+                              select(cod_municipio,
+                                     cod_regsaud)
+
+populacao_tratado <- 
+  pop_brasil_tratado |> 
+  left_join(relacao_municipio_rs,
+            by = c("cod_municipiodv"="cod_municipio")) |> 
+  left_join(plano_odontologico_rs,
+            by = c("cod_regsaud",
+                   "id_faixa")) |> 
+  select(-benef, -pop) |> 
+  mutate(pop_sus = total * (1 - cobertura_plano))
+  
+
+```
+
+A variável pop_sus será útil para simular os resultados usando a população que não tem acesso a plano de saúde (exclusivamente odontológico).
+
 ### 5.2. Prevalência de condições de saúde bucal (H) - Brasil
 
 Vamos fazer a leitura dos dados de cobertura de procedimentos para cada faixa etária em todos os municípios do Brasil para, em sequência, calcular a prevalência de condições de saúde bucal (H).
@@ -646,8 +720,8 @@ No script abaixo, juntamos a população de cada município à respectiva cobert
 
 # tratando os dados devido ao padrao de codigo IBGE de 7 digitos em algumas bases
 
-pop_brasil_tratado <-
-  pop_brasil_tratado |> 
+populacao_tratado <-
+  populacao_tratado |> 
     mutate(ibge_sb = 
              as.character(ibge_sb)) |> 
     mutate(ibge_sb = 
@@ -655,25 +729,26 @@ pop_brasil_tratado <-
                      start = 1, 
                      end = 6)) 
     
-
 cobertura_sb$ibge <- as.character(cobertura_sb$ibge)
 
 # juntando base de populacao e cobertura de saude bucal
 
 pop_coberta_br <- 
-  pop_brasil_tratado |> 
+  populacao_tratado |> 
   left_join(cobertura_sb, 
             by = c("ibge_sb" = "ibge",
                    "id_faixa" = "id_faixa")) |> 
   select(ibge, ibge_sb, 
          municipio.x, 
          faixa, id_faixa, 
-         total, procedimento, cobertura, 
-         cod_municipiodv, cod_mun_loc) |> 
+         total, procedimento, cobertura, cobertura_plano,
+         pop_sus, cod_municipiodv, cod_mun_loc) |> 
   rename(municipio = municipio.x) |> 
-  mutate(populacao_coberta = cobertura * total) |> 
-  mutate(populacao_coberta = round(populacao_coberta, 2))
-
+  rename(cobertura_servicos = cobertura) |> 
+  mutate(populacao_coberta = cobertura_servicos * total) |> 
+  mutate(populacao_coberta = round(populacao_coberta, 2)) |> 
+  mutate(populacao_coberta_sus = cobertura_servicos * pop_sus) |> 
+  mutate(populacao_coberta_sus = round(populacao_coberta_sus, 2))
 
 ```
 
@@ -708,13 +783,23 @@ necessidades_servicos_br <- pop_coberta_br |>
                             mutate(nec_servicos = 
                                     populacao_coberta * producao_pc) |> 
                             mutate(nec_servicos = 
-                                     round(nec_servicos, 2))
+                                     round(nec_servicos, 2)) |> 
+                            mutate(nec_servicos_sus = 
+                                     populacao_coberta_sus * producao_pc) |> 
+                            mutate(nec_servicos_sus = round(nec_servicos_sus,2))
 
 necessidades_servicos_br |> 
   select(municipio, 
-         procedimento, 
          faixa, 
-         nec_servicos) 
+         total,
+         procedimento, 
+         nec_servicos,
+         nec_servicos_sus) |> 
+  rename(populacao = total) |> 
+  group_by(faixa, procedimento) |> 
+  summarise(populacao = sum(populacao),
+            servicos = sum(nec_servicos),
+            servicos_sus = sum(nec_servicos_sus))
 
 ```
 
@@ -729,7 +814,9 @@ Uma vez que sabemos a necessidade de saúde bucal (NSB) com base na distribuiç�
 necessidades_prof_br <- 
             necessidades_servicos_br |>
                           mutate(nec_prof = 
-                                (nec_servicos * 25/60)/1576) |> 
+                                (nec_servicos * 25/60)/1576) |>
+                          mutate(nec_prof_sus = 
+                                 (nec_servicos_sus * 25/60)/1576) |> 
                           mutate(nivel = if_else(
                             procedimento == "Atenção Básica",
                                            "APS",
@@ -737,14 +824,19 @@ necessidades_prof_br <-
                           group_by(ibge, municipio, 
                                    nivel, cod_municipiodv, 
                                    cod_mun_loc) |> 
-                          summarise(necessidade = sum(nec_prof)) |> 
-                          mutate(necessidade = round(necessidade, 2))
+                          summarise(necessidade = sum(nec_prof),
+                                    necessidade_sus = sum(nec_prof_sus)) |> 
+                          mutate(necessidade = round(necessidade, 2)) |> 
+                          mutate(necessidade_sus = round(necessidade_sus, 2))
+   
+                          
                           
 necessidades_prof_br |>
   ungroup() |> 
   select(municipio, 
          nivel, 
-         necessidade)
+         necessidade,
+         necessidade_sus) 
 
 ```
 
@@ -891,14 +983,18 @@ cd_oferta_vs_demanda_br$FTE_40_direto[is.na(cd_oferta_vs_demanda_br$FTE_40_diret
 cd_oferta_vs_demanda_br <- 
   cd_oferta_vs_demanda_br |> 
   mutate(ra = FTE_40_linha - necessidade, 
-         rr = (FTE_40_linha/necessidade) * 100) |> 
+         rr = (FTE_40_linha/necessidade) * 100,
+         ra_s = FTE_40_linha - necessidade_sus,
+         rr_s = (FTE_40_linha/necessidade_sus) * 100) |> 
   mutate(ra = round(ra, 2),
-         rr = round(rr, 2)) |> 
+         rr = round(rr, 2),
+         ra_s = round(ra_s, 2),
+         rr_s = round(rr_s, 2)) |> 
   mutate(necessidade = round(necessidade, 2)) |>
   mutate(FTE_40_linha = round(FTE_40_linha, 2)) |> 
   select(ibge, municipio, 
-         nivel, necessidade, 
-         FTE_40_linha, rr, ra, cod_municipiodv, 
+         nivel, necessidade, necessidade_sus,
+         FTE_40_linha, rr, ra, rr_s, ra_s, cod_municipiodv, 
          cod_mun_loc)
 
 cd_oferta_vs_demanda_br |> 
@@ -975,11 +1071,18 @@ cd_oferta_vs_demanda_regiao_saude <-
     group_by(nivel, cod_regsaud, uf_sigla,
              regiao_saude) |> 
     summarise(necessidade = sum(necessidade),
+              necessidade_sus = sum(necessidade_sus),
               oferta = sum(FTE_40_linha)) |> 
     mutate(ra = oferta - necessidade, 
-           rr = (oferta/necessidade) * 100) |> 
+           rr = (oferta/necessidade) * 100,
+           ra_s = oferta - necessidade_sus,
+           rr_s = (oferta/necessidade_sus) * 100) |> 
     mutate(ra = round(ra, 2),
-           rr = round(rr, 2))
+           rr = round(rr, 2),
+           ra_s = round(ra_s, 2),
+           rr_s = round(rr_s, 2)) |> 
+    mutate(rr = if_else(rr == 0.00, 1.00, rr)) |> 
+    mutate(rr_s = if_else(rr_s == 0.00, 1.00, rr_s))
   
 ```
 
@@ -1017,24 +1120,219 @@ if (!"geometry" %in% names(mapa_rs)) {
                       crs = 4326) 
 }
 
+```
 
-ggplot() +
-  geom_sf(data = mapa_rs, 
+#### 7.3.1.1. Mapa para APS
+
+```{r}
+
+a <- ggplot() +
+  geom_sf(data = mapa_rs |> filter(nivel == "APS"), 
           aes(fill = rr, geometry = geometry), 
           color = "#e9e9e9") +
   geom_sf(data = estados_br, 
           fill = NA, 
-          color = "#B8B8B8", 
+          color = "#4c4d4a", 
           size = 0.1) + 
   scale_fill_gradientn(colors = c("#D92B3A", 
-                                  "blue", 
-                                  "#371F78"), 
+                                  "#d4e302",
+                                  "#02592e"), 
                        values = 
                          rescale(c(0,50,100)), 
-                       limits = c(0, 100)) +  
-  labs(fill = "Taxa RR") +  
-  theme_void() + 
-  facet_grid(~nivel)
+                       limits = c(0,100),
+                       breaks = c(0, 50, 100)) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  theme(legend.position = "bottom",
+        legend.justification = "center",
+        legend.box = "horizontal",
+        axis.text.x = element_text(size = 14),  
+        axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14),
+        plot.title = element_text(size = 16)) +
+#  annotation_north_arrow(location = "tr",  
+#                         which_north = "true",
+#                         style = north_arrow_fancy_orienteering()) +
+  annotation_scale(location = "bl",  
+                   width_hint = 0.3)  +
+  ggtitle("Primary Healthcare")
+
+
+ggsave(filename = "mapa_aps.jpeg", plot = a,
+       dpi = 400, width = 14, height = 9)
+
+```
+
+Resultados por UF
+
+```{r}
+
+mapa_rs |> 
+  group_by(nivel, 
+           uf_sigla) |> 
+  summarise(nec = sum(necessidade),
+            of = sum(oferta)) |> 
+  mutate(rr = 100 * (of/nec)) |> 
+  mutate(rr = round(rr, 1)) |> 
+  filter(nivel == "AES") |> 
+  ggplot(aes(x = fct_reorder(uf_sigla, 
+                             rr), 
+             y = rr)) +
+  geom_col() + 
+  geom_text(aes(label = rr,
+                hjust = -0.25)) +
+  coord_flip() + 
+  xlab("Resultado relativo (%)") + 
+  ylab("UF") + 
+  theme_minimal()
+
+```
+
+```{r}
+
+mapa_rs |> 
+  group_by(nivel, 
+           uf_sigla) |> 
+  summarise(nec = sum(necessidade),
+            of = sum(oferta)) |> 
+  mutate(rr = 100 * (of/nec)) |> 
+  mutate(rr = round(rr, 1)) |> 
+  filter(nivel == "APS") |> 
+  ggplot(aes(x = fct_reorder(uf_sigla, 
+                             rr), 
+             y = rr)) +
+  geom_col() + 
+  geom_text(aes(label = rr,
+                hjust = -0.25)) +
+  coord_flip() + 
+  xlab("Resultado relativo (%)") + 
+  ylab("UF") + 
+  theme_minimal()
+
+```
+
+#### 7.3.1.2. Mapa para AES
+
+```{r}
+
+b <- ggplot() +
+  geom_sf(data = mapa_rs |> filter(nivel == "AES"), 
+          aes(fill = rr, geometry = geometry), 
+          color = "#e9e9e9") +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#4c4d4a", 
+          size = 0.1) + 
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#d4e302",
+                                  "#02592e"), 
+                       values = 
+                         rescale(c(0,80,165)), 
+                       limits = c(0,165),
+                       breaks = c(0, 80, 160)) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  theme(legend.position = "bottom",
+        legend.justification = "center",
+        legend.box = "horizontal",
+        axis.text.x = element_text(size = 14),  
+        axis.text.y = element_blank(),
+        legend.text = element_text(size = 14),
+        plot.title = element_text(size = 16)) +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
+#  annotation_scale(location = "bl",  
+#                   width_hint = 0.3)  +
+  ggtitle("Specialized Healthcare")
+
+
+c <- a + b
+
+ggsave(filename = "mapas.jpeg", 
+       plot = c,
+       dpi = 400, 
+       width = 16, 
+       height = 10)
+
+```
+
+#### 7.3.1.1.1 Resultados por população SUS 
+
+```{r}
+
+z <- ggplot() +
+  geom_sf(data = mapa_rs |> filter(nivel == "APS"), 
+          aes(fill = rr_s, geometry = geometry), 
+          color = "#e9e9e9") +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#4c4d4a", 
+          size = 0.1) + 
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#d4e302",
+                                  "#02592e"), 
+                       values = 
+                         rescale(c(0,50,100)), 
+                       limits = c(0,100),
+                       breaks = c(0, 50, 100)) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  theme(legend.position = "bottom",
+        legend.justification = "center",
+        legend.box = "horizontal",
+        axis.text.x = element_text(size = 14),  
+        axis.text.y = element_text(size = 14),
+        legend.text = element_text(size = 14),
+        plot.title = element_text(size = 16)) +
+#  annotation_north_arrow(location = "tr",  
+#                         which_north = "true",
+#                         style = north_arrow_fancy_orienteering()) +
+  annotation_scale(location = "bl",  
+                   width_hint = 0.3)  +
+  ggtitle("Primary Healthcare")
+
+
+x <- ggplot() +
+  geom_sf(data = mapa_rs |> filter(nivel == "AES"), 
+          aes(fill = rr_s, geometry = geometry), 
+          color = "#e9e9e9") +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#4c4d4a", 
+          size = 0.1) + 
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#d4e302",
+                                  "#02592e"), 
+                       values = 
+                         rescale(c(0,80,195)), 
+                       limits = c(0,195),
+                       breaks = c(0, 80, 195)) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  theme(legend.position = "bottom",
+        legend.justification = "center",
+        legend.box = "horizontal",
+        axis.text.x = element_text(size = 14),  
+        axis.text.y = element_blank(),
+        legend.text = element_text(size = 14),
+        plot.title = element_text(size = 16)) +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
+#  annotation_scale(location = "bl",  
+#                   width_hint = 0.3)  +
+  ggtitle("Specialized Healthcare")
+
+
+w <- z + x
+
+ggsave(filename = "mapas_sus.jpeg", 
+       plot = w,
+       dpi = 400, 
+       width = 16, 
+       height = 10)
+
 
 ```
 
@@ -1346,24 +1644,31 @@ gap_necessidade_oferta <-
 
 Utilizamos uma lista de valores para iterar conforme a tabela abaixo. Estas combinações resultaram em 1600 combinações de resultados.
 
-| Parâmetro                                    | Sigla | Valores                                                                                  |
-|----------------------------------------------|-------|------------------------------------------------------------------------------------------|
-| Tempo total disponível                       | TTD   | em horas: 1576; 1676; 1776; 1876                                                         |
-| Tempo de procedimentos                       | T     | em minutos: 25, 35, 45, 55                                                               |
-| Percentual de atividades diretas             | PD    | em unidade percentual: 50%, 60%, 80%, 90%, 100%                                          |
-| Percentual de atividades da linha de cuidado | PL    | em unidade percentual: 50%, 60%, 80%, 90%, 100%                                          |
-| Categoria profissional                       | CAT   | Cirurgião-dentista e Técnico/Auxiliar de Saúde Bucal                                     |
-| Recorte de Profissionais                     | SUS   | TRUE (pegar todos profissionais, SUS e não SUS) ou FALSE (pegar só os profissionais SUS) |
++----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
+| Parâmetro                                    | Sigla                | Valores                                                                                  |
++==============================================+======================+==========================================================================================+
+| Tempo total disponível                       | TTD                  | em horas: 1576; 1676; 1776; 1876                                                         |
++----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
+| Tempo de procedimentos                       | T                    | em minutos: 25, 35, 45, 55                                                               |
++----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
+| Percentual de atividades diretas             | PD                   | em unidade percentual: 50%, 60%, 80%, 90%, 100%                                          |
++----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
+| Percentual de atividades da linha de cuidado | PL                   | em unidade percentual: 50%, 60%, 80%, 90%, 100%                                          |
++----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
+| Categoria profissional                       | CAT                  | Cirurgião-dentista e Técnico/Auxiliar de Saúde Bucal                                     |
++----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
+| Recorte de Profissionais                     | SUS                  | TRUE (pegar todos profissionais, SUS e não SUS) ou FALSE (pegar só os profissionais SUS) |
++----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
 
 ```{r eval=FALSE}
 #| warning: false
 
 # Criando lista de vetores para cada parâmetro
 list_ttd <- as.numeric(c("1576", "1676", "1776", "1876"))
-list_tempo <- as.numeric(c("25","35", "45", "55"))
-list_pd <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
-list_pl <- as.numeric(c("0.50", "0.60", "0.80", "0.90", "1"))
-list_cat <- c("2232","3224")
+list_tempo <- as.numeric(c("25","35", "45", "55", "65", "75"))
+list_pd <- as.numeric(c("0.50", "0.60","0.70", "0.80", "0.90", "1"))
+list_pl <- as.numeric(c("0.50", "0.60", "0.70", "0.80", "0.90", "1"))
+list_cat <- c("2232")#,"3224")
 list_sus <- c(TRUE, FALSE) # pegar todos os profissionais (FALSE) ou só SUS (TRUE)
 
 resultado1 <- list()
