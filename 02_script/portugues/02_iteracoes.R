@@ -68,7 +68,7 @@ gap_necessidade_oferta <-
              -ls_cobertura,
              -faixa_etaria)
     
-    necessidades_servicos_br <- 
+    necessidades_servicos <- 
       pop_coberta_br |> 
       left_join(producao_brasil, 
                 by = c("ibge" = "ibge",
@@ -82,8 +82,8 @@ gap_necessidade_oferta <-
                populacao_coberta_sus * producao_pc) |> 
       mutate(nec_servicos_sus = round(nec_servicos_sus,2))
     
-    necessidades_prof_br <- 
-      necessidades_servicos_br |>
+    necessidades_prof <- 
+      necessidades_servicos |>
       mutate(nec_prof = case_when(
         procedimento == "Atenção Básica" ~ (nec_servicos * tempo_aps/60)/ttd,
         procedimento == "Endodontia" ~ (nec_servicos * tempo_endo/60)/ttd,
@@ -137,7 +137,7 @@ gap_necessidade_oferta <-
     #flag <- plano
     
     oferta_vs_demanda <-
-      necessidades_prof_br |> 
+      necessidades_prof |> 
       left_join(oferta_tratada, 
                 by = c("cod_municipiodv"="ibge",
                        "nivel" = "nivel")) |> 
@@ -170,62 +170,6 @@ gap_necessidade_oferta <-
     
     
   }
-
-
-# testando para ver se função esta funcionando  --------------------------------
-
-
-cenario_1 <- gap_necessidade_oferta(
-                  tempo_aps = 30,
-                  tempo_endo = 45,
-                  tempo_peri = 45,
-                  tempo_prot = 50,
-                  ttd = 1576,
-                  pd = 0.70, 
-                  pl = 0.70, 
-                  sus = TRUE, 
-                  categoria = "2232", 
-                  plano = 1)
-
-
-
-cenario_2 <- gap_necessidade_oferta(
-  tempo_aps = 30,
-  tempo_endo = 45,
-  tempo_peri = 45,
-  tempo_prot = 50,
-  ttd = 1576,
-  pd = 0.70, 
-  pl = 0.80, 
-  sus = TRUE, 
-  categoria = "2232", 
-  plano = 1)
-
-
-cenario_3 <- gap_necessidade_oferta(
-  tempo_aps = 30,
-  tempo_endo = 45,
-  tempo_peri = 45,
-  tempo_prot = 50,
-  ttd = 1576,
-  pd = 0.70, 
-  pl = 0.80, 
-  sus = TRUE, 
-  categoria = "2232", 
-  plano = 0)
-
-cenario_4 <- gap_necessidade_oferta(
-  tempo_aps = 30,
-  tempo_endo = 45,
-  tempo_peri = 45,
-  tempo_prot = 50,
-  ttd = 1576,
-  pd = 0.70, 
-  pl = 0.80, 
-  sus = FALSE, 
-  categoria = "2232", 
-  plano = 0)
-
 
 
 # testando  ----------------------------------------------------------
@@ -316,6 +260,17 @@ cat("Número de resultados acumulados:", length(resultado1), "\n")
 
 # Unificando todos os resultados em um único data.frame
 resultado_teste1 <- do.call(rbind, resultado1)
+
+resultado_teste1 |> 
+  filter(regiao_saude == "Jundiaí") |> 
+  ggplot(aes(x = rr)) + geom_histogram() +
+  facet_wrap(~nivel, scales = "free")
+
+
+resultado_teste1 |> 
+  filter(regiao_saude == "Alto Acre") |> 
+  ggplot(aes(x = rr)) + geom_histogram() + 
+  facet_wrap(~nivel, scales = "free") + xlim(c(0,1))
 
 
 
