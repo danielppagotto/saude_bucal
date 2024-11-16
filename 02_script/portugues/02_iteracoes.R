@@ -176,12 +176,12 @@ gap_necessidade_oferta <-
 
 
 list_ttd <- c(1576, 1676, 1776)  # Transformação de strings para números (não precisa de as.numeric)
-list_tempo_aps <- c(25, 35, 45, 55)
+list_tempo_aps <- c(15, 25, 35, 45)
 list_tempo_endo <- c(35, 45, 55)
 list_tempo_peri <- c(35, 45, 55)
 list_tempo_prot <- c(35, 45, 55)
-list_pd <- c(0.40, 0.50, 0.60)
-list_pl <- c(0.50, 0.60, 0.70)
+list_pd <- c(0.30, 0.40, 0.50, 0.60)
+list_pl <- c(0.40, 0.50, 0.60, 0.70)
 list_cat <- c("2232")  # Categoria como vetor de strings
 list_sus <- c(1, 0)  # Seleciona entre todos os profissionais (0) ou apenas SUS (1)
 list_plano <- c(1, 0)  # Plano como 1 (necessidades) ou 0 (necessidades_sus)
