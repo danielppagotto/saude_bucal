@@ -261,6 +261,9 @@ cat("Número de resultados acumulados:", length(resultado1), "\n")
 # Unificando todos os resultados em um único data.frame
 resultado_teste1 <- do.call(rbind, resultado1)
 
+
+arrow::write_parquet(resultado_teste1, "resultado1711.parquet")
+
 resultado_teste1 |> 
   filter(regiao_saude == "Jundiaí") |> 
   ggplot(aes(x = rr)) + geom_histogram() +

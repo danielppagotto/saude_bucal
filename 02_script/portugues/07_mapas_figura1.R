@@ -129,11 +129,21 @@ cores_regioes_go <- c(
 )
 
 b <- ggplot() +
-  geom_sf(data = municipios_go, fill = NA, color = "gray50", size = 0.2) +
-  geom_sf(data = spdf_fortified_go, aes(fill = nome), color = "black", size = 0.3, alpha = 0.7) +
-  scale_fill_manual(values = cores_regioes_go, guide = "none") +
-  annotation_scale(location = "bl", width_hint = 0.3) +
-  annotation_north_arrow(location = "tr", which_north = "true", 
+  geom_sf(data = municipios_go, 
+          fill = NA, 
+          color = "gray50", 
+          size = 0.2) +
+  geom_sf(data = spdf_fortified_go, 
+          aes(fill = nome), 
+          color = "black", 
+          size = 0.3, 
+          alpha = 0.7) +
+  scale_fill_manual(values = cores_regioes_go, 
+                    guide = "none") +
+  annotation_scale(location = "bl", 
+                   width_hint = 0.3) +
+  annotation_north_arrow(location = "tr", 
+                         which_north = "true", 
                          style = north_arrow_fancy_orienteering) +
   annotate(
     "rect", 
