@@ -1,10 +1,18 @@
 
 
+# Carregando pacotes -------------------------------------------------------
+
+
 library(tidyverse)
 library(arrow)
 library(patchwork)
 library(geojsonio)
 library(geojsonsf)
+library(geobr)
+library(scales)
+library(ggspatial) 
+
+
 
 resultado_teste2 <- 
   read_parquet("~/GitHub/saude_bucal/resultado1711.parquet")
@@ -25,18 +33,6 @@ limite_lat <- c(-33, 4)     # limites de latitude
 
 
 
-# Adicionar geometria se não existir
-if (!"geometry" %in% names(mapa_rs)) {
-  
-  mapa_rs <- st_as_sf(mapa_rs, 
-                      coords = c("longitude", 
-                                 "latitude"), 
-                      crs = 4326) 
-}
-
-
-
-
 # Mapas para cenário baseline  --------------------------------------------
 
 
@@ -46,8 +42,8 @@ baseline <-
            tempo_prot == '55' & 
            tempo_aps == '45' &
            tempo_peri == '55' &
-           pd == '0.3',
-         pl == '0.4',
+           pd == '0.4',
+         pl == '0.5',
          ttd == '1576',
          sus == 'Somente profissionais SUS',
          plano == 'Necessidade de todos')
@@ -61,9 +57,9 @@ baseline <-
             by = c("cod_regsaud"="reg_id")) |> 
   distinct_all()
 
-if (!"geometry" %in% names(baseline_1576)) {
+if (!"geometry" %in% names(baseline)) {
   
-  baseline_1576 <- st_as_sf(baseline_1576, 
+  baseline <- st_as_sf(baseline, 
                        coords = c("longitude", 
                                   "latitude"), 
                        crs = 4326) 
@@ -72,7 +68,7 @@ if (!"geometry" %in% names(baseline_1576)) {
 
 a1 <- 
   ggplot() +
-  geom_sf(data = baseline_1576 |> 
+  geom_sf(data = baseline |> 
             filter(nivel == "APS"), 
           aes(fill = rr, geometry = geometry), 
           color = "#f5f5f5") +
@@ -80,6 +76,17 @@ a1 <-
           fill = NA, 
           color = "#4c4d4a", 
           size = 0.1) + 
+  geom_sf(data = estados_br |> filter(abbrev_state == "MG" &
+                                        abbrev_state == "SP"), 
+          fill = NA, 
+          color = "black", # Cor preta mais escura
+          size = 2) +
+  annotate("segment", 
+           x = -44, y = -25,   # Coordenadas iniciais da seta (no oceano)
+           xend = -44, yend = -19.5, # Coordenadas finais da seta (em Minas Gerais)
+           arrow = arrow(length = unit(0.15, "cm")), # Tamanho menor da seta
+           color = "black", # Cor da seta
+           size = 1.2) +
   scale_fill_gradientn(colors = c("#D92B3A", 
                                   "#d4e302",
                                   "#02592e"), 
@@ -105,12 +112,13 @@ a1 <-
     panel.border = element_rect(color = "black", 
                                 fill = NA, 
                                 size = 1), 
-    plot.margin = margin(10, 10, 10, 10))
+    plot.margin = margin(10, 10, 10, 10)) +
+  ggtitle("Primary healthcare")
 
 
 b1 <- 
   ggplot() +
-  geom_sf(data = baseline_1576 |> 
+  geom_sf(data = baseline |> 
             filter(nivel == "AES"), 
           aes(fill = rr, geometry = geometry), 
           color = "#f5f5f5") +
@@ -118,6 +126,25 @@ b1 <-
           fill = NA, 
           color = "#4c4d4a", 
           size = 0.1) + 
+  geom_sf(data = estados_br |> filter(abbrev_state == "MG" &
+                                        abbrev_state == "SP"), 
+          fill = NA, 
+          color = "black", # Cor preta mais escura
+          size = 2) +
+  # Seta para Minas Gerais
+  annotate("segment", 
+           x = -40, y = -30,   # Coordenadas iniciais da seta (no oceano)
+           xend = -44, yend = -19.5, # Coordenadas finais da seta (em Minas Gerais)
+           arrow = arrow(length = unit(0.15, "cm")), # Tamanho menor da seta
+           color = "black", # Cor da seta
+           size = 1.2) + # Espessura da seta
+  # Seta para São Paulo
+  annotate("segment", 
+           x = -40, y = -30,   # Coordenadas iniciais da seta (no oceano, mesma origem)
+           xend = -47, yend = -23.5, # Coordenadas finais da seta (em São Paulo)
+           arrow = arrow(length = unit(0.15, "cm")), # Tamanho menor da seta
+           color = "black", # Cor da seta
+           size = 1.2) + # Espessura da seta
   scale_fill_gradientn(colors = c("#D92B3A", 
                                   "#d4e302",
                                   "#02592e"), 
@@ -148,15 +175,26 @@ b1 <-
     panel.border = element_rect(color = "black", 
                                 fill = NA, 
                                 size = 1), 
-    plot.margin = margin(10, 10, 10, 10))
+    plot.margin = margin(10, 10, 10, 10)) +
+  ggtitle("Specialized Healthcare")
 
+b1
 
-
-c1 <- a1 + b1
+c1 <- a1 + b1 
 c1
 
-ggsave(filename = "04_mapas/cenario_baseline.png",
+ggsave(filename = "04_mapas/cenario_baselinet.png",
        c1, dpi = 350, height = 8, width = 16)
+
+
+
+# APS ---------------------------------------------------------------------
+
+
+# cenario 1 ---------------------------------------------------------------
+
+
+
 
 
 # cenario 1 ---------------------------------------------------------------
