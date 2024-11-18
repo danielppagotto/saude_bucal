@@ -422,7 +422,7 @@ evolucao
 c_aps <- (a1 + c2 + c4) / evolucao
 
 ggsave(filename = "04_mapas/cenarios_aps.png",
-       c_aps, dpi = 600, height = 8, width = 14)
+       c_aps, dpi = 1000, height = 8, width = 14)
 
 
 
