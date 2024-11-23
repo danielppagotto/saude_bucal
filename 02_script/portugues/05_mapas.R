@@ -11,6 +11,7 @@ library(geojsonsf)
 library(geobr)
 library(scales)
 library(ggspatial) 
+library(sf)
 
 
 
@@ -109,7 +110,7 @@ a1 <-
     axis.text.x = element_text(size = 14),  
     axis.text.y = element_text(size = 14),
     legend.text = element_text(size = 14),
-    plot.title = element_text(size = 16),
+    plot.title = element_text(size = 14),
     panel.border = element_rect(color = "black", 
                                 fill = NA, 
                                 size = 1), 
@@ -172,7 +173,7 @@ b1 <-
     axis.text.x = element_text(size = 14),  
     axis.text.y = element_text(size = 14),
     legend.text = element_text(size = 14),
-    plot.title = element_text(size = 16),
+    plot.title = element_text(size = 14),
     panel.border = element_rect(color = "black", 
                                 fill = NA, 
                                 size = 1), 
@@ -189,9 +190,58 @@ ggsave(filename = "04_mapas/cenario_baseline.png",
 
 
 
-# APS ---------------------------------------------------------------------
+# 1) APS ---------------------------------------------------------------------
 
-# cenario 1 ---------------------------------------------------------------
+# cenario 1 - baseline ---------------------------------------------------------------
+
+c1_baseline <- 
+  ggplot() +
+  geom_sf(data = baseline |> 
+            filter(nivel == "APS"), 
+          aes(fill = rr, geometry = geometry), 
+          color = "#f5f5f5") +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#4c4d4a", 
+          size = 0.1) + 
+  geom_sf(data = estados_br |> filter(abbrev_state == "MG" &
+                                        abbrev_state == "SP"), 
+          fill = NA, 
+          color = "black", # Cor preta mais escura
+          size = 2) +
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#d4e302",
+                                  "#02592e"), 
+                       values = 
+                         rescale(c(0,50,100)), 
+                       limits = c(0,100),
+                       breaks = c(0, 50, 100)) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
+  annotation_scale(location = "bl", width_hint = 0.3) +
+  annotate("text", x = -Inf, y = Inf, label = "A", # Canto superior esquerdo
+           hjust = -0.5, vjust = 1.5, size = 6) + 
+  theme(
+    legend.position = "none",
+    legend.justification = "center",
+    legend.box = "horizontal",
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(size = 14),  
+    axis.text.y = element_text(size = 14),
+    legend.text = element_text(size = 14),
+    plot.title = element_text(size = 14),
+    panel.border = element_rect(color = "black", 
+                                fill = NA, 
+                                size = 1), 
+    plot.margin = margin(10, 10, 10, 10)) +
+  ggtitle("Baseline scenario")
+
+
+# cenario 2 ---------------------------------------------------------------
 
 c2_productivity <- 
   resultado_teste2 |> 
@@ -240,11 +290,14 @@ c2 <-
                        breaks = c(0, 50, 100)) + 
   theme_minimal() +
   labs(fill = "Relative gap") +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
   annotation_scale(location = "bl", width_hint = 0.3) +
-  annotate("text", x = -Inf, y = Inf, label = "A", # Canto superior esquerdo
+  annotate("text", x = -Inf, y = Inf, label = "A", 
            hjust = -0.5, vjust = 1.5, size = 6) + 
   theme(
-    legend.position = "bottom",
+    legend.position = "none",
     legend.justification = "center",
     legend.box = "horizontal",
     axis.title.x = element_blank(),
@@ -252,13 +305,15 @@ c2 <-
     axis.text.x = element_text(size = 14),  
     axis.text.y = element_text(size = 14),
     legend.text = element_text(size = 14),
-    plot.title = element_text(size = 16),
+    plot.title = element_text(size = 14),
     panel.border = element_rect(color = "black", 
                                 fill = NA, 
                                 size = 1), 
     plot.margin = margin(10, 10, 10, 10)) +
-  ggtitle("Primary healthcare")
+  ggtitle("Improved productivity scenario")
 
+
+# cenario 3 ---------------------------------------------------------------
 
 c3_productivity <- 
   resultado_teste2 |> 
@@ -305,12 +360,15 @@ c3 <-
                        limits = c(0,100),
                        breaks = c(0, 50, 100)) + 
   theme_minimal() +
-  labs(fill = "Relative gap") +
+  labs(fill = "Relative gap (%)") +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
   annotation_scale(location = "bl", width_hint = 0.3) +
   annotate("text", x = -Inf, y = Inf, label = "B", # Canto superior esquerdo
            hjust = -0.5, vjust = 1.5, size = 6) + 
   theme(
-    legend.position = "bottom",
+    legend.position = "none",
     legend.justification = "center",
     legend.box = "horizontal",
     axis.title.x = element_blank(),
@@ -318,20 +376,24 @@ c3 <-
     axis.text.x = element_text(size = 14),  
     axis.text.y = element_text(size = 14),
     legend.text = element_text(size = 14),
-    plot.title = element_text(size = 16),
+    plot.title = element_text(size = 14),
     panel.border = element_rect(color = "black", 
                                 fill = NA, 
                                 size = 1), 
-    plot.margin = margin(10, 10, 10, 10)) 
+    plot.margin = margin(10, 10, 10, 10)) +
+    ggtitle("SUS dependent deduction scenario")
 
+
+
+# cenario 4 ---------------------------------------------------------------
 
 c4_productivity <- 
   resultado_teste2 |> 
   filter(tempo_endo == '35' &
-           tempo_prot == '35' & 
-           tempo_aps == '25' &
-           tempo_peri == '35' &
-           pd == '0.6',
+         tempo_prot == '35' & 
+         tempo_aps == '25' &
+         tempo_peri == '35' &
+         pd == '0.6',
          pl == '0.6',
          ttd == '1676',
          sus == "Todos profissionais independente de vínculo",
@@ -366,11 +428,14 @@ c4 <-
                        breaks = c(0, 50, 100)) + 
   theme_minimal() +
   labs(fill = "Relative gap") +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
   annotation_scale(location = "bl", width_hint = 0.3) +
   annotate("text", x = -Inf, y = Inf, label = "C", # Canto superior esquerdo
            hjust = -0.5, vjust = 1.5, size = 6) + 
   theme(
-    legend.position = "bottom",
+    legend.position = "right",
     legend.justification = "center",
     legend.box = "horizontal",
     axis.title.x = element_blank(),
@@ -378,12 +443,15 @@ c4 <-
     axis.text.x = element_text(size = 14),  
     axis.text.y = element_text(size = 14),
     legend.text = element_text(size = 14),
-    plot.title = element_text(size = 16),
+    plot.title = element_text(size = 14),
     panel.border = element_rect(color = "black", 
                                 fill = NA, 
                                 size = 1), 
-    plot.margin = margin(10, 10, 10, 10)) 
+    plot.margin = margin(10, 10, 10, 10)) +
+    ggtitle("Supply of professionals with any type of contract")
 
+
+# grafico de linhas -------------------------------------------------------
 
 
 # grafico 
@@ -410,20 +478,294 @@ evolucao <- grafico |>
          (oferta_rs/necessidade) * 100,
          (oferta_rs/necessidade_sus) * 100)) |> 
   mutate(rr = round(rr, 2)) |> 
+  rename(Região = regiao) |> 
   ggplot(aes(x = scenario, y = rr, 
-             col = regiao, group = regiao)) + 
+             col = Região, group = Região)) + 
   geom_line(linetype = "dashed") +
   geom_label(aes(label = rr), 
-             size = 3, fontface = "bold", label.size = 0.2) +
-  theme_minimal()
+             size = 5, fontface = "bold", label.size = 0.2) +
+  theme_minimal() +
+  ylab("Relative gap") + 
+  theme(
+    axis.title.x = element_text(size = 16, face = "bold"),  # Aumenta eixos X
+    axis.title.y = element_text(size = 16, face = "bold"),  # Aumenta eixos Y
+    axis.text.x = element_text(size = 14),                 # Texto do eixo X
+    axis.text.y = element_text(size = 14),                 # Texto do eixo Y
+    legend.title = element_text(size = 16, face = "bold"), # Título da legenda
+    legend.text = element_text(size = 14),                 # Texto da legenda
+    plot.title = element_text(size = 20, face = "bold"),   # Título do gráfico
+    plot.subtitle = element_text(size = 16),               # Subtítulo (se houver)
+    strip.text = element_text(size = 16)                   # Texto de facetas
+  )
 
 evolucao
 
-c_aps <- (a1 + c2 + c4) / evolucao
+
+
+# Figura 3 ----------------------------------------------------------------
+
+
+c_aps <- (c2 + c3 + c4) / evolucao
+
+c_aps
 
 ggsave(filename = "04_mapas/cenarios_aps.png",
        c_aps, dpi = 1000, height = 8, width = 14)
 
+
+
+# 2) AES ------------------------------------------------------------------
+
+# cenario 1 ---------------------------------------------------------------
+
+d1_baseline <- 
+  ggplot() +
+  geom_sf(data = baseline |> 
+            filter(nivel == "AES"), 
+          aes(fill = rr, geometry = geometry), 
+          color = "#f5f5f5") +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#4c4d4a", 
+          size = 0.1) + 
+  geom_sf(data = estados_br |> filter(abbrev_state == "MG" &
+                                        abbrev_state == "SP"), 
+          fill = NA, 
+          color = "black", # Cor preta mais escura
+          size = 2) +
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#d4e302",
+                                  "#02592e"), 
+                       values = 
+                         rescale(c(0,50,100)), 
+                       limits = c(0,100),
+                       breaks = c(0, 50, 100)) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
+  annotation_scale(location = "bl", width_hint = 0.3) +
+  annotate("text", x = -Inf, y = Inf, label = "A", # Canto superior esquerdo
+           hjust = -0.5, vjust = 1.5, size = 6) + 
+  theme(
+    legend.position = "none",
+    legend.justification = "center",
+    legend.box = "horizontal",
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(size = 14),  
+    axis.text.y = element_text(size = 14),
+    legend.text = element_text(size = 14),
+    plot.title = element_text(size = 14),
+    panel.border = element_rect(color = "black", 
+                                fill = NA, 
+                                size = 1), 
+    plot.margin = margin(10, 10, 10, 10)) +
+  ggtitle("Baseline scenario")
+
+
+# cenario 2 ---------------------------------------------------------------
+
+
+d2 <- 
+  ggplot() +
+  geom_sf(data = c2_productivity |> 
+            filter(nivel == "AES"), 
+          aes(fill = rr, geometry = geometry), 
+          color = "#f5f5f5") +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#4c4d4a", 
+          size = 0.1) + 
+  geom_sf(data = estados_br |> filter(abbrev_state == "MG" &
+                                        abbrev_state == "SP"), 
+          fill = NA, 
+          color = "black", # Cor preta mais escura
+          size = 2) +
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#d4e302",
+                                  "#02592e"), 
+                       values = 
+                         rescale(c(0,50,100)), 
+                       limits = c(0,100),
+                       breaks = c(0, 50, 100)) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
+  annotation_scale(location = "bl", width_hint = 0.3) +
+  annotate("text", x = -Inf, y = Inf, label = "A", # Canto superior esquerdo
+           hjust = -0.5, vjust = 1.5, size = 6) + 
+  theme(
+    legend.position = "none",
+    legend.justification = "center",
+    legend.box = "horizontal",
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(size = 14),  
+    axis.text.y = element_text(size = 14),
+    legend.text = element_text(size = 14),
+    plot.title = element_text(size = 14),
+    panel.border = element_rect(color = "black", 
+                                fill = NA, 
+                                size = 1), 
+    plot.margin = margin(10, 10, 10, 10)) +
+  ggtitle("Improved productivity scenario")
+
+
+# cenario 3 ---------------------------------------------------------------
+
+
+d3 <- 
+  ggplot() +
+  geom_sf(data = c3_productivity |> 
+            filter(nivel == "AES"), 
+          aes(fill = rr, geometry = geometry), 
+          color = "#f5f5f5") +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#4c4d4a", 
+          size = 0.1) + 
+  geom_sf(data = estados_br |> filter(abbrev_state == "MG" &
+                                        abbrev_state == "SP"), 
+          fill = NA, 
+          color = "black", # Cor preta mais escura
+          size = 2) +
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#d4e302",
+                                  "#02592e"), 
+                       values = 
+                         rescale(c(0,50,100)), 
+                       limits = c(0,100),
+                       breaks = c(0, 50, 100)) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
+  annotation_scale(location = "bl", width_hint = 0.3) +
+  annotate("text", x = -Inf, y = Inf, label = "B", # Canto superior esquerdo
+           hjust = -0.5, vjust = 1.5, size = 6) + 
+  theme(
+    legend.position = "none",
+    legend.justification = "center",
+    legend.box = "horizontal",
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(size = 14),  
+    axis.text.y = element_text(size = 14),
+    legend.text = element_text(size = 14),
+    plot.title = element_text(size = 14),
+    panel.border = element_rect(color = "black", 
+                                fill = NA, 
+                                size = 1), 
+    plot.margin = margin(10, 10, 10, 10))  + 
+  ggtitle("SUS dependent deduction scenario")
+
+
+
+# cenario 4 ---------------------------------------------------------------
+
+
+d4 <- 
+  ggplot() +
+  geom_sf(data = c4_productivity |> 
+            filter(nivel == "AES"), 
+          aes(fill = rr, geometry = geometry), 
+          color = "#f5f5f5") +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#4c4d4a", 
+          size = 0.1) + 
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#d4e302",
+                                  "#02592e"), 
+                       values = 
+                         rescale(c(0,50,100)), 
+                       limits = c(0,100),
+                       breaks = c(0, 50, 100)) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
+  annotation_scale(location = "bl", width_hint = 0.3) +
+  annotate("text", x = -Inf, y = Inf, label = "C", # Canto superior esquerdo
+           hjust = -0.5, vjust = 1.5, size = 6) + 
+  theme(
+    legend.position = "right",
+    legend.justification = "center",
+    legend.box = "horizontal",
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(size = 14),  
+    axis.text.y = element_text(size = 14),
+    legend.text = element_text(size = 14),
+    plot.title = element_text(size = 14),
+    panel.border = element_rect(color = "black", 
+                                fill = NA, 
+                                size = 1), 
+    plot.margin = margin(10, 10, 10, 10)) +
+  ggtitle("Supply of professionals with any type of contract")
+
+
+# grafico de linhas -------------------------------------------------------
+
+
+# grafico 
+
+
+
+evolucao_aes <- grafico |> 
+  filter(nivel == "AES") |> 
+  mutate(regiao = case_when(
+    uf_sigla %in% c("AC", "AP", "AM", "PA", "RO", "RR", "TO") ~ "Norte",
+    uf_sigla %in% c("AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE") ~ "Nordeste",
+    uf_sigla %in% c("DF", "GO", "MT", "MS") ~ "Centro-Oeste",
+    uf_sigla %in% c("ES", "MG", "RJ", "SP") ~ "Sudeste",
+    uf_sigla %in% c("PR", "RS", "SC") ~ "Sul")) |> 
+  group_by(nivel, scenario, regiao) |> 
+  summarise(necessidade = sum(necessidade),
+            necessidade_sus = sum(necessidade_sus),
+            oferta_rs = sum(oferta_rs)) |>
+  mutate(rr = if_else(scenario == "Baseline" |
+                        scenario == "Scenario 2", 
+                      (oferta_rs/necessidade) * 100,
+                      (oferta_rs/necessidade_sus) * 100)) |> 
+  mutate(rr = round(rr, 2)) |> 
+  mutate(rr = if_else(rr > 100, 100, rr)) |> 
+  rename(Região = regiao) |> 
+  ggplot(aes(x = scenario, y = rr, 
+             col = Região, group = Região)) + 
+  geom_line(linetype = "dashed") +
+  geom_label(aes(label = rr), 
+             size = 5, fontface = "bold", label.size = 0.2) +
+  theme_minimal() +
+  ylab("Relative gap (%)") + 
+  theme(
+    axis.title.x = element_text(size = 16, face = "bold"),  # Aumenta eixos X
+    axis.title.y = element_text(size = 16, face = "bold"),  # Aumenta eixos Y
+    axis.text.x = element_text(size = 14),                 # Texto do eixo X
+    axis.text.y = element_text(size = 14),                 # Texto do eixo Y
+    legend.title = element_text(size = 16, face = "bold"), # Título da legenda
+    legend.text = element_text(size = 14),                 # Texto da legenda
+    plot.title = element_text(size = 20, face = "bold"),   # Título do gráfico
+    plot.subtitle = element_text(size = 16),               # Subtítulo (se houver)
+    strip.text = element_text(size = 16)                   # Texto de facetas
+  )
+
+evolucao_aes
+
+
+# figura 4 ----------------------------------------------------------------
+
+d_aes <- (d2 + d3 + d4) / evolucao_aes
+
+
+ggsave(filename = "04_mapas/cenarios_aes.png",
+       d_aes, dpi = 1000, height = 8, width = 14)
 
 
 
@@ -476,7 +818,7 @@ a1 <- ggplot() +
         axis.text.x = element_text(size = 14),  
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14),
-        plot.title = element_text(size = 16)) +
+        plot.title = element_text(size = 14)) +
   #  annotation_north_arrow(location = "tr",  
   #                         which_north = "true",
   #                         style = north_arrow_fancy_orienteering()) +
@@ -508,7 +850,7 @@ b1 <- ggplot() +
         axis.text.x = element_text(size = 14),  
         axis.text.y = element_blank(),
         legend.text = element_text(size = 14),
-        plot.title = element_text(size = 16)) +
+        plot.title = element_text(size = 14)) +
   annotation_north_arrow(location = "tr",  
                          which_north = "true",
                          style = north_arrow_fancy_orienteering()) +
@@ -571,7 +913,7 @@ a2 <- ggplot() +
         axis.text.x = element_text(size = 14),  
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14),
-        plot.title = element_text(size = 16)) +
+        plot.title = element_text(size = 14)) +
   #  annotation_north_arrow(location = "tr",  
   #                         which_north = "true",
   #                         style = north_arrow_fancy_orienteering()) +
@@ -603,7 +945,7 @@ b2 <- ggplot() +
         axis.text.x = element_text(size = 14),  
         axis.text.y = element_blank(),
         legend.text = element_text(size = 14),
-        plot.title = element_text(size = 16)) +
+        plot.title = element_text(size = 14)) +
   annotation_north_arrow(location = "tr",  
                          which_north = "true",
                          style = north_arrow_fancy_orienteering()) +
@@ -665,7 +1007,7 @@ a3 <- ggplot() +
         axis.text.x = element_text(size = 14),  
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14),
-        plot.title = element_text(size = 16)) +
+        plot.title = element_text(size = 14)) +
   #  annotation_north_arrow(location = "tr",  
   #                         which_north = "true",
   #                         style = north_arrow_fancy_orienteering()) +
@@ -697,7 +1039,7 @@ b3 <- ggplot() +
         axis.text.x = element_text(size = 14),  
         axis.text.y = element_blank(),
         legend.text = element_text(size = 14),
-        plot.title = element_text(size = 16)) +
+        plot.title = element_text(size = 14)) +
   annotation_north_arrow(location = "tr",  
                          which_north = "true",
                          style = north_arrow_fancy_orienteering()) +
@@ -758,7 +1100,7 @@ a4 <- ggplot() +
         axis.text.x = element_text(size = 14),  
         axis.text.y = element_text(size = 14),
         legend.text = element_text(size = 14),
-        plot.title = element_text(size = 16)) +
+        plot.title = element_text(size = 14)) +
   #  annotation_north_arrow(location = "tr",  
   #                         which_north = "true",
   #                         style = north_arrow_fancy_orienteering()) +
@@ -790,7 +1132,7 @@ b4 <- ggplot() +
         axis.text.x = element_text(size = 14),  
         axis.text.y = element_blank(),
         legend.text = element_text(size = 14),
-        plot.title = element_text(size = 16)) +
+        plot.title = element_text(size = 14)) +
   annotation_north_arrow(location = "tr",  
                          which_north = "true",
                          style = north_arrow_fancy_orienteering()) +
