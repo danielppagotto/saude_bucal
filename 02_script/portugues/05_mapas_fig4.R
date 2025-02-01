@@ -13,6 +13,7 @@ library(scales)
 library(ggspatial) 
 library(sf)
 library(readxl)
+library(leaflet)
 
 
 cenarios_regioes <- read_excel("01_dados/cenarios_regioes.xlsx")
@@ -108,6 +109,7 @@ c1_baseline <-
     plot.margin = margin(10, 10, 10, 10)) +
   ggtitle("Baseline scenario")
 
+c1_baseline
 
 # cenario 2 ---------------------------------------------------------------
 
@@ -609,13 +611,5 @@ d_aes
 
 ggsave(filename = "04_mapas/cenarios_aes.png",
        d_aes, dpi = 1000, height = 10, width = 20)
-
-
-
-
-
-
-
-
 
 
