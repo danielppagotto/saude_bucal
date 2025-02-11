@@ -1,6 +1,8 @@
 library(shiny)
 library(dplyr)
+library(plotly)
 library(DT)
+library(forcats)
 library(patchwork)
 library(tidyr)
 library(stringr)
@@ -16,17 +18,17 @@ options(jsonlite.keep_vec_names = FALSE)
 # ---------------------------
 # Leitura dos dados
 # ---------------------------
-pop_brasil <- readRDS("~/GitHub/saude_bucal/07_shiny_app/data/pop_brasil.rds")
-relacao_municipio_rs <- readRDS("~/GitHub/saude_bucal/07_shiny_app/data/relacao_municipio_rs.rds")
-plano_odontologico_rs <- readRDS("~/GitHub/saude_bucal/07_shiny_app/data/plano_odontologico_rs.rds")
-cobertura_sb <- readRDS("~/GitHub/saude_bucal/07_shiny_app/data/cobertura_sb.rds")
-producao_normativa_br <- readRDS("~/GitHub/saude_bucal/07_shiny_app/data/producao_normativa_br.rds")
-oferta_brasil <- readRDS("~/GitHub/saude_bucal/07_shiny_app/data/oferta_brasil.rds")
-hierarquia_municipios <- readRDS("~/GitHub/saude_bucal/07_shiny_app/data/hierarquia_municipios.rds")
-estados_br <- readRDS("~/GitHub/saude_bucal/07_shiny_app/data/estados_br.rds")  # Objeto sf ou compatível
+pop_brasil <- readRDS("./data/pop_brasil.rds")
+relacao_municipio_rs <- readRDS("./data/relacao_municipio_rs.rds")
+plano_odontologico_rs <- readRDS("./data/plano_odontologico_rs.rds")
+cobertura_sb <- readRDS("./data/cobertura_sb.rds")
+producao_normativa_br <- readRDS("./data/producao_normativa_br.rds")
+oferta_brasil <- readRDS("./data/oferta_brasil.rds")
+hierarquia_municipios <- readRDS("./data/hierarquia_municipios.rds")
+estados_br <- readRDS("./data/estados_br.rds")  # Objeto sf ou compatível
 
 # Carregar o shape das regiões de saúde via GeoJSON e converter para sf
-spdf <- geojson_read("~/GitHub/saude_bucal/01_dados/shape_file_regioes_saude.json", 
+spdf <- geojson_read("./shape_file_regioes_saude.json", 
                      what = "sp")
 spdf_fortified <- st_as_sf(spdf)
 
@@ -413,5 +415,6 @@ server <- function(input, output) {
 # ---------------------------
 # Executa o aplicativo Shiny
 # ---------------------------
-shinyApp(ui = ui, server = server,
-         options = "launch.browser")
+shinyApp(ui = ui, 
+         server = server,
+         options = list(launch.browser = TRUE))
