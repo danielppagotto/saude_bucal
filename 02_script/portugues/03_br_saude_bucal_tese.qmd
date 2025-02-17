@@ -860,8 +860,9 @@ gap_necessidade_oferta <-
       select(ibge, ibge_sb, 
              municipio.x, 
              faixa, id_faixa, 
-             total, procedimento, cobertura, cobertura_plano,
-             pop_sus, cod_municipiodv, cod_mun_loc) |> 
+             total, procedimento, cobertura,
+             cobertura_plano, pop_sus, 
+             cod_municipiodv, cod_mun_loc) |> 
       rename(municipio = municipio.x) |> 
       rename(cobertura_servicos = cobertura) |> 
       mutate(populacao_coberta = cobertura_servicos * total) |> 

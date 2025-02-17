@@ -1,0 +1,7 @@
+services:
+  shiny-app:
+    build: .
+    ports:
+      - "3838:3838"
+    environment:
+      - TZ=America/Sao_Paulo

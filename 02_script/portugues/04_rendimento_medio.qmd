@@ -28,14 +28,29 @@ Primeiramente, carregaremos os dados da Pnad Contínua do primeiro trimestre de 
 ```{r}
 
 # Carregando a base da Pnad Contínua
-  base_pnadc <- get_pnadc(2024, 1, vars=c("VD4016","V4010"))
-  base_pnad012024 <- as_survey(base_pnadc) #HABILITANDO PARA O PACOTE SRVYR
+base_pnadc <- get_pnadc(2024, 3, 
+                        vars=c("VD4016","V4010"))
+
+#HABILITANDO PARA O PACOTE SRVYR
+base_pnad012024 <- as_survey(base_pnadc) 
+  
+# Calculando a nível Brasil
+rend_dentista_br <- base_pnad012024 |> 
+    filter(V4010 == "2261") |> 
+    group_by(V4010) |> 
+    summarise(rend_dentista = round(mean(VD4016, 
+                                         na.rm = TRUE),
+                                    2)) |>
+    select(-ends_with("_se"))
+
 
 # Calculando a média de dentistas por Estado  
   rend_dentista <- base_pnad012024 |> 
     filter(V4010 == "2261") |> 
     group_by(UF) |> 
-    summarise(rend_dentista = round(mean(VD4016, na.rm = TRUE),2)) |>
+    summarise(rend_dentista = round(mean(VD4016, 
+                                         na.rm = TRUE),
+                                    2)) |>
     select(-ends_with("_se"))
   
 # Calculando a média de auxiliares e ajudantes de odontologia por Estado  
@@ -58,16 +73,20 @@ Em seguida, iremos renomear a coluna UF de forma a ter apenas as suas respectiva
 
 # Tabela de correspondência
 uf_siglas <- tibble::tibble(
-  estado = c("Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", 
-             "Ceará", "Distrito Federal", "Espírito Santo", 
-             "Goiás", "Maranhão", "Mato Grosso", "Mato Grosso do Sul", 
-             "Minas Gerais", "Pará", "Paraíba", "Paraná", "Pernambuco", 
+  estado = c("Acre", "Alagoas", "Amapá", 
+             "Amazonas", "Bahia", "Ceará", 
+             "Distrito Federal", "Espírito Santo", 
+             "Goiás", "Maranhão", "Mato Grosso", 
+             "Mato Grosso do Sul", "Minas Gerais", 
+             "Pará", "Paraíba", "Paraná", "Pernambuco", 
              "Piauí", "Rio de Janeiro", "Rio Grande do Norte", 
-             "Rio Grande do Sul", "Rondônia", "Roraima", "Santa Catarina", 
-             "São Paulo", "Sergipe", "Tocantins"),
-  sigla = c("AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", 
-            "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", 
-            "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO")
+             "Rio Grande do Sul", "Rondônia", "Roraima", 
+             "Santa Catarina","São Paulo", "Sergipe",
+             "Tocantins"),
+  sigla = c("AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", 
+            "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", 
+            "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", 
+            "SP", "SE", "TO")
 )
 
 # Realizar o join para renomear os estados pela sigla
