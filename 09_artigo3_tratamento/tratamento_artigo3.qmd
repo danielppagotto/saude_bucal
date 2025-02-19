@@ -1,0 +1,248 @@
+---
+title: "tratamento_artigo3"
+format: html
+---
+
+## Tratamento de dados
+
+Carregando as bibliotecas necessárias.
+
+```{r}
+#| message: false
+#| warning: false
+
+options(scipen = 999)
+
+library(tidyverse)
+library(RODBC)
+library(geojsonio)
+library(geojsonsf)
+library(geobr)
+library(scales)
+library(ggspatial) 
+library(sf)
+
+```
+
+## Carregamento de dados
+
+### 1.1. Instituições de Ensino Superior
+
+#### 1.1.1. Quantidade de vagas e matrículas em cursos de odontologia
+
+```{r}
+
+# codigo para acessar dados de datalake proprio 
+
+dremio_host <- Sys.getenv("endereco")
+dremio_port <- Sys.getenv("port")
+dremio_uid <- Sys.getenv("uid")
+dremio_pwd <- Sys.getenv("datalake")
+
+
+channel <- odbcDriverConnect(sprintf("DRIVER=Dremio Connector;
+                                     HOST=%s;
+                                     PORT=%s;
+                                     UID=%s;
+                                     PWD=%s;
+                                     AUTHENTICATIONTYPE=Basic Authentication;
+                                     CONNECTIONTYPE=Direct", 
+                         dremio_host, 
+                         dremio_port, 
+                         dremio_uid, 
+                         dremio_pwd))
+
+query <- 'SELECT * FROM "@daniel"."ies_odonto"'
+
+
+
+ies_odonto <- sqlQuery(channel, query, 
+                     as.is = TRUE) 
+
+ies_odonto$total_ingresso <- as.numeric(ies_odonto$total_ingresso)
+
+ies_odonto$total_matriculas <- as.numeric(ies_odonto$total_matriculas)
+
+ies_odonto$inscritos_total <- as.numeric(ies_odonto$inscritos_total)
+
+ies_odonto$concluintes_total <- as.numeric(ies_odonto$concluintes_total)
+
+ies_odonto$vaga_total <- as.numeric(ies_odonto$vaga_total)
+
+
+```
+
+Tratamento de IES
+
+```{r}
+
+ies_tratado <- 
+  ies_odonto |> 
+  filter(tp_categoria_administrativa != "Especial") |> 
+  mutate(categoria = if_else(
+                      tp_categoria_administrativa == "Privada com fins lucrativos" |
+                      tp_categoria_administrativa == "Privada sem fins lucrativos", "Privada", "Publico"
+                      
+  )) |> 
+  group_by(ano, uf_sigla, regiao_saude, 
+           cod_regsaud, categoria) |> 
+  summarise(vagas = sum(vaga_total),
+            matriculas = sum(total_matriculas)) |> 
+    pivot_wider(
+    id_cols = c(ano, uf_sigla, regiao_saude, cod_regsaud),
+    names_from = categoria,
+    values_from = c(vagas, matriculas),
+    names_glue = "{.value}_{categoria}"
+  ) |> 
+  mutate(across(starts_with("vagas"), ~replace_na(.,0)),
+         across(starts_with("matriculas"), ~replace_na(.,0))) |> 
+  mutate(vagas_total = vagas_Privada + vagas_Publico, 
+         .after = vagas_Publico) |> 
+  mutate(matriculas_total = matriculas_Privada + matriculas_Publico, 
+         .after = matriculas_Publico)
+
+```
+
+#### 1.1.2. Taxa de crescimento de vagas e matrículas de odontologia em IES
+
+A taxa de crescimento foi calculada de acordo com o seguinte bloco de código. Calculamos o crescimento de vagas e matrículas em um período de cinco anos, entre 2017 e 2022. Nem todas as regiões de saúde tiveram registro de profissionais em formação.
+
+```{r}
+
+crescimento_ies <- 
+  ies_tratado |> 
+  filter(ano == 2017 | ano == 2022) |> 
+  ungroup() |> 
+  group_by(ano, uf_sigla, cod_regsaud,
+           regiao_saude) |> 
+  summarise(vagas = sum(vagas_total),
+            matriculas = sum(matriculas_total)) |> 
+  pivot_wider(
+    id_cols = c(uf_sigla, regiao_saude, cod_regsaud),
+    names_from = ano,
+    values_from = c(vagas, matriculas),
+    names_glue = "{.value}_{ano}"
+  ) |> 
+  mutate(across(starts_with("vagas"), ~replace_na(.,1)),
+         across(starts_with("matriculas"), ~replace_na(.,1))) |> 
+  mutate(crescimento_vagas = (vagas_2022 * 100/vagas_2017) - 100, .after = vagas_2022) |> 
+  mutate(crescimento_matriculas = (matriculas_2022 * 100/matriculas_2017) - 100, .after = matriculas_2022)
+
+
+```
+
+O mapa abaixo mostra um mapa contendo o indicador em questão. Cerca de 232 regiões de saúde apresentaram o valor zero devido à ausência de IES e vagas nestas localidades.
+
+```{r}
+#| message: false
+#| warning: false
+
+estados_br <- read_state(year = 2020,
+                         showProgress = FALSE)
+
+spdf <- 
+  geojson_read("~/GitHub/saude_bucal/01_dados/shape_file_regioes_saude.json", 
+               what = "sp") 
+
+spdf_fortified <- 
+  sf::st_as_sf(spdf) |> 
+  sf::st_set_crs(4326) |> 
+  unique()
+
+# Definir limites de longitude e latitude para focar no Brasil
+limite_long <- c(-75, -28)  # limites de longitude
+limite_lat <- c(-33, 4)     # limites de latitude
+
+spdf_fortified$reg_id <- as.character(spdf_fortified$reg_id)
+
+baseline <- 
+  spdf_fortified |> 
+  left_join(crescimento_ies, 
+            by = c("reg_id"="cod_regsaud")) |> 
+  mutate(across(starts_with("crescimento"), 
+                ~replace_na(.,0))) |> 
+  mutate(crescimento_matriculas = 
+           round(crescimento_matriculas, 2)) |> 
+  mutate(crescimento_matriculas = 
+           if_else(crescimento_matriculas > 150, 
+                   150, crescimento_matriculas)) 
+  
+
+if (!"geometry" %in% names(baseline)) {
+  
+  baseline <- st_as_sf(baseline, 
+                       coords = c("longitude", 
+                                  "latitude"), 
+                       crs = 4326) 
+}
+
+
+
+baseline |> 
+  ggplot() +
+  geom_sf(aes(fill = crescimento_matriculas, 
+              geometry = geometry)) +
+  geom_sf(data = estados_br, 
+          fill = NA, 
+          color = "#4c4d4a", 
+          size = 0.1) + 
+  geom_sf(data = baseline |> 
+            filter(crescimento_matriculas == 0), 
+          fill = "white", 
+          color = "black", 
+          size = 0.2) +
+  scale_fill_gradientn(colors = c("#D92B3A", 
+                                  "#d4e302",
+                                  "#02592e")) + 
+  theme_minimal() +
+  labs(fill = "Relative gap") +
+  annotation_north_arrow(location = "tr",  
+                         which_north = "true",
+                         style = north_arrow_fancy_orienteering()) +
+  annotation_scale(location = "bl", 
+                   width_hint = 0.3) +
+  theme(
+    legend.justification = "center",
+    legend.box = "horizontal",
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.text.x = element_text(size = 14),  
+    axis.text.y = element_text(size = 14),
+    legend.text = element_text(size = 14),
+    plot.title = element_text(size = 14),
+    panel.border = element_rect(color = "black", 
+                                fill = NA, 
+                                size = 1), 
+    plot.margin = margin(10, 10, 
+                         10, 10)) 
+
+
+```
+
+### 1.2. Retenção
+
+A seguir serão acessados dados de retenção de profissionais pelas regiões de saúde.
+
+```{r}
+
+
+query_retencao <- 'SELECT * FROM Dados.retencao."Cirurgiões-dentistas_retencao_geral.parquet"'
+
+
+
+retencao <- sqlQuery(channel,
+                     query_retencao, 
+                     as.is = TRUE) 
+
+```
+
+Visualizando os dados de retenção.
+
+```{r}
+
+retencao |>
+  fasdf
+
+
+
+```
