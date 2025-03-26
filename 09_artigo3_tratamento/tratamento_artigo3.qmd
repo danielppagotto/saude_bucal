@@ -21,14 +21,61 @@ library(geobr)
 library(scales)
 library(ggspatial) 
 library(sf)
+library(rlang)
+library(readxl)
 
 ```
 
 ## Carregamento de dados
 
-### 1.1. Instituições de Ensino Superior
+### 1.1. Variável resposta - gap de cirurgiões dentistas
 
-#### 1.1.1. Quantidade de vagas e matrículas em cursos de odontologia
+```{r}
+
+cenarios_regioes <- 
+  read_excel("~/GitHub/saude_bucal/09_artigo3_tratamento/cenarios_regioes.xlsx") |> 
+  filter(cenario == 'cenario 4')
+
+cenario_aps <- cenarios_regioes |> 
+                  filter(nivel == "APS") |> 
+                  mutate(quantis = case_when(
+                        rr < quantile(rr, 
+                                      probs = 0.25) ~ "Intervalo 1", 
+                        rr > quantile(rr, 
+                                      probs = 0.25) & 
+                        rr < quantile(rr, 
+                                      probs = 0.5) ~ "Intervalo 2",
+                        rr > quantile(rr, 
+                                      probs = 0.5) & 
+                        rr < quantile(rr, 
+                                      probs = 0.75) ~ "Intervalo 3",
+                        rr > quantile(rr, 
+                                      probs = 0.75) ~ 
+                          "Intervalo 4"))
+
+cenario_aes <- cenarios_regioes |> 
+                  filter(nivel == "AES") |> 
+               mutate(quantis = case_when(
+                        rr < quantile(rr, 
+                                      probs = 0.25) ~ "Intervalo 1", 
+                        rr > quantile(rr, 
+                                      probs = 0.25) & 
+                        rr < quantile(rr, 
+                                      probs = 0.5) ~ "Intervalo 2",
+                        rr > quantile(rr, 
+                                      probs = 0.5) & 
+                        rr < quantile(rr, 
+                                      probs = 0.75) ~ "Intervalo 3",
+                        rr > quantile(rr, 
+                                      probs = 0.75) ~ 
+                          "Intervalo 4"))
+
+
+```
+
+### 1.2. Instituições de Ensino Superior
+
+#### 1.2.1. Quantidade de vagas e matrículas em cursos de odontologia
 
 ```{r}
 
@@ -176,45 +223,61 @@ if (!"geometry" %in% names(baseline)) {
                        crs = 4326) 
 }
 
+```
 
+Criando a função gerar mapa para visualizar mapas.
 
-baseline |> 
-  ggplot() +
-  geom_sf(aes(fill = crescimento_matriculas, 
-              geometry = geometry)) +
-  geom_sf(data = estados_br, 
-          fill = NA, 
-          color = "#4c4d4a", 
-          size = 0.1) + 
-  geom_sf(data = baseline |> 
-            filter(crescimento_matriculas == 0), 
-          fill = "white", 
-          color = "black", 
-          size = 0.2) +
-  scale_fill_gradientn(colors = c("#D92B3A", 
-                                  "#d4e302",
-                                  "#02592e")) + 
-  theme_minimal() +
-  labs(fill = "Relative gap") +
-  annotation_north_arrow(location = "tr",  
-                         which_north = "true",
-                         style = north_arrow_fancy_orienteering()) +
-  annotation_scale(location = "bl", 
-                   width_hint = 0.3) +
-  theme(
-    legend.justification = "center",
-    legend.box = "horizontal",
-    axis.title.x = element_blank(),
-    axis.title.y = element_blank(),
-    axis.text.x = element_text(size = 14),  
-    axis.text.y = element_text(size = 14),
-    legend.text = element_text(size = 14),
-    plot.title = element_text(size = 14),
-    panel.border = element_rect(color = "black", 
-                                fill = NA, 
-                                size = 1), 
-    plot.margin = margin(10, 10, 
-                         10, 10)) 
+```{r}
+
+gerar_mapa <- function(variavel, 
+                       texto_lab,
+                       texto_titulo){
+  
+  variavel_sym <- sym(variavel) 
+  
+  baseline |> 
+    ggplot() +
+    geom_sf(aes(fill = !!variavel_sym, 
+                geometry = geometry)) +
+    geom_sf(data = estados_br, 
+            fill = NA, 
+            color = "#4c4d4a", 
+            size = 0.1) + 
+    geom_sf(data = baseline |> 
+              filter(!!variavel_sym == 0), 
+            fill = "white", 
+            color = "black", 
+            size = 0.2) +
+    scale_fill_gradientn(colors = c("#D92B3A", 
+                                    "#d4e302",
+                                    "#02592e")) + 
+    theme_minimal() +
+    labs(fill = texto_lab) +
+    ggtitle(texto_titulo) +
+    annotation_north_arrow(location = "tr",  
+                           which_north = "true",
+                           style = north_arrow_fancy_orienteering()) +
+    annotation_scale(location = "bl", 
+                     width_hint = 0.3) +
+    theme(
+      legend.justification = "center",
+      legend.box = "horizontal",
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.text.x = element_text(size = 14),  
+      axis.text.y = element_text(size = 14),
+      legend.text = element_text(size = 14),
+      plot.title = element_text(size = 14),
+      panel.border = element_rect(color = "black", 
+                                  fill = NA, 
+                                  size = 1), 
+      plot.margin = margin(10, 10, 
+                           10, 10)) 
+}
+
+gerar_mapa("crescimento_matriculas",
+           "Crescimento de matrículas",
+           "Crescimento de matrículas em IES entre 2017 e 2022")
 
 
 ```
@@ -234,15 +297,208 @@ retencao <- sqlQuery(channel,
                      query_retencao, 
                      as.is = TRUE) 
 
+baseline <- baseline |> 
+               left_join(retencao, 
+                         by = c("reg_id"="regiao_saude"))
+
 ```
+
+Visualizando o resultado da retenção.
+
+```{r}
+
+gerar_mapa("retencao_geral",
+           "Retenção (%)",
+           "Taxa de retenção de cirurgiões-dentistas")
+
+```
+
+### 1.3. Equipamentos de Odontologia
 
 Visualizando os dados de retenção.
 
 ```{r}
 
-retencao |>
-  fasdf
+query <- 'SELECT * FROM 
+          "@daniel"."equipamentos_odontologia_regiao_saude"'
+
+
+equip_odonto <- sqlQuery(channel, 
+                         query, 
+                         as.is = TRUE) 
+
+equip_odonto$equip_sus <- as.numeric(equip_odonto$equip_sus)
+equip_odonto$equip_nao_sus <- as.numeric(equip_odonto$equip_nao_sus)
+
+crescimento_equip_odonto <- 
+  equip_odonto |> 
+  filter(equipamento == "Equipamento odontológico completo") |> 
+  filter(ano == 2010 | ano == 2024) |> 
+  group_by(ano, uf_sigla, cod_regsaud,
+           regiao_saude) |> 
+  summarise(equip_sus = sum(equip_sus),
+            equip_nao_sus = sum(equip_nao_sus)) |> 
+  pivot_wider(
+    id_cols = c(uf_sigla, regiao_saude, cod_regsaud),
+    names_from = ano,
+    values_from = c(equip_sus, equip_nao_sus),
+    names_glue = "{.value}_{ano}"
+  ) |> 
+  mutate(across(starts_with("equip_sus"), ~replace_na(.,1)),
+         across(starts_with("equip_nao_sus"), ~replace_na(.,1))) |> 
+  mutate(crescimento_equip_sus = 
+           (equip_sus_2024 * 100/equip_sus_2010) - 100, 
+         .after = equip_sus_2024) |> 
+  mutate(crescimento_equip_nsus = 
+           (equip_nao_sus_2024 * 100/equip_nao_sus_2010) - 100, 
+         .after = equip_nao_sus_2024) |>
+  ungroup() |> 
+  select(-uf_sigla, -regiao_saude)
+  
+baseline <- baseline |> 
+  left_join(crescimento_equip_odonto,
+            by = c("reg_id"="cod_regsaud"))
+
+
+```
+
+Gerando o mapa
+
+```{r}
+
+gerar_mapa("crescimento_equip_sus",
+           "Crescimento equipamentos SUS",
+           "Crescimento equipamentos SUS")
+
+```
+
+```{r}
+
+gerar_mapa("crescimento_equip_nsus",
+           "Crescimento equipamentos Não SUS",
+           "Crescimento equipamentos Não SUS")
+
+```
+
+### 1.4. CEO
+
+Quantidade de vínculos de profissionais de odonto -
+
+```{r}
+
+query_ceo <- 'SELECT * FROM "@daniel".CEO'
+
+ceo <- sqlQuery(channel, query_ceo, 
+                     as.is = TRUE) 
+
+ceo$ANO <- as.numeric(ceo$ANO)
+ceo$total <- as.numeric(ceo$total)
+
+ceo_regioes <- 
+            ceo |> 
+            filter(ANO == 2019 | ANO == 2024) |> 
+            group_by(ANO, uf, cod_regsaud,
+                     regiao_saude) |> 
+            summarise(ceo = sum(total)) |> 
+            pivot_wider(
+              id_cols = c(uf, regiao_saude, cod_regsaud),
+              names_from = ANO,
+              values_from = ceo,
+              names_glue = "{.value}_{ANO}"
+            ) |> 
+            mutate(across(starts_with("ceo"), 
+                          ~replace_na(.,0))) |> 
+            mutate(crescimento_ceo = 
+                     (ceo_2024 * 100/ceo_2019) - 100, 
+                   .after = ceo_2024) |> 
+            ungroup() |> 
+            select(-uf, -regiao_saude)
+
+```
+
+```{r}
+
+baseline <- baseline |> 
+  left_join(ceo_regioes, 
+            by = c("reg_id"="cod_regsaud"))
+
+
+baseline <- 
+  baseline |> 
+  mutate(across(starts_with("ceo"), 
+                          ~replace_na(.,0)))
+
+```
+
+### 1.5. PIB per capita
+
+Esta subseção é focada no levantamento de PIB per capita por região de saúde.
+
+```{r}
+
+query_pib <- 'SELECT * FROM "Analytics Layer"."Econômico"."PIB per capita por regiões de saúde"'
 
 
 
+pib_percapita <- sqlQuery(channel,
+                          query_pib, 
+                          as.is = TRUE) 
+
+pib_percapita$PIB_PER_CAPITA <- as.numeric(pib_percapita$PIB_PER_CAPITA)
+
+pib_percapita$POPULACAO <- as.numeric(pib_percapita$POPULACAO)
+
+pib_percapita$PIB_REGIOES <- as.numeric(pib_percapita$PIB_REGIOES)
+
+
+variacao_pib <- 
+  pib_percapita |> 
+  filter(ANO == '2010' | ANO == '2021') |> 
+  pivot_wider(
+    id_cols = c(regiao_saude, cod_regsaud),
+    names_from = ANO,
+    values_from = c(PIB_PER_CAPITA),
+    names_glue = "{.value}_{ANO}"
+  ) |> 
+  mutate(across(starts_with("equip_sus"), ~replace_na(.,1)),
+         across(starts_with("equip_nao_sus"), ~replace_na(.,1))) |> 
+  mutate(crescimento_equip_sus = 
+           (equip_sus_2024 * 100/equip_sus_2010) - 100, 
+         .after = equip_sus_2024) |> 
+  mutate(crescimento_equip_nsus = 
+           (equip_nao_sus_2024 * 100/equip_nao_sus_2010) - 100, 
+         .after = equip_nao_sus_2024) |>
+  ungroup() |> 
+  select(-uf_sigla, -regiao_saude)
+
+
+```
+
+### 1.6. Vínculos
+
+quantidade vínculos de profissionais de odonto em diferentes tipos de estabelecimento (público e privado)
+
+2.  Juntando tudo
+
+```{r}
+
+cenario_aes$cod_regsaud <- as.character(cenario_aes$cod_regsaud)
+
+teste <- cenario_aes |> 
+  left_join(retencao, by = c("cod_regsaud"="regiao_saude"))
+
+teste |> 
+  ggplot(aes(x = retencao_geral, y = rr)) + 
+  geom_point() + geom_smooth(se = FALSE)
+
+cor(teste$retencao_geral, teste$rr)
+
+```
+
+```{r}
+
+modelo = lm("rr ~ retencao_geral", 
+            data = teste)
+
+summary(modelo)
 ```

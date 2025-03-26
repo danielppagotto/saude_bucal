@@ -97,7 +97,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#implicações-de-resultados-em-termos-quantitativos" id="toc-implicações-de-resultados-em-termos-quantitativos" class="nav-link" data-scroll-target="#implicações-de-resultados-em-termos-quantitativos">4.3. Implicações de resultados em termos quantitativos</a></li>
   <li><a href="#implicações-de-resultados-em-termos-financeiros" id="toc-implicações-de-resultados-em-termos-financeiros" class="nav-link" data-scroll-target="#implicações-de-resultados-em-termos-financeiros">4.4. Implicações de resultados em termos financeiros</a></li>
   </ul></li>
-  <li><a href="#análise-de-cenário" id="toc-análise-de-cenário" class="nav-link" data-scroll-target="#análise-de-cenário">5. Análise de Cenário</a></li>
+  <li><a href="#análise-de-cenário" id="toc-análise-de-cenário" class="nav-link" data-scroll-target="#análise-de-cenário">5. Análise de Cenário</a>
+  <ul class="collapse">
+  <li><a href="#quatro-cenários-do-estudo" id="toc-quatro-cenários-do-estudo" class="nav-link" data-scroll-target="#quatro-cenários-do-estudo">5.1. Quatro cenários do estudo</a></li>
+  <li><a href="#executando-a-função-para-um-conjunto-de-valores" id="toc-executando-a-função-para-um-conjunto-de-valores" class="nav-link" data-scroll-target="#executando-a-função-para-um-conjunto-de-valores">5.2. Executando a função para um conjunto de valores</a></li>
+  </ul></li>
   <li><a href="#referências" id="toc-referências" class="nav-link" data-scroll-target="#referências">Referências</a></li>
   </ul>
 </nav>
@@ -328,8 +332,8 @@ dbl (5): PERIODO, CD_MUNICIPIO, CD_UF, PLANO_ODONTO, POP
 <table class="caption-top table">
 <caption>Fonte: Brasil (2021)</caption>
 <colgroup>
-<col style="width: 4%">
-<col style="width: 95%">
+<col style="width: 5%">
+<col style="width: 94%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1090,170 +1094,168 @@ using the `.groups` argument.</code></pre>
 <span id="cb35-62"><a href="#cb35-62" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(ibge, ibge_sb, </span>
 <span id="cb35-63"><a href="#cb35-63" aria-hidden="true" tabindex="-1"></a>             municipio.x, </span>
 <span id="cb35-64"><a href="#cb35-64" aria-hidden="true" tabindex="-1"></a>             faixa, id_faixa, </span>
-<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a>             total, procedimento, cobertura, cobertura_plano,</span>
-<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a>             pop_sus, cod_municipiodv, cod_mun_loc) <span class="sc">|&gt;</span> </span>
-<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">municipio =</span> municipio.x) <span class="sc">|&gt;</span> </span>
-<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">cobertura_servicos =</span> cobertura) <span class="sc">|&gt;</span> </span>
-<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">populacao_coberta =</span> cobertura_servicos <span class="sc">*</span> total) <span class="sc">|&gt;</span> </span>
-<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">populacao_coberta =</span> <span class="fu">round</span>(populacao_coberta, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-71"><a href="#cb35-71" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">populacao_coberta_sus =</span> cobertura_servicos <span class="sc">*</span> pop_sus) <span class="sc">|&gt;</span> </span>
-<span id="cb35-72"><a href="#cb35-72" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">populacao_coberta_sus =</span> <span class="fu">round</span>(populacao_coberta_sus, <span class="dv">2</span>))</span>
-<span id="cb35-73"><a href="#cb35-73" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-74"><a href="#cb35-74" aria-hidden="true" tabindex="-1"></a>    producao_brasil <span class="ot">&lt;-</span> </span>
-<span id="cb35-75"><a href="#cb35-75" aria-hidden="true" tabindex="-1"></a>      producao_normativa_br <span class="sc">|&gt;</span> </span>
-<span id="cb35-76"><a href="#cb35-76" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>municipio, </span>
-<span id="cb35-77"><a href="#cb35-77" aria-hidden="true" tabindex="-1"></a>             <span class="sc">-</span>li_cobertura,</span>
-<span id="cb35-78"><a href="#cb35-78" aria-hidden="true" tabindex="-1"></a>             <span class="sc">-</span>ls_cobertura,</span>
-<span id="cb35-79"><a href="#cb35-79" aria-hidden="true" tabindex="-1"></a>             <span class="sc">-</span>faixa_etaria)</span>
-<span id="cb35-80"><a href="#cb35-80" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb35-81"><a href="#cb35-81" aria-hidden="true" tabindex="-1"></a>    necessidades_servicos_br <span class="ot">&lt;-</span> </span>
-<span id="cb35-82"><a href="#cb35-82" aria-hidden="true" tabindex="-1"></a>      pop_coberta_br <span class="sc">|&gt;</span> </span>
-<span id="cb35-83"><a href="#cb35-83" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(producao_brasil, </span>
-<span id="cb35-84"><a href="#cb35-84" aria-hidden="true" tabindex="-1"></a>                <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"ibge"</span> <span class="ot">=</span> <span class="st">"ibge"</span>,</span>
-<span id="cb35-85"><a href="#cb35-85" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"id_faixa"</span>,</span>
-<span id="cb35-86"><a href="#cb35-86" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"procedimento"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-87"><a href="#cb35-87" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">nec_servicos =</span> </span>
-<span id="cb35-88"><a href="#cb35-88" aria-hidden="true" tabindex="-1"></a>               populacao_coberta <span class="sc">*</span> producao_pc) <span class="sc">|&gt;</span> </span>
-<span id="cb35-89"><a href="#cb35-89" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">nec_servicos =</span> </span>
-<span id="cb35-90"><a href="#cb35-90" aria-hidden="true" tabindex="-1"></a>               <span class="fu">round</span>(nec_servicos, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-91"><a href="#cb35-91" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">nec_servicos_sus =</span> </span>
-<span id="cb35-92"><a href="#cb35-92" aria-hidden="true" tabindex="-1"></a>               populacao_coberta_sus <span class="sc">*</span> producao_pc) <span class="sc">|&gt;</span> </span>
-<span id="cb35-93"><a href="#cb35-93" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">nec_servicos_sus =</span> <span class="fu">round</span>(nec_servicos_sus,<span class="dv">2</span>))</span>
-<span id="cb35-94"><a href="#cb35-94" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-65"><a href="#cb35-65" aria-hidden="true" tabindex="-1"></a>             total, procedimento, cobertura,</span>
+<span id="cb35-66"><a href="#cb35-66" aria-hidden="true" tabindex="-1"></a>             cobertura_plano, pop_sus, </span>
+<span id="cb35-67"><a href="#cb35-67" aria-hidden="true" tabindex="-1"></a>             cod_municipiodv, cod_mun_loc) <span class="sc">|&gt;</span> </span>
+<span id="cb35-68"><a href="#cb35-68" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">municipio =</span> municipio.x) <span class="sc">|&gt;</span> </span>
+<span id="cb35-69"><a href="#cb35-69" aria-hidden="true" tabindex="-1"></a>      <span class="fu">rename</span>(<span class="at">cobertura_servicos =</span> cobertura) <span class="sc">|&gt;</span> </span>
+<span id="cb35-70"><a href="#cb35-70" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">populacao_coberta =</span> cobertura_servicos <span class="sc">*</span> total) <span class="sc">|&gt;</span> </span>
+<span id="cb35-71"><a href="#cb35-71" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">populacao_coberta =</span> <span class="fu">round</span>(populacao_coberta, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-72"><a href="#cb35-72" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">populacao_coberta_sus =</span> cobertura_servicos <span class="sc">*</span> pop_sus) <span class="sc">|&gt;</span> </span>
+<span id="cb35-73"><a href="#cb35-73" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">populacao_coberta_sus =</span> <span class="fu">round</span>(populacao_coberta_sus, <span class="dv">2</span>))</span>
+<span id="cb35-74"><a href="#cb35-74" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-75"><a href="#cb35-75" aria-hidden="true" tabindex="-1"></a>    producao_brasil <span class="ot">&lt;-</span> </span>
+<span id="cb35-76"><a href="#cb35-76" aria-hidden="true" tabindex="-1"></a>      producao_normativa_br <span class="sc">|&gt;</span> </span>
+<span id="cb35-77"><a href="#cb35-77" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(<span class="sc">-</span>municipio, </span>
+<span id="cb35-78"><a href="#cb35-78" aria-hidden="true" tabindex="-1"></a>             <span class="sc">-</span>li_cobertura,</span>
+<span id="cb35-79"><a href="#cb35-79" aria-hidden="true" tabindex="-1"></a>             <span class="sc">-</span>ls_cobertura,</span>
+<span id="cb35-80"><a href="#cb35-80" aria-hidden="true" tabindex="-1"></a>             <span class="sc">-</span>faixa_etaria)</span>
+<span id="cb35-81"><a href="#cb35-81" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-82"><a href="#cb35-82" aria-hidden="true" tabindex="-1"></a>    necessidades_servicos_br <span class="ot">&lt;-</span> </span>
+<span id="cb35-83"><a href="#cb35-83" aria-hidden="true" tabindex="-1"></a>      pop_coberta_br <span class="sc">|&gt;</span> </span>
+<span id="cb35-84"><a href="#cb35-84" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(producao_brasil, </span>
+<span id="cb35-85"><a href="#cb35-85" aria-hidden="true" tabindex="-1"></a>                <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"ibge"</span> <span class="ot">=</span> <span class="st">"ibge"</span>,</span>
+<span id="cb35-86"><a href="#cb35-86" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"id_faixa"</span>,</span>
+<span id="cb35-87"><a href="#cb35-87" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"procedimento"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-88"><a href="#cb35-88" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">nec_servicos =</span> </span>
+<span id="cb35-89"><a href="#cb35-89" aria-hidden="true" tabindex="-1"></a>               populacao_coberta <span class="sc">*</span> producao_pc) <span class="sc">|&gt;</span> </span>
+<span id="cb35-90"><a href="#cb35-90" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">nec_servicos =</span> </span>
+<span id="cb35-91"><a href="#cb35-91" aria-hidden="true" tabindex="-1"></a>               <span class="fu">round</span>(nec_servicos, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-92"><a href="#cb35-92" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">nec_servicos_sus =</span> </span>
+<span id="cb35-93"><a href="#cb35-93" aria-hidden="true" tabindex="-1"></a>               populacao_coberta_sus <span class="sc">*</span> producao_pc) <span class="sc">|&gt;</span> </span>
+<span id="cb35-94"><a href="#cb35-94" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">nec_servicos_sus =</span> <span class="fu">round</span>(nec_servicos_sus,<span class="dv">2</span>))</span>
 <span id="cb35-95"><a href="#cb35-95" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-96"><a href="#cb35-96" aria-hidden="true" tabindex="-1"></a>    <span class="co">#tempo_aps &lt;- 30</span></span>
-<span id="cb35-97"><a href="#cb35-97" aria-hidden="true" tabindex="-1"></a>    <span class="co">#tempo_endo &lt;- 30</span></span>
-<span id="cb35-98"><a href="#cb35-98" aria-hidden="true" tabindex="-1"></a>    <span class="co">#tempo_prot &lt;- 60</span></span>
-<span id="cb35-99"><a href="#cb35-99" aria-hidden="true" tabindex="-1"></a>    <span class="co">#tempo_peri &lt;- 30</span></span>
-<span id="cb35-100"><a href="#cb35-100" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-101"><a href="#cb35-101" aria-hidden="true" tabindex="-1"></a>    necessidades_prof_br <span class="ot">&lt;-</span> </span>
-<span id="cb35-102"><a href="#cb35-102" aria-hidden="true" tabindex="-1"></a>      necessidades_servicos_br <span class="sc">|&gt;</span></span>
-<span id="cb35-103"><a href="#cb35-103" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
-<span id="cb35-104"><a href="#cb35-104" aria-hidden="true" tabindex="-1"></a>        <span class="at">nec_prof =</span> </span>
-<span id="cb35-105"><a href="#cb35-105" aria-hidden="true" tabindex="-1"></a>          <span class="fu">case_when</span>(</span>
-<span id="cb35-106"><a href="#cb35-106" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Atenção Básica"</span> <span class="sc">~</span> </span>
-<span id="cb35-107"><a href="#cb35-107" aria-hidden="true" tabindex="-1"></a>          (nec_servicos <span class="sc">*</span> tempo_aps<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
-<span id="cb35-108"><a href="#cb35-108" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Endodontia"</span> <span class="sc">~</span> </span>
-<span id="cb35-109"><a href="#cb35-109" aria-hidden="true" tabindex="-1"></a>          (nec_servicos <span class="sc">*</span> tempo_endo<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
-<span id="cb35-110"><a href="#cb35-110" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Periodontia"</span> <span class="sc">~</span> </span>
-<span id="cb35-111"><a href="#cb35-111" aria-hidden="true" tabindex="-1"></a>          (nec_servicos <span class="sc">*</span> tempo_peri<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
-<span id="cb35-112"><a href="#cb35-112" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Prótese"</span> <span class="sc">~</span> </span>
-<span id="cb35-113"><a href="#cb35-113" aria-hidden="true" tabindex="-1"></a>          (nec_servicos <span class="sc">*</span> tempo_prot<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>)</span>
-<span id="cb35-114"><a href="#cb35-114" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">|&gt;</span> </span>
-<span id="cb35-115"><a href="#cb35-115" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
-<span id="cb35-116"><a href="#cb35-116" aria-hidden="true" tabindex="-1"></a>        <span class="at">nec_prof_sus =</span> </span>
-<span id="cb35-117"><a href="#cb35-117" aria-hidden="true" tabindex="-1"></a>               <span class="fu">case_when</span>(</span>
-<span id="cb35-118"><a href="#cb35-118" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Atenção Básica"</span> <span class="sc">~</span> </span>
-<span id="cb35-119"><a href="#cb35-119" aria-hidden="true" tabindex="-1"></a>          (nec_servicos_sus <span class="sc">*</span> tempo_aps<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
-<span id="cb35-120"><a href="#cb35-120" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Endodontia"</span> <span class="sc">~</span> </span>
-<span id="cb35-121"><a href="#cb35-121" aria-hidden="true" tabindex="-1"></a>          (nec_servicos_sus <span class="sc">*</span> tempo_endo<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
-<span id="cb35-122"><a href="#cb35-122" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Periodontia"</span> <span class="sc">~</span> </span>
-<span id="cb35-123"><a href="#cb35-123" aria-hidden="true" tabindex="-1"></a>          (nec_servicos_sus <span class="sc">*</span> tempo_peri<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
-<span id="cb35-124"><a href="#cb35-124" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Prótese"</span> <span class="sc">~</span> </span>
-<span id="cb35-125"><a href="#cb35-125" aria-hidden="true" tabindex="-1"></a>          (nec_servicos_sus <span class="sc">*</span> tempo_prot<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>)</span>
-<span id="cb35-126"><a href="#cb35-126" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">|&gt;</span> </span>
-<span id="cb35-127"><a href="#cb35-127" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">nivel =</span> <span class="fu">if_else</span>(procedimento <span class="sc">==</span> <span class="st">"Atenção Básica"</span>,</span>
-<span id="cb35-128"><a href="#cb35-128" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"APS"</span>,</span>
-<span id="cb35-129"><a href="#cb35-129" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"AES"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-130"><a href="#cb35-130" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(ibge, municipio, </span>
-<span id="cb35-131"><a href="#cb35-131" aria-hidden="true" tabindex="-1"></a>               nivel, cod_municipiodv, </span>
-<span id="cb35-132"><a href="#cb35-132" aria-hidden="true" tabindex="-1"></a>               cod_mun_loc) <span class="sc">|&gt;</span> </span>
-<span id="cb35-133"><a href="#cb35-133" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">necessidade =</span> <span class="fu">sum</span>(nec_prof),</span>
-<span id="cb35-134"><a href="#cb35-134" aria-hidden="true" tabindex="-1"></a>                <span class="at">necessidade_sus =</span> <span class="fu">sum</span>(nec_prof_sus)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-135"><a href="#cb35-135" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">necessidade =</span> <span class="fu">round</span>(necessidade, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-136"><a href="#cb35-136" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">necessidade_sus =</span> <span class="fu">round</span>(necessidade_sus, <span class="dv">2</span>))</span>
-<span id="cb35-137"><a href="#cb35-137" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-138"><a href="#cb35-138" aria-hidden="true" tabindex="-1"></a>    <span class="co">#categoria &lt;- "2232"</span></span>
-<span id="cb35-139"><a href="#cb35-139" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-140"><a href="#cb35-140" aria-hidden="true" tabindex="-1"></a>    oferta_prof <span class="ot">&lt;-</span> </span>
-<span id="cb35-141"><a href="#cb35-141" aria-hidden="true" tabindex="-1"></a>      oferta_brasil <span class="sc">|&gt;</span> </span>
-<span id="cb35-142"><a href="#cb35-142" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(profissional <span class="sc">==</span> categoria)</span>
-<span id="cb35-143"><a href="#cb35-143" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-144"><a href="#cb35-144" aria-hidden="true" tabindex="-1"></a>    todos <span class="ot">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># Se sus = TRUE vai pegar apenas aqueles profissionais com vínculo SUS</span></span>
-<span id="cb35-145"><a href="#cb35-145" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># Se SUS = FALSE vai pegar todos os profissionais independente do vínculo</span></span>
-<span id="cb35-146"><a href="#cb35-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-147"><a href="#cb35-147" aria-hidden="true" tabindex="-1"></a>   <span class="co"># sus &lt;- TRUE</span></span>
-<span id="cb35-148"><a href="#cb35-148" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-149"><a href="#cb35-149" aria-hidden="true" tabindex="-1"></a>    oferta_temp <span class="ot">&lt;-</span> </span>
-<span id="cb35-150"><a href="#cb35-150" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(todos <span class="sc">==</span> sus)</span>
-<span id="cb35-151"><a href="#cb35-151" aria-hidden="true" tabindex="-1"></a>      {</span>
-<span id="cb35-152"><a href="#cb35-152" aria-hidden="true" tabindex="-1"></a>        oferta_prof <span class="sc">|&gt;</span> </span>
-<span id="cb35-153"><a href="#cb35-153" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(SUS <span class="sc">==</span> <span class="st">"1"</span>) </span>
-<span id="cb35-154"><a href="#cb35-154" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
-<span id="cb35-155"><a href="#cb35-155" aria-hidden="true" tabindex="-1"></a>      oferta_prof <span class="sc">|&gt;</span> </span>
-<span id="cb35-156"><a href="#cb35-156" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(ibge, profissional, nivel) <span class="sc">|&gt;</span> </span>
-<span id="cb35-157"><a href="#cb35-157" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">fte40 =</span> <span class="fu">sum</span>(fte40)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-158"><a href="#cb35-158" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ungroup</span>()</span>
-<span id="cb35-159"><a href="#cb35-159" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb35-160"><a href="#cb35-160" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-161"><a href="#cb35-161" aria-hidden="true" tabindex="-1"></a>    oferta_temp<span class="sc">$</span>fte40[<span class="fu">is.na</span>(oferta_temp<span class="sc">$</span>fte40)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb35-162"><a href="#cb35-162" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-163"><a href="#cb35-163" aria-hidden="true" tabindex="-1"></a>   <span class="co"># pd &lt;- 0.60</span></span>
-<span id="cb35-164"><a href="#cb35-164" aria-hidden="true" tabindex="-1"></a>    <span class="co">#pl &lt;- 0.50</span></span>
-<span id="cb35-165"><a href="#cb35-165" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-166"><a href="#cb35-166" aria-hidden="true" tabindex="-1"></a>    oferta_temp <span class="ot">&lt;-</span> </span>
-<span id="cb35-167"><a href="#cb35-167" aria-hidden="true" tabindex="-1"></a>      oferta_temp <span class="sc">|&gt;</span> </span>
-<span id="cb35-168"><a href="#cb35-168" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">FTE_40_direto =</span> fte40 <span class="sc">*</span> pd) <span class="sc">|&gt;</span> </span>
-<span id="cb35-169"><a href="#cb35-169" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">FTE_40_linha =</span> FTE_40_direto <span class="sc">*</span> pl)</span>
-<span id="cb35-170"><a href="#cb35-170" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-171"><a href="#cb35-171" aria-hidden="true" tabindex="-1"></a>    oferta_temp<span class="sc">$</span>FTE_40_direto[<span class="fu">is.na</span>(oferta_temp<span class="sc">$</span>FTE_40_direto)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb35-172"><a href="#cb35-172" aria-hidden="true" tabindex="-1"></a>    oferta_temp<span class="sc">$</span>FTE_40_linha[<span class="fu">is.na</span>(oferta_temp<span class="sc">$</span>FTE_40_linha)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb35-173"><a href="#cb35-173" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-96"><a href="#cb35-96" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-97"><a href="#cb35-97" aria-hidden="true" tabindex="-1"></a>    <span class="co">#tempo_aps &lt;- 30</span></span>
+<span id="cb35-98"><a href="#cb35-98" aria-hidden="true" tabindex="-1"></a>    <span class="co">#tempo_endo &lt;- 30</span></span>
+<span id="cb35-99"><a href="#cb35-99" aria-hidden="true" tabindex="-1"></a>    <span class="co">#tempo_prot &lt;- 60</span></span>
+<span id="cb35-100"><a href="#cb35-100" aria-hidden="true" tabindex="-1"></a>    <span class="co">#tempo_peri &lt;- 30</span></span>
+<span id="cb35-101"><a href="#cb35-101" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-102"><a href="#cb35-102" aria-hidden="true" tabindex="-1"></a>    necessidades_prof_br <span class="ot">&lt;-</span> </span>
+<span id="cb35-103"><a href="#cb35-103" aria-hidden="true" tabindex="-1"></a>      necessidades_servicos_br <span class="sc">|&gt;</span></span>
+<span id="cb35-104"><a href="#cb35-104" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
+<span id="cb35-105"><a href="#cb35-105" aria-hidden="true" tabindex="-1"></a>        <span class="at">nec_prof =</span> </span>
+<span id="cb35-106"><a href="#cb35-106" aria-hidden="true" tabindex="-1"></a>          <span class="fu">case_when</span>(</span>
+<span id="cb35-107"><a href="#cb35-107" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Atenção Básica"</span> <span class="sc">~</span> </span>
+<span id="cb35-108"><a href="#cb35-108" aria-hidden="true" tabindex="-1"></a>          (nec_servicos <span class="sc">*</span> tempo_aps<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
+<span id="cb35-109"><a href="#cb35-109" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Endodontia"</span> <span class="sc">~</span> </span>
+<span id="cb35-110"><a href="#cb35-110" aria-hidden="true" tabindex="-1"></a>          (nec_servicos <span class="sc">*</span> tempo_endo<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
+<span id="cb35-111"><a href="#cb35-111" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Periodontia"</span> <span class="sc">~</span> </span>
+<span id="cb35-112"><a href="#cb35-112" aria-hidden="true" tabindex="-1"></a>          (nec_servicos <span class="sc">*</span> tempo_peri<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
+<span id="cb35-113"><a href="#cb35-113" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Prótese"</span> <span class="sc">~</span> </span>
+<span id="cb35-114"><a href="#cb35-114" aria-hidden="true" tabindex="-1"></a>          (nec_servicos <span class="sc">*</span> tempo_prot<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>)</span>
+<span id="cb35-115"><a href="#cb35-115" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">|&gt;</span> </span>
+<span id="cb35-116"><a href="#cb35-116" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(</span>
+<span id="cb35-117"><a href="#cb35-117" aria-hidden="true" tabindex="-1"></a>        <span class="at">nec_prof_sus =</span> </span>
+<span id="cb35-118"><a href="#cb35-118" aria-hidden="true" tabindex="-1"></a>               <span class="fu">case_when</span>(</span>
+<span id="cb35-119"><a href="#cb35-119" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Atenção Básica"</span> <span class="sc">~</span> </span>
+<span id="cb35-120"><a href="#cb35-120" aria-hidden="true" tabindex="-1"></a>          (nec_servicos_sus <span class="sc">*</span> tempo_aps<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
+<span id="cb35-121"><a href="#cb35-121" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Endodontia"</span> <span class="sc">~</span> </span>
+<span id="cb35-122"><a href="#cb35-122" aria-hidden="true" tabindex="-1"></a>          (nec_servicos_sus <span class="sc">*</span> tempo_endo<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
+<span id="cb35-123"><a href="#cb35-123" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Periodontia"</span> <span class="sc">~</span> </span>
+<span id="cb35-124"><a href="#cb35-124" aria-hidden="true" tabindex="-1"></a>          (nec_servicos_sus <span class="sc">*</span> tempo_peri<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>,</span>
+<span id="cb35-125"><a href="#cb35-125" aria-hidden="true" tabindex="-1"></a>        procedimento <span class="sc">==</span> <span class="st">"Prótese"</span> <span class="sc">~</span> </span>
+<span id="cb35-126"><a href="#cb35-126" aria-hidden="true" tabindex="-1"></a>          (nec_servicos_sus <span class="sc">*</span> tempo_prot<span class="sc">/</span><span class="dv">60</span>)<span class="sc">/</span><span class="dv">1576</span>)</span>
+<span id="cb35-127"><a href="#cb35-127" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">|&gt;</span> </span>
+<span id="cb35-128"><a href="#cb35-128" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">nivel =</span> <span class="fu">if_else</span>(procedimento <span class="sc">==</span> <span class="st">"Atenção Básica"</span>,</span>
+<span id="cb35-129"><a href="#cb35-129" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"APS"</span>,</span>
+<span id="cb35-130"><a href="#cb35-130" aria-hidden="true" tabindex="-1"></a>                           <span class="st">"AES"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-131"><a href="#cb35-131" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(ibge, municipio, </span>
+<span id="cb35-132"><a href="#cb35-132" aria-hidden="true" tabindex="-1"></a>               nivel, cod_municipiodv, </span>
+<span id="cb35-133"><a href="#cb35-133" aria-hidden="true" tabindex="-1"></a>               cod_mun_loc) <span class="sc">|&gt;</span> </span>
+<span id="cb35-134"><a href="#cb35-134" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">necessidade =</span> <span class="fu">sum</span>(nec_prof),</span>
+<span id="cb35-135"><a href="#cb35-135" aria-hidden="true" tabindex="-1"></a>                <span class="at">necessidade_sus =</span> <span class="fu">sum</span>(nec_prof_sus)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-136"><a href="#cb35-136" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">necessidade =</span> <span class="fu">round</span>(necessidade, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-137"><a href="#cb35-137" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">necessidade_sus =</span> <span class="fu">round</span>(necessidade_sus, <span class="dv">2</span>))</span>
+<span id="cb35-138"><a href="#cb35-138" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-139"><a href="#cb35-139" aria-hidden="true" tabindex="-1"></a>    <span class="co">#categoria &lt;- "2232"</span></span>
+<span id="cb35-140"><a href="#cb35-140" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-141"><a href="#cb35-141" aria-hidden="true" tabindex="-1"></a>    oferta_prof <span class="ot">&lt;-</span> </span>
+<span id="cb35-142"><a href="#cb35-142" aria-hidden="true" tabindex="-1"></a>      oferta_brasil <span class="sc">|&gt;</span> </span>
+<span id="cb35-143"><a href="#cb35-143" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(profissional <span class="sc">==</span> categoria)</span>
+<span id="cb35-144"><a href="#cb35-144" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-145"><a href="#cb35-145" aria-hidden="true" tabindex="-1"></a>    todos <span class="ot">&lt;-</span> <span class="cn">TRUE</span> <span class="co"># Se sus = TRUE vai pegar apenas aqueles profissionais com vínculo SUS</span></span>
+<span id="cb35-146"><a href="#cb35-146" aria-hidden="true" tabindex="-1"></a>                  <span class="co"># Se SUS = FALSE vai pegar todos os profissionais independente do vínculo</span></span>
+<span id="cb35-147"><a href="#cb35-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-148"><a href="#cb35-148" aria-hidden="true" tabindex="-1"></a>   <span class="co"># sus &lt;- TRUE</span></span>
+<span id="cb35-149"><a href="#cb35-149" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-150"><a href="#cb35-150" aria-hidden="true" tabindex="-1"></a>    oferta_temp <span class="ot">&lt;-</span> </span>
+<span id="cb35-151"><a href="#cb35-151" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span>(todos <span class="sc">==</span> sus)</span>
+<span id="cb35-152"><a href="#cb35-152" aria-hidden="true" tabindex="-1"></a>      {</span>
+<span id="cb35-153"><a href="#cb35-153" aria-hidden="true" tabindex="-1"></a>        oferta_prof <span class="sc">|&gt;</span> </span>
+<span id="cb35-154"><a href="#cb35-154" aria-hidden="true" tabindex="-1"></a>          <span class="fu">filter</span>(SUS <span class="sc">==</span> <span class="st">"1"</span>) </span>
+<span id="cb35-155"><a href="#cb35-155" aria-hidden="true" tabindex="-1"></a>      } <span class="cf">else</span> {</span>
+<span id="cb35-156"><a href="#cb35-156" aria-hidden="true" tabindex="-1"></a>      oferta_prof <span class="sc">|&gt;</span> </span>
+<span id="cb35-157"><a href="#cb35-157" aria-hidden="true" tabindex="-1"></a>        <span class="fu">group_by</span>(ibge, profissional, nivel) <span class="sc">|&gt;</span> </span>
+<span id="cb35-158"><a href="#cb35-158" aria-hidden="true" tabindex="-1"></a>        <span class="fu">summarise</span>(<span class="at">fte40 =</span> <span class="fu">sum</span>(fte40)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-159"><a href="#cb35-159" aria-hidden="true" tabindex="-1"></a>        <span class="fu">ungroup</span>()</span>
+<span id="cb35-160"><a href="#cb35-160" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb35-161"><a href="#cb35-161" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-162"><a href="#cb35-162" aria-hidden="true" tabindex="-1"></a>    oferta_temp<span class="sc">$</span>fte40[<span class="fu">is.na</span>(oferta_temp<span class="sc">$</span>fte40)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb35-163"><a href="#cb35-163" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-164"><a href="#cb35-164" aria-hidden="true" tabindex="-1"></a>   <span class="co"># pd &lt;- 0.60</span></span>
+<span id="cb35-165"><a href="#cb35-165" aria-hidden="true" tabindex="-1"></a>    <span class="co">#pl &lt;- 0.50</span></span>
+<span id="cb35-166"><a href="#cb35-166" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-167"><a href="#cb35-167" aria-hidden="true" tabindex="-1"></a>    oferta_temp <span class="ot">&lt;-</span> </span>
+<span id="cb35-168"><a href="#cb35-168" aria-hidden="true" tabindex="-1"></a>      oferta_temp <span class="sc">|&gt;</span> </span>
+<span id="cb35-169"><a href="#cb35-169" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">FTE_40_direto =</span> fte40 <span class="sc">*</span> pd) <span class="sc">|&gt;</span> </span>
+<span id="cb35-170"><a href="#cb35-170" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">FTE_40_linha =</span> FTE_40_direto <span class="sc">*</span> pl)</span>
+<span id="cb35-171"><a href="#cb35-171" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-172"><a href="#cb35-172" aria-hidden="true" tabindex="-1"></a>    oferta_temp<span class="sc">$</span>FTE_40_direto[<span class="fu">is.na</span>(oferta_temp<span class="sc">$</span>FTE_40_direto)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb35-173"><a href="#cb35-173" aria-hidden="true" tabindex="-1"></a>    oferta_temp<span class="sc">$</span>FTE_40_linha[<span class="fu">is.na</span>(oferta_temp<span class="sc">$</span>FTE_40_linha)] <span class="ot">&lt;-</span> <span class="dv">0</span></span>
 <span id="cb35-174"><a href="#cb35-174" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-175"><a href="#cb35-175" aria-hidden="true" tabindex="-1"></a>    flag <span class="ot">&lt;-</span> <span class="dv">1</span> </span>
-<span id="cb35-176"><a href="#cb35-176" aria-hidden="true" tabindex="-1"></a>    <span class="co"># se flag = 1, vamos trabalhar com as necessidades todos</span></span>
-<span id="cb35-177"><a href="#cb35-177" aria-hidden="true" tabindex="-1"></a>    <span class="co"># se flag = 0, vamos trabalhar com as necessidades daqueles sus dependentes</span></span>
-<span id="cb35-178"><a href="#cb35-178" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-179"><a href="#cb35-179" aria-hidden="true" tabindex="-1"></a>   <span class="co"># plano &lt;- 1</span></span>
-<span id="cb35-180"><a href="#cb35-180" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-181"><a href="#cb35-181" aria-hidden="true" tabindex="-1"></a>    flag <span class="ot">&lt;-</span> plano</span>
-<span id="cb35-182"><a href="#cb35-182" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-175"><a href="#cb35-175" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-176"><a href="#cb35-176" aria-hidden="true" tabindex="-1"></a>    flag <span class="ot">&lt;-</span> <span class="dv">1</span> </span>
+<span id="cb35-177"><a href="#cb35-177" aria-hidden="true" tabindex="-1"></a>    <span class="co"># se flag = 1, vamos trabalhar com as necessidades todos</span></span>
+<span id="cb35-178"><a href="#cb35-178" aria-hidden="true" tabindex="-1"></a>    <span class="co"># se flag = 0, vamos trabalhar com as necessidades daqueles sus dependentes</span></span>
+<span id="cb35-179"><a href="#cb35-179" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-180"><a href="#cb35-180" aria-hidden="true" tabindex="-1"></a>   <span class="co"># plano &lt;- 1</span></span>
+<span id="cb35-181"><a href="#cb35-181" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-182"><a href="#cb35-182" aria-hidden="true" tabindex="-1"></a>    flag <span class="ot">&lt;-</span> plano</span>
 <span id="cb35-183"><a href="#cb35-183" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-184"><a href="#cb35-184" aria-hidden="true" tabindex="-1"></a>    oferta_vs_demanda <span class="ot">&lt;-</span></span>
-<span id="cb35-185"><a href="#cb35-185" aria-hidden="true" tabindex="-1"></a>      necessidades_prof_br <span class="sc">|&gt;</span> </span>
-<span id="cb35-186"><a href="#cb35-186" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(oferta_temp, </span>
-<span id="cb35-187"><a href="#cb35-187" aria-hidden="true" tabindex="-1"></a>                <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"cod_municipiodv"</span><span class="ot">=</span><span class="st">"ibge"</span>,</span>
-<span id="cb35-188"><a href="#cb35-188" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"nivel"</span> <span class="ot">=</span> <span class="st">"nivel"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-189"><a href="#cb35-189" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(hierarquia_municipios, </span>
-<span id="cb35-190"><a href="#cb35-190" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"cod_municipiodv"</span><span class="ot">=</span><span class="st">"cod_municipio"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-191"><a href="#cb35-191" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">ra =</span> <span class="fu">if_else</span>(flag <span class="sc">==</span> <span class="dv">1</span>, </span>
-<span id="cb35-192"><a href="#cb35-192" aria-hidden="true" tabindex="-1"></a>                          FTE_40_linha <span class="sc">-</span> necessidade, </span>
-<span id="cb35-193"><a href="#cb35-193" aria-hidden="true" tabindex="-1"></a>                          FTE_40_linha <span class="sc">-</span> necessidade_sus)) <span class="sc">|&gt;</span></span>
-<span id="cb35-194"><a href="#cb35-194" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">rr =</span> <span class="fu">if_else</span>(flag <span class="sc">==</span> <span class="dv">0</span>, </span>
-<span id="cb35-195"><a href="#cb35-195" aria-hidden="true" tabindex="-1"></a>                          FTE_40_linha<span class="sc">/</span>necessidade, </span>
-<span id="cb35-196"><a href="#cb35-196" aria-hidden="true" tabindex="-1"></a>                          FTE_40_linha<span class="sc">/</span>necessidade_sus)) <span class="sc">|&gt;</span></span>
-<span id="cb35-197"><a href="#cb35-197" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">ra =</span> <span class="fu">round</span>(ra, <span class="dv">2</span>),</span>
-<span id="cb35-198"><a href="#cb35-198" aria-hidden="true" tabindex="-1"></a>             <span class="at">rr =</span> <span class="fu">round</span>(rr, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-199"><a href="#cb35-199" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">necessidade =</span> <span class="fu">round</span>(necessidade, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb35-200"><a href="#cb35-200" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">FTE_40_linha =</span> <span class="fu">round</span>(FTE_40_linha, <span class="dv">2</span>)) </span>
-<span id="cb35-201"><a href="#cb35-201" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-202"><a href="#cb35-202" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb35-203"><a href="#cb35-203" aria-hidden="true" tabindex="-1"></a><span class="do">### falta colocar as flags aqui para pegar a população SUS dependente </span></span>
-<span id="cb35-204"><a href="#cb35-204" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-205"><a href="#cb35-205" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb35-206"><a href="#cb35-206" aria-hidden="true" tabindex="-1"></a>    cd_oferta_vs_demanda_regiao_saude <span class="ot">&lt;-</span> </span>
-<span id="cb35-207"><a href="#cb35-207" aria-hidden="true" tabindex="-1"></a>    oferta_vs_demanda <span class="sc">|&gt;</span> </span>
-<span id="cb35-208"><a href="#cb35-208" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(nivel, cod_regsaud, uf_sigla,</span>
-<span id="cb35-209"><a href="#cb35-209" aria-hidden="true" tabindex="-1"></a>               regiao_saude) <span class="sc">|&gt;</span> </span>
-<span id="cb35-210"><a href="#cb35-210" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">necessidade =</span> <span class="fu">sum</span>(necessidade),</span>
-<span id="cb35-211"><a href="#cb35-211" aria-hidden="true" tabindex="-1"></a>                <span class="at">necessidade_sus =</span> <span class="fu">sum</span>(necessidade_sus),</span>
-<span id="cb35-212"><a href="#cb35-212" aria-hidden="true" tabindex="-1"></a>                <span class="at">oferta =</span> <span class="fu">sum</span>(FTE_40_linha)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-213"><a href="#cb35-213" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">ra =</span> <span class="fu">if_else</span>(flag <span class="sc">==</span> <span class="dv">1</span>, </span>
-<span id="cb35-214"><a href="#cb35-214" aria-hidden="true" tabindex="-1"></a>                          oferta <span class="sc">-</span> necessidade, </span>
-<span id="cb35-215"><a href="#cb35-215" aria-hidden="true" tabindex="-1"></a>                          oferta <span class="sc">-</span> necessidade_sus)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-216"><a href="#cb35-216" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">rr =</span> <span class="fu">if_else</span>(flag <span class="sc">==</span> <span class="dv">1</span>, </span>
-<span id="cb35-217"><a href="#cb35-217" aria-hidden="true" tabindex="-1"></a>                          oferta<span class="sc">/</span>necessidade, </span>
-<span id="cb35-218"><a href="#cb35-218" aria-hidden="true" tabindex="-1"></a>                          oferta<span class="sc">/</span>necessidade_sus)) <span class="sc">|&gt;</span> </span>
-<span id="cb35-219"><a href="#cb35-219" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">ra =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> ra, <span class="dv">2</span>),</span>
-<span id="cb35-220"><a href="#cb35-220" aria-hidden="true" tabindex="-1"></a>             <span class="at">rr =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> rr, <span class="dv">2</span>))<span class="sc">|&gt;</span> </span>
-<span id="cb35-221"><a href="#cb35-221" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">rr =</span> <span class="fu">if_else</span>(rr <span class="sc">==</span> <span class="fl">0.00</span>, <span class="fl">0.01</span>, rr)) </span>
-<span id="cb35-222"><a href="#cb35-222" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-223"><a href="#cb35-223" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-224"><a href="#cb35-224" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb35-225"><a href="#cb35-225" aria-hidden="true" tabindex="-1"></a>  }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb35-184"><a href="#cb35-184" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-185"><a href="#cb35-185" aria-hidden="true" tabindex="-1"></a>    oferta_vs_demanda <span class="ot">&lt;-</span></span>
+<span id="cb35-186"><a href="#cb35-186" aria-hidden="true" tabindex="-1"></a>      necessidades_prof_br <span class="sc">|&gt;</span> </span>
+<span id="cb35-187"><a href="#cb35-187" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(oferta_temp, </span>
+<span id="cb35-188"><a href="#cb35-188" aria-hidden="true" tabindex="-1"></a>                <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"cod_municipiodv"</span><span class="ot">=</span><span class="st">"ibge"</span>,</span>
+<span id="cb35-189"><a href="#cb35-189" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"nivel"</span> <span class="ot">=</span> <span class="st">"nivel"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-190"><a href="#cb35-190" aria-hidden="true" tabindex="-1"></a>      <span class="fu">left_join</span>(hierarquia_municipios, </span>
+<span id="cb35-191"><a href="#cb35-191" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"cod_municipiodv"</span><span class="ot">=</span><span class="st">"cod_municipio"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-192"><a href="#cb35-192" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">ra =</span> <span class="fu">if_else</span>(flag <span class="sc">==</span> <span class="dv">1</span>, </span>
+<span id="cb35-193"><a href="#cb35-193" aria-hidden="true" tabindex="-1"></a>                          FTE_40_linha <span class="sc">-</span> necessidade, </span>
+<span id="cb35-194"><a href="#cb35-194" aria-hidden="true" tabindex="-1"></a>                          FTE_40_linha <span class="sc">-</span> necessidade_sus)) <span class="sc">|&gt;</span></span>
+<span id="cb35-195"><a href="#cb35-195" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">rr =</span> <span class="fu">if_else</span>(flag <span class="sc">==</span> <span class="dv">0</span>, </span>
+<span id="cb35-196"><a href="#cb35-196" aria-hidden="true" tabindex="-1"></a>                          FTE_40_linha<span class="sc">/</span>necessidade, </span>
+<span id="cb35-197"><a href="#cb35-197" aria-hidden="true" tabindex="-1"></a>                          FTE_40_linha<span class="sc">/</span>necessidade_sus)) <span class="sc">|&gt;</span></span>
+<span id="cb35-198"><a href="#cb35-198" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">ra =</span> <span class="fu">round</span>(ra, <span class="dv">2</span>),</span>
+<span id="cb35-199"><a href="#cb35-199" aria-hidden="true" tabindex="-1"></a>             <span class="at">rr =</span> <span class="fu">round</span>(rr, <span class="dv">2</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-200"><a href="#cb35-200" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">necessidade =</span> <span class="fu">round</span>(necessidade, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb35-201"><a href="#cb35-201" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">FTE_40_linha =</span> <span class="fu">round</span>(FTE_40_linha, <span class="dv">2</span>)) </span>
+<span id="cb35-202"><a href="#cb35-202" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-203"><a href="#cb35-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-204"><a href="#cb35-204" aria-hidden="true" tabindex="-1"></a><span class="do">### falta colocar as flags aqui para pegar a população SUS dependente </span></span>
+<span id="cb35-205"><a href="#cb35-205" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb35-206"><a href="#cb35-206" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb35-207"><a href="#cb35-207" aria-hidden="true" tabindex="-1"></a>    cd_oferta_vs_demanda_regiao_saude <span class="ot">&lt;-</span> </span>
+<span id="cb35-208"><a href="#cb35-208" aria-hidden="true" tabindex="-1"></a>    oferta_vs_demanda <span class="sc">|&gt;</span> </span>
+<span id="cb35-209"><a href="#cb35-209" aria-hidden="true" tabindex="-1"></a>      <span class="fu">group_by</span>(nivel, cod_regsaud, uf_sigla,</span>
+<span id="cb35-210"><a href="#cb35-210" aria-hidden="true" tabindex="-1"></a>               regiao_saude) <span class="sc">|&gt;</span> </span>
+<span id="cb35-211"><a href="#cb35-211" aria-hidden="true" tabindex="-1"></a>      <span class="fu">summarise</span>(<span class="at">necessidade =</span> <span class="fu">sum</span>(necessidade),</span>
+<span id="cb35-212"><a href="#cb35-212" aria-hidden="true" tabindex="-1"></a>                <span class="at">necessidade_sus =</span> <span class="fu">sum</span>(necessidade_sus),</span>
+<span id="cb35-213"><a href="#cb35-213" aria-hidden="true" tabindex="-1"></a>                <span class="at">oferta =</span> <span class="fu">sum</span>(FTE_40_linha)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-214"><a href="#cb35-214" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">ra =</span> <span class="fu">if_else</span>(flag <span class="sc">==</span> <span class="dv">1</span>, </span>
+<span id="cb35-215"><a href="#cb35-215" aria-hidden="true" tabindex="-1"></a>                          oferta <span class="sc">-</span> necessidade, </span>
+<span id="cb35-216"><a href="#cb35-216" aria-hidden="true" tabindex="-1"></a>                          oferta <span class="sc">-</span> necessidade_sus)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-217"><a href="#cb35-217" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">rr =</span> <span class="fu">if_else</span>(flag <span class="sc">==</span> <span class="dv">1</span>, </span>
+<span id="cb35-218"><a href="#cb35-218" aria-hidden="true" tabindex="-1"></a>                          oferta<span class="sc">/</span>necessidade, </span>
+<span id="cb35-219"><a href="#cb35-219" aria-hidden="true" tabindex="-1"></a>                          oferta<span class="sc">/</span>necessidade_sus)) <span class="sc">|&gt;</span> </span>
+<span id="cb35-220"><a href="#cb35-220" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">ra =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> ra, <span class="dv">2</span>),</span>
+<span id="cb35-221"><a href="#cb35-221" aria-hidden="true" tabindex="-1"></a>             <span class="at">rr =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> rr, <span class="dv">2</span>))<span class="sc">|&gt;</span> </span>
+<span id="cb35-222"><a href="#cb35-222" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">rr =</span> <span class="fu">if_else</span>(rr <span class="sc">==</span> <span class="fl">0.00</span>, <span class="fl">0.01</span>, rr)) </span>
+<span id="cb35-223"><a href="#cb35-223" aria-hidden="true" tabindex="-1"></a>  }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="quatro-cenários-do-estudo" class="level4">
-<h4 class="anchored" data-anchor-id="quatro-cenários-do-estudo">5.1. Quatro cenários do estudo</h4>
+<section id="quatro-cenários-do-estudo" class="level3">
+<h3 class="anchored" data-anchor-id="quatro-cenários-do-estudo">5.1. Quatro cenários do estudo</h3>
 <p>Nesta seção vamos aplicar os quatro cenários que foram sugeridos nesta pesquisa.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> <span class="fu">gap_necessidade_oferta</span>(<span class="at">tempo_aps =</span> <span class="dv">45</span>,</span>
@@ -1266,104 +1268,82 @@ using the `.groups` argument.</code></pre>
 <span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">sus =</span> <span class="cn">TRUE</span>,</span>
 <span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">categoria =</span> <span class="st">'2232'</span>,  </span>
 <span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">plano =</span> <span class="dv">1</span>)  <span class="sc">|&gt;</span> </span>
-<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">cenario =</span> <span class="st">"baseline"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in left_join(populacao_tratado, cobertura_sb, by = c(ibge_sb = "ibge", : Detected an unexpected many-to-many relationship between `x` and `y`.
-ℹ Row 1 of `x` matches multiple rows in `y`.
-ℹ Row 121 of `y` matches multiple rows in `x`.
-ℹ If a many-to-many relationship is expected, set `relationship =
-  "many-to-many"` to silence this warning.</code></pre>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">cenario =</span> <span class="st">"baseline"</span>)</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-13"><a href="#cb36-13" aria-hidden="true" tabindex="-1"></a>cenario2 <span class="ot">&lt;-</span> <span class="fu">gap_necessidade_oferta</span>(<span class="at">tempo_aps =</span> <span class="dv">25</span>,  </span>
+<span id="cb36-14"><a href="#cb36-14" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_endo =</span> <span class="dv">35</span>,  </span>
+<span id="cb36-15"><a href="#cb36-15" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_prot =</span> <span class="dv">35</span>, </span>
+<span id="cb36-16"><a href="#cb36-16" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_peri =</span> <span class="dv">35</span>, </span>
+<span id="cb36-17"><a href="#cb36-17" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pd =</span> <span class="fl">0.6</span>,       </span>
+<span id="cb36-18"><a href="#cb36-18" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pl =</span> <span class="fl">0.6</span>,     </span>
+<span id="cb36-19"><a href="#cb36-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">ttd =</span> <span class="dv">1676</span>,      </span>
+<span id="cb36-20"><a href="#cb36-20" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">sus =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb36-21"><a href="#cb36-21" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">categoria =</span> <span class="st">'2232'</span>,   </span>
+<span id="cb36-22"><a href="#cb36-22" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">plano =</span> <span class="dv">1</span>)   <span class="sc">|&gt;</span> </span>
+<span id="cb36-23"><a href="#cb36-23" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">cenario =</span> <span class="st">"cenario 2"</span>)</span>
+<span id="cb36-24"><a href="#cb36-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-25"><a href="#cb36-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-26"><a href="#cb36-26" aria-hidden="true" tabindex="-1"></a>cenario3 <span class="ot">&lt;-</span> <span class="fu">gap_necessidade_oferta</span>(<span class="at">tempo_aps =</span> <span class="dv">25</span>,</span>
+<span id="cb36-27"><a href="#cb36-27" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_endo =</span> <span class="dv">35</span>,   </span>
+<span id="cb36-28"><a href="#cb36-28" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_prot =</span> <span class="dv">35</span>, </span>
+<span id="cb36-29"><a href="#cb36-29" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_peri =</span> <span class="dv">35</span>, </span>
+<span id="cb36-30"><a href="#cb36-30" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pd =</span> <span class="fl">0.6</span>,        </span>
+<span id="cb36-31"><a href="#cb36-31" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pl =</span> <span class="fl">0.6</span>,    </span>
+<span id="cb36-32"><a href="#cb36-32" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">ttd =</span> <span class="dv">1676</span>,   </span>
+<span id="cb36-33"><a href="#cb36-33" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">sus =</span> <span class="cn">TRUE</span>,  </span>
+<span id="cb36-34"><a href="#cb36-34" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">categoria =</span> <span class="st">'2232'</span>, </span>
+<span id="cb36-35"><a href="#cb36-35" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">plano =</span> <span class="dv">0</span>)  <span class="sc">|&gt;</span> </span>
+<span id="cb36-36"><a href="#cb36-36" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">cenario =</span> <span class="st">"cenario 3"</span>)</span>
+<span id="cb36-37"><a href="#cb36-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-38"><a href="#cb36-38" aria-hidden="true" tabindex="-1"></a>cenario4 <span class="ot">&lt;-</span> <span class="fu">gap_necessidade_oferta</span>(<span class="at">tempo_aps =</span> <span class="dv">25</span>,</span>
+<span id="cb36-39"><a href="#cb36-39" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_endo =</span> <span class="dv">35</span>,   </span>
+<span id="cb36-40"><a href="#cb36-40" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_prot =</span> <span class="dv">35</span>, </span>
+<span id="cb36-41"><a href="#cb36-41" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_peri =</span> <span class="dv">35</span>, </span>
+<span id="cb36-42"><a href="#cb36-42" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pd =</span> <span class="fl">0.6</span>,        </span>
+<span id="cb36-43"><a href="#cb36-43" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pl =</span> <span class="fl">0.6</span>,    </span>
+<span id="cb36-44"><a href="#cb36-44" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">ttd =</span> <span class="dv">1676</span>,   </span>
+<span id="cb36-45"><a href="#cb36-45" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">sus =</span> <span class="cn">FALSE</span>,  </span>
+<span id="cb36-46"><a href="#cb36-46" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">categoria =</span> <span class="st">'2232'</span>, </span>
+<span id="cb36-47"><a href="#cb36-47" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">plano =</span> <span class="dv">0</span>)  <span class="sc">|&gt;</span> </span>
+<span id="cb36-48"><a href="#cb36-48" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">cenario =</span> <span class="st">"cenario 4"</span>)</span>
+<span id="cb36-49"><a href="#cb36-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-50"><a href="#cb36-50" aria-hidden="true" tabindex="-1"></a>cenarios_rs <span class="ot">&lt;-</span> <span class="fu">rbind</span>(baseline,</span>
+<span id="cb36-51"><a href="#cb36-51" aria-hidden="true" tabindex="-1"></a>                  cenario2,</span>
+<span id="cb36-52"><a href="#cb36-52" aria-hidden="true" tabindex="-1"></a>                  cenario3,</span>
+<span id="cb36-53"><a href="#cb36-53" aria-hidden="true" tabindex="-1"></a>                  cenario4)</span>
+<span id="cb36-54"><a href="#cb36-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-55"><a href="#cb36-55" aria-hidden="true" tabindex="-1"></a><span class="co">#writexl::write_xlsx(cenarios_rs, "~/GitHub/saude_bucal/01_dados/cenarios_regioes.xlsx")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Verificando resultados para Brasil todo para tabela 1.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>cenarios <span class="ot">&lt;-</span> <span class="fu">rbind</span>(baseline,</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>                  cenario2,</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>                  cenario3,</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>                  cenario4) <span class="sc">|&gt;</span> </span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">group_by</span>(cenario, nivel) <span class="sc">|&gt;</span> </span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>            <span class="fu">summarise</span>(<span class="at">necessidade =</span> <span class="fu">sum</span>(necessidade),</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>                      <span class="at">necessidade_sus =</span> <span class="fu">sum</span>(necessidade_sus),</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>                      <span class="at">oferta =</span> <span class="fu">sum</span>(oferta)) <span class="sc">|&gt;</span> </span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">ra =</span> oferta <span class="sc">-</span> necessidade,</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">ra_s =</span> oferta <span class="sc">-</span> necessidade_sus,</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>                   <span class="at">rr =</span> (oferta<span class="sc">/</span>necessidade) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>                   <span class="at">rr_s =</span> (oferta<span class="sc">/</span>necessidade_sus) <span class="sc">*</span> <span class="dv">100</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'ibge', 'municipio', 'nivel',
-'cod_municipiodv'. You can override using the `.groups` argument.
-`summarise()` has grouped output by 'nivel', 'cod_regsaud', 'uf_sigla'. You can
-override using the `.groups` argument.</code></pre>
+<pre><code>`summarise()` has grouped output by 'cenario'. You can override using the
+`.groups` argument.</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>cenario2 <span class="ot">&lt;-</span> <span class="fu">gap_necessidade_oferta</span>(<span class="at">tempo_aps =</span> <span class="dv">25</span>,  </span>
-<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_endo =</span> <span class="dv">35</span>,  </span>
-<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_prot =</span> <span class="dv">35</span>, </span>
-<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_peri =</span> <span class="dv">35</span>, </span>
-<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pd =</span> <span class="fl">0.6</span>,       </span>
-<span id="cb39-6"><a href="#cb39-6" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pl =</span> <span class="fl">0.6</span>,     </span>
-<span id="cb39-7"><a href="#cb39-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">ttd =</span> <span class="dv">1676</span>,      </span>
-<span id="cb39-8"><a href="#cb39-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">sus =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb39-9"><a href="#cb39-9" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">categoria =</span> <span class="st">'2232'</span>,   </span>
-<span id="cb39-10"><a href="#cb39-10" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">plano =</span> <span class="dv">1</span>)   <span class="sc">|&gt;</span> </span>
-<span id="cb39-11"><a href="#cb39-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">cenario =</span> <span class="st">"cenario 2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in left_join(populacao_tratado, cobertura_sb, by = c(ibge_sb = "ibge", : Detected an unexpected many-to-many relationship between `x` and `y`.
-ℹ Row 1 of `x` matches multiple rows in `y`.
-ℹ Row 121 of `y` matches multiple rows in `x`.
-ℹ If a many-to-many relationship is expected, set `relationship =
-  "many-to-many"` to silence this warning.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'ibge', 'municipio', 'nivel',
-'cod_municipiodv'. You can override using the `.groups` argument.
-`summarise()` has grouped output by 'nivel', 'cod_regsaud', 'uf_sigla'. You can
-override using the `.groups` argument.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>cenario3 <span class="ot">&lt;-</span> <span class="fu">gap_necessidade_oferta</span>(<span class="at">tempo_aps =</span> <span class="dv">25</span>,</span>
-<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_endo =</span> <span class="dv">35</span>,   </span>
-<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_prot =</span> <span class="dv">35</span>, </span>
-<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_peri =</span> <span class="dv">35</span>, </span>
-<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pd =</span> <span class="fl">0.6</span>,        </span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pl =</span> <span class="fl">0.6</span>,    </span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">ttd =</span> <span class="dv">1676</span>,   </span>
-<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">sus =</span> <span class="cn">TRUE</span>,  </span>
-<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">categoria =</span> <span class="st">'2232'</span>, </span>
-<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">plano =</span> <span class="dv">0</span>)  <span class="sc">|&gt;</span> </span>
-<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">cenario =</span> <span class="st">"cenario 3"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in left_join(populacao_tratado, cobertura_sb, by = c(ibge_sb = "ibge", : Detected an unexpected many-to-many relationship between `x` and `y`.
-ℹ Row 1 of `x` matches multiple rows in `y`.
-ℹ Row 121 of `y` matches multiple rows in `x`.
-ℹ If a many-to-many relationship is expected, set `relationship =
-  "many-to-many"` to silence this warning.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'ibge', 'municipio', 'nivel',
-'cod_municipiodv'. You can override using the `.groups` argument.
-`summarise()` has grouped output by 'nivel', 'cod_regsaud', 'uf_sigla'. You can
-override using the `.groups` argument.</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>cenario4 <span class="ot">&lt;-</span> <span class="fu">gap_necessidade_oferta</span>(<span class="at">tempo_aps =</span> <span class="dv">25</span>,</span>
-<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_endo =</span> <span class="dv">35</span>,   </span>
-<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_prot =</span> <span class="dv">35</span>, </span>
-<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">tempo_peri =</span> <span class="dv">35</span>, </span>
-<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pd =</span> <span class="fl">0.6</span>,        </span>
-<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">pl =</span> <span class="fl">0.6</span>,    </span>
-<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">ttd =</span> <span class="dv">1676</span>,   </span>
-<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">sus =</span> <span class="cn">FALSE</span>,  </span>
-<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">categoria =</span> <span class="st">'2232'</span>, </span>
-<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">plano =</span> <span class="dv">0</span>)  <span class="sc">|&gt;</span> </span>
-<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(<span class="at">cenario =</span> <span class="st">"cenario 4"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in left_join(populacao_tratado, cobertura_sb, by = c(ibge_sb = "ibge", : Detected an unexpected many-to-many relationship between `x` and `y`.
-ℹ Row 1 of `x` matches multiple rows in `y`.
-ℹ Row 121 of `y` matches multiple rows in `x`.
-ℹ If a many-to-many relationship is expected, set `relationship =
-  "many-to-many"` to silence this warning.</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>`summarise()` has grouped output by 'ibge', 'municipio', 'nivel',
-'cod_municipiodv'. You can override using the `.groups` argument.
-`summarise()` has grouped output by 'ibge', 'profissional'. You can override
-using the `.groups` argument.
-`summarise()` has grouped output by 'nivel', 'cod_regsaud', 'uf_sigla'. You can
-override using the `.groups` argument.</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co">#writexl::write_xlsx(cenarios,</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="co">#                    "~/GitHub/saude_bucal/06_artigo/resultados_br.xlsx")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="executando-a-função-para-um-conjunto-de-valores" class="level4">
-<h4 class="anchored" data-anchor-id="executando-a-função-para-um-conjunto-de-valores">5.2. Executando a função para um conjunto de valores</h4>
+<section id="executando-a-função-para-um-conjunto-de-valores" class="level3">
+<h3 class="anchored" data-anchor-id="executando-a-função-para-um-conjunto-de-valores">5.2. Executando a função para um conjunto de valores</h3>
 <p>Utilizamos uma lista de valores para iterar conforme a tabela abaixo. Estas combinações resultaram em 1600 combinações de resultados.</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 30%">
-<col style="width: 9%">
-<col style="width: 59%">
+<col style="width: 29%">
+<col style="width: 14%">
+<col style="width: 56%">
 </colgroup>
 <thead>
 <tr class="header">
@@ -1406,88 +1386,88 @@ override using the `.groups` argument.</code></pre>
 </tbody>
 </table>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando lista de vetores para cada parâmetro</span></span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>list_ttd <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">"1576"</span>, <span class="st">"1676"</span>, <span class="st">"1776"</span>, <span class="st">"1876"</span>))</span>
-<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>list_tempo <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">"25"</span>,<span class="st">"35"</span>, <span class="st">"45"</span>, <span class="st">"55"</span>, <span class="st">"65"</span>, <span class="st">"75"</span>))</span>
-<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>list_pd <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">"0.50"</span>, <span class="st">"0.60"</span>,<span class="st">"0.70"</span>, <span class="st">"0.80"</span>, <span class="st">"0.90"</span>, <span class="st">"1"</span>))</span>
-<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>list_pl <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">"0.50"</span>, <span class="st">"0.60"</span>, <span class="st">"0.70"</span>, <span class="st">"0.80"</span>, <span class="st">"0.90"</span>, <span class="st">"1"</span>))</span>
-<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>list_cat <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"2232"</span>)<span class="co">#,"3224")</span></span>
-<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>list_sus <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>) <span class="co"># pegar todos os profissionais (FALSE) ou só SUS (TRUE)</span></span>
-<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>resultado1 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
-<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>iteracao1 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
-<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>total_iteracoes1 <span class="ot">&lt;-</span> </span>
-<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">length</span>(list_ttd) <span class="sc">*</span> <span class="fu">length</span>(list_tempo) <span class="sc">*</span> <span class="fu">length</span>(list_pd) <span class="sc">*</span> </span>
-<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">length</span>(list_pl) <span class="sc">*</span> <span class="fu">length</span>(list_cat) <span class="sc">*</span> <span class="fu">length</span>(list_sus)</span>
-<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (ttd <span class="cf">in</span> list_ttd) {</span>
-<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (tempo <span class="cf">in</span> list_tempo) {</span>
-<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (pd <span class="cf">in</span> list_pd) {</span>
-<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (pl <span class="cf">in</span> list_pl) { </span>
-<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span>(sus <span class="cf">in</span> list_sus){</span>
-<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>          <span class="cf">for</span>(cat <span class="cf">in</span> list_cat){</span>
-<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>            iteracao1 <span class="ot">&lt;-</span> iteracao1 <span class="sc">+</span> <span class="dv">1</span></span>
-<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>            <span class="fu">cat</span>(<span class="st">"Iteração:"</span>, iteracao1, <span class="st">"de"</span>, total_iteracoes1, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>            res1 <span class="ot">&lt;-</span> </span>
-<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>              <span class="fu">gap_necessidade_oferta</span>(</span>
-<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>                <span class="at">tempo =</span> tempo, </span>
-<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>                <span class="at">ttd =</span> ttd, </span>
-<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>                <span class="at">pd =</span> pd, </span>
-<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>                <span class="at">pl =</span> pl,</span>
-<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>                <span class="at">sus =</span> sus, </span>
-<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>                <span class="at">cat =</span> cat)</span>
-<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a>            res1 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(res1, </span>
-<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a>                         <span class="at">ttd =</span> ttd, </span>
-<span id="cb48-36"><a href="#cb48-36" aria-hidden="true" tabindex="-1"></a>                         <span class="at">tempo =</span> tempo, </span>
-<span id="cb48-37"><a href="#cb48-37" aria-hidden="true" tabindex="-1"></a>                         <span class="at">pd =</span> pd, </span>
-<span id="cb48-38"><a href="#cb48-38" aria-hidden="true" tabindex="-1"></a>                         <span class="at">pl =</span> pl,</span>
-<span id="cb48-39"><a href="#cb48-39" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sus =</span> sus,</span>
-<span id="cb48-40"><a href="#cb48-40" aria-hidden="true" tabindex="-1"></a>                         <span class="at">cat =</span> cat)</span>
-<span id="cb48-41"><a href="#cb48-41" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb48-42"><a href="#cb48-42" aria-hidden="true" tabindex="-1"></a>            res1<span class="sc">$</span>atributos <span class="ot">&lt;-</span> <span class="fu">paste</span>(ttd, </span>
-<span id="cb48-43"><a href="#cb48-43" aria-hidden="true" tabindex="-1"></a>                                   tempo, </span>
-<span id="cb48-44"><a href="#cb48-44" aria-hidden="true" tabindex="-1"></a>                                   pd, </span>
-<span id="cb48-45"><a href="#cb48-45" aria-hidden="true" tabindex="-1"></a>                                   pl, </span>
-<span id="cb48-46"><a href="#cb48-46" aria-hidden="true" tabindex="-1"></a>                                   sus,</span>
-<span id="cb48-47"><a href="#cb48-47" aria-hidden="true" tabindex="-1"></a>                                   cat, </span>
-<span id="cb48-48"><a href="#cb48-48" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">sep =</span> <span class="st">"_"</span>)</span>
-<span id="cb48-49"><a href="#cb48-49" aria-hidden="true" tabindex="-1"></a>            </span>
-<span id="cb48-50"><a href="#cb48-50" aria-hidden="true" tabindex="-1"></a>            resultado1[[<span class="fu">length</span>(resultado1) <span class="sc">+</span> <span class="dv">1</span>]] <span class="ot">&lt;-</span> res1</span>
-<span id="cb48-51"><a href="#cb48-51" aria-hidden="true" tabindex="-1"></a>          }</span>
-<span id="cb48-52"><a href="#cb48-52" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb48-53"><a href="#cb48-53" aria-hidden="true" tabindex="-1"></a>      }</span>
-<span id="cb48-54"><a href="#cb48-54" aria-hidden="true" tabindex="-1"></a>    }</span>
-<span id="cb48-55"><a href="#cb48-55" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb48-56"><a href="#cb48-56" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb48-57"><a href="#cb48-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-58"><a href="#cb48-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Verificando o tamanho da lista resultado</span></span>
-<span id="cb48-59"><a href="#cb48-59" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(resultado1)</span>
-<span id="cb48-60"><a href="#cb48-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-61"><a href="#cb48-61" aria-hidden="true" tabindex="-1"></a>resultado_teste1 <span class="ot">&lt;-</span> </span>
-<span id="cb48-62"><a href="#cb48-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, resultado1) </span>
-<span id="cb48-63"><a href="#cb48-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-64"><a href="#cb48-64" aria-hidden="true" tabindex="-1"></a>hierarquia_municipios<span class="sc">$</span>cod_municipio <span class="ot">&lt;-</span> </span>
-<span id="cb48-65"><a href="#cb48-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.character</span>(hierarquia_municipios<span class="sc">$</span>cod_municipio)</span>
-<span id="cb48-66"><a href="#cb48-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-67"><a href="#cb48-67" aria-hidden="true" tabindex="-1"></a>resultado <span class="ot">&lt;-</span> </span>
-<span id="cb48-68"><a href="#cb48-68" aria-hidden="true" tabindex="-1"></a>  resultado_teste1 <span class="sc">|&gt;</span></span>
-<span id="cb48-69"><a href="#cb48-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">categoria =</span> <span class="fu">if_else</span>(profissional <span class="sc">==</span> <span class="st">'2232'</span>,</span>
-<span id="cb48-70"><a href="#cb48-70" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"Dentista"</span>,<span class="st">"TSB/ASB"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb48-71"><a href="#cb48-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sus =</span> <span class="fu">if_else</span>(sus <span class="sc">==</span> <span class="cn">TRUE</span>, </span>
-<span id="cb48-72"><a href="#cb48-72" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Apenas SUS"</span>, <span class="st">"Todos"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb48-73"><a href="#cb48-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb48-74"><a href="#cb48-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(hierarquia_municipios, </span>
-<span id="cb48-75"><a href="#cb48-75" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"cod_municipiodv"</span><span class="ot">=</span><span class="st">"cod_municipio"</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb48-76"><a href="#cb48-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(cod_municipiodv, regiao, uf_sigla, uf, municipio, </span>
-<span id="cb48-77"><a href="#cb48-77" aria-hidden="true" tabindex="-1"></a>         regiao_saude, cod_regsaud, nivel, profissional, </span>
-<span id="cb48-78"><a href="#cb48-78" aria-hidden="true" tabindex="-1"></a>         categoria, sus, necessidade, fte40, FTE_40_direto, </span>
-<span id="cb48-79"><a href="#cb48-79" aria-hidden="true" tabindex="-1"></a>         FTE_40_linha, ra, rr, ttd, tempo, pd, pl, atributos)</span>
-<span id="cb48-80"><a href="#cb48-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb48-81"><a href="#cb48-81" aria-hidden="true" tabindex="-1"></a><span class="co">#write.csv2(resultado, "resultado_final_1600.csv")</span></span>
-<span id="cb48-82"><a href="#cb48-82" aria-hidden="true" tabindex="-1"></a><span class="co">#arrow::write_parquet(resultado, "resultado_final_1600.parquet")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Criando lista de vetores para cada parâmetro</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>list_ttd <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">"1576"</span>, <span class="st">"1676"</span>, <span class="st">"1776"</span>, <span class="st">"1876"</span>))</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>list_tempo <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">"25"</span>,<span class="st">"35"</span>, <span class="st">"45"</span>, <span class="st">"55"</span>, <span class="st">"65"</span>, <span class="st">"75"</span>))</span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>list_pd <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">"0.50"</span>, <span class="st">"0.60"</span>,<span class="st">"0.70"</span>, <span class="st">"0.80"</span>, <span class="st">"0.90"</span>, <span class="st">"1"</span>))</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>list_pl <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">c</span>(<span class="st">"0.50"</span>, <span class="st">"0.60"</span>, <span class="st">"0.70"</span>, <span class="st">"0.80"</span>, <span class="st">"0.90"</span>, <span class="st">"1"</span>))</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>list_cat <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"2232"</span>)<span class="co">#,"3224")</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a>list_sus <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="cn">TRUE</span>, <span class="cn">FALSE</span>) <span class="co"># pegar todos os profissionais (FALSE) ou só SUS (TRUE)</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>resultado1 <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>iteracao1 <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a>total_iteracoes1 <span class="ot">&lt;-</span> </span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">length</span>(list_ttd) <span class="sc">*</span> <span class="fu">length</span>(list_tempo) <span class="sc">*</span> <span class="fu">length</span>(list_pd) <span class="sc">*</span> </span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">length</span>(list_pl) <span class="sc">*</span> <span class="fu">length</span>(list_cat) <span class="sc">*</span> <span class="fu">length</span>(list_sus)</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (ttd <span class="cf">in</span> list_ttd) {</span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (tempo <span class="cf">in</span> list_tempo) {</span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> (pd <span class="cf">in</span> list_pd) {</span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>      <span class="cf">for</span> (pl <span class="cf">in</span> list_pl) { </span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span>(sus <span class="cf">in</span> list_sus){</span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>          <span class="cf">for</span>(cat <span class="cf">in</span> list_cat){</span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>            iteracao1 <span class="ot">&lt;-</span> iteracao1 <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>            <span class="fu">cat</span>(<span class="st">"Iteração:"</span>, iteracao1, <span class="st">"de"</span>, total_iteracoes1, <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a>            res1 <span class="ot">&lt;-</span> </span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>              <span class="fu">gap_necessidade_oferta</span>(</span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>                <span class="at">tempo =</span> tempo, </span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>                <span class="at">ttd =</span> ttd, </span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>                <span class="at">pd =</span> pd, </span>
+<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a>                <span class="at">pl =</span> pl,</span>
+<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a>                <span class="at">sus =</span> sus, </span>
+<span id="cb40-32"><a href="#cb40-32" aria-hidden="true" tabindex="-1"></a>                <span class="at">cat =</span> cat)</span>
+<span id="cb40-33"><a href="#cb40-33" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb40-34"><a href="#cb40-34" aria-hidden="true" tabindex="-1"></a>            res1 <span class="ot">&lt;-</span> <span class="fu">cbind</span>(res1, </span>
+<span id="cb40-35"><a href="#cb40-35" aria-hidden="true" tabindex="-1"></a>                         <span class="at">ttd =</span> ttd, </span>
+<span id="cb40-36"><a href="#cb40-36" aria-hidden="true" tabindex="-1"></a>                         <span class="at">tempo =</span> tempo, </span>
+<span id="cb40-37"><a href="#cb40-37" aria-hidden="true" tabindex="-1"></a>                         <span class="at">pd =</span> pd, </span>
+<span id="cb40-38"><a href="#cb40-38" aria-hidden="true" tabindex="-1"></a>                         <span class="at">pl =</span> pl,</span>
+<span id="cb40-39"><a href="#cb40-39" aria-hidden="true" tabindex="-1"></a>                         <span class="at">sus =</span> sus,</span>
+<span id="cb40-40"><a href="#cb40-40" aria-hidden="true" tabindex="-1"></a>                         <span class="at">cat =</span> cat)</span>
+<span id="cb40-41"><a href="#cb40-41" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb40-42"><a href="#cb40-42" aria-hidden="true" tabindex="-1"></a>            res1<span class="sc">$</span>atributos <span class="ot">&lt;-</span> <span class="fu">paste</span>(ttd, </span>
+<span id="cb40-43"><a href="#cb40-43" aria-hidden="true" tabindex="-1"></a>                                   tempo, </span>
+<span id="cb40-44"><a href="#cb40-44" aria-hidden="true" tabindex="-1"></a>                                   pd, </span>
+<span id="cb40-45"><a href="#cb40-45" aria-hidden="true" tabindex="-1"></a>                                   pl, </span>
+<span id="cb40-46"><a href="#cb40-46" aria-hidden="true" tabindex="-1"></a>                                   sus,</span>
+<span id="cb40-47"><a href="#cb40-47" aria-hidden="true" tabindex="-1"></a>                                   cat, </span>
+<span id="cb40-48"><a href="#cb40-48" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">sep =</span> <span class="st">"_"</span>)</span>
+<span id="cb40-49"><a href="#cb40-49" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb40-50"><a href="#cb40-50" aria-hidden="true" tabindex="-1"></a>            resultado1[[<span class="fu">length</span>(resultado1) <span class="sc">+</span> <span class="dv">1</span>]] <span class="ot">&lt;-</span> res1</span>
+<span id="cb40-51"><a href="#cb40-51" aria-hidden="true" tabindex="-1"></a>          }</span>
+<span id="cb40-52"><a href="#cb40-52" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb40-53"><a href="#cb40-53" aria-hidden="true" tabindex="-1"></a>      }</span>
+<span id="cb40-54"><a href="#cb40-54" aria-hidden="true" tabindex="-1"></a>    }</span>
+<span id="cb40-55"><a href="#cb40-55" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb40-56"><a href="#cb40-56" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb40-57"><a href="#cb40-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-58"><a href="#cb40-58" aria-hidden="true" tabindex="-1"></a><span class="co"># Verificando o tamanho da lista resultado</span></span>
+<span id="cb40-59"><a href="#cb40-59" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(resultado1)</span>
+<span id="cb40-60"><a href="#cb40-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-61"><a href="#cb40-61" aria-hidden="true" tabindex="-1"></a>resultado_teste1 <span class="ot">&lt;-</span> </span>
+<span id="cb40-62"><a href="#cb40-62" aria-hidden="true" tabindex="-1"></a>  <span class="fu">do.call</span>(rbind, resultado1) </span>
+<span id="cb40-63"><a href="#cb40-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-64"><a href="#cb40-64" aria-hidden="true" tabindex="-1"></a>hierarquia_municipios<span class="sc">$</span>cod_municipio <span class="ot">&lt;-</span> </span>
+<span id="cb40-65"><a href="#cb40-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.character</span>(hierarquia_municipios<span class="sc">$</span>cod_municipio)</span>
+<span id="cb40-66"><a href="#cb40-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-67"><a href="#cb40-67" aria-hidden="true" tabindex="-1"></a>resultado <span class="ot">&lt;-</span> </span>
+<span id="cb40-68"><a href="#cb40-68" aria-hidden="true" tabindex="-1"></a>  resultado_teste1 <span class="sc">|&gt;</span></span>
+<span id="cb40-69"><a href="#cb40-69" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">categoria =</span> <span class="fu">if_else</span>(profissional <span class="sc">==</span> <span class="st">'2232'</span>,</span>
+<span id="cb40-70"><a href="#cb40-70" aria-hidden="true" tabindex="-1"></a>                             <span class="st">"Dentista"</span>,<span class="st">"TSB/ASB"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb40-71"><a href="#cb40-71" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">sus =</span> <span class="fu">if_else</span>(sus <span class="sc">==</span> <span class="cn">TRUE</span>, </span>
+<span id="cb40-72"><a href="#cb40-72" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Apenas SUS"</span>, <span class="st">"Todos"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb40-73"><a href="#cb40-73" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb40-74"><a href="#cb40-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(hierarquia_municipios, </span>
+<span id="cb40-75"><a href="#cb40-75" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"cod_municipiodv"</span><span class="ot">=</span><span class="st">"cod_municipio"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb40-76"><a href="#cb40-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(cod_municipiodv, regiao, uf_sigla, uf, municipio, </span>
+<span id="cb40-77"><a href="#cb40-77" aria-hidden="true" tabindex="-1"></a>         regiao_saude, cod_regsaud, nivel, profissional, </span>
+<span id="cb40-78"><a href="#cb40-78" aria-hidden="true" tabindex="-1"></a>         categoria, sus, necessidade, fte40, FTE_40_direto, </span>
+<span id="cb40-79"><a href="#cb40-79" aria-hidden="true" tabindex="-1"></a>         FTE_40_linha, ra, rr, ttd, tempo, pd, pl, atributos)</span>
+<span id="cb40-80"><a href="#cb40-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-81"><a href="#cb40-81" aria-hidden="true" tabindex="-1"></a><span class="co">#write.csv2(resultado, "resultado_final_1600.csv")</span></span>
+<span id="cb40-82"><a href="#cb40-82" aria-hidden="true" tabindex="-1"></a><span class="co">#arrow::write_parquet(resultado, "resultado_final_1600.parquet")</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Estas iterações resultaram em 1600 combinações que levaram a construção de um dataframe com 17.824.000 observações (5570 municípios x 1600 combinações x cálculos de necessidades para 2 níveis de atenção). A apresentação destes resultados ocorrerá por meio de um dashboard.</p>
 </section>
