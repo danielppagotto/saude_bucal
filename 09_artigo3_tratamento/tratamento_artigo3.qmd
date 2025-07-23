@@ -23,59 +23,57 @@ library(ggspatial)
 library(sf)
 library(rlang)
 library(readxl)
+library(quantreg)
+library(lmtest)
 
 ```
 
-## Carregamento de dados
+## 1. Carregamento de dados
+
+Os passos abaixos descrevem a organização dos dados do banco de dados que servirá para rodar as análises inferenciais.
 
 ### 1.1. Variável resposta - gap de cirurgiões dentistas
+
+A variável resposta é o gap de CD. Mas vamos acessar os modelos referentes ao cenário
 
 ```{r}
 
 cenarios_regioes <- 
-  read_excel("~/GitHub/saude_bucal/09_artigo3_tratamento/cenarios_regioes.xlsx") |> 
-  filter(cenario == 'cenario 4')
+  read_excel("~/GitHub/saude_bucal/09_artigo3_tratamento/cenarios_regioes.xlsx") 
 
-cenario_aps <- cenarios_regioes |> 
-                  filter(nivel == "APS") |> 
-                  mutate(quantis = case_when(
-                        rr < quantile(rr, 
-                                      probs = 0.25) ~ "Intervalo 1", 
-                        rr > quantile(rr, 
-                                      probs = 0.25) & 
-                        rr < quantile(rr, 
-                                      probs = 0.5) ~ "Intervalo 2",
-                        rr > quantile(rr, 
-                                      probs = 0.5) & 
-                        rr < quantile(rr, 
-                                      probs = 0.75) ~ "Intervalo 3",
-                        rr > quantile(rr, 
-                                      probs = 0.75) ~ 
-                          "Intervalo 4"))
+m1 <- cenarios_regioes |> 
+        filter(cenario == 'cenario 4' & 
+               nivel == "APS") |> 
+        mutate(rr_1 = rr) |> 
+        select(cod_regsaud, regiao_saude, rr_1)
 
-cenario_aes <- cenarios_regioes |> 
-                  filter(nivel == "AES") |> 
-               mutate(quantis = case_when(
-                        rr < quantile(rr, 
-                                      probs = 0.25) ~ "Intervalo 1", 
-                        rr > quantile(rr, 
-                                      probs = 0.25) & 
-                        rr < quantile(rr, 
-                                      probs = 0.5) ~ "Intervalo 2",
-                        rr > quantile(rr, 
-                                      probs = 0.5) & 
-                        rr < quantile(rr, 
-                                      probs = 0.75) ~ "Intervalo 3",
-                        rr > quantile(rr, 
-                                      probs = 0.75) ~ 
-                          "Intervalo 4"))
+m2 <- cenarios_regioes |> 
+        filter(cenario == 'cenario 4' & 
+               nivel == "AES") |> 
+        mutate(rr_2 = rr) |> 
+        select(cod_regsaud, rr_2)
+
+m3 <- cenarios_regioes |> 
+        filter(cenario == 'cenario 3' & 
+               nivel == "AES") |> 
+        mutate(rr_3 = rr) |> 
+        select(cod_regsaud, rr_3)
+
+base_completa <- 
+  m1 |> 
+  left_join(m2, by = c("cod_regsaud"="cod_regsaud")) |> 
+  left_join(m3, by = c("cod_regsaud"="cod_regsaud"))
 
 
 ```
 
 ### 1.2. Instituições de Ensino Superior
 
+O próximo passo consiste em acessar o total de vagas de cursos de odontologia por região de saúde.
+
 #### 1.2.1. Quantidade de vagas e matrículas em cursos de odontologia
+
+Acessando os dados de matrículas, vagas e concluintes.
 
 ```{r}
 
@@ -119,7 +117,7 @@ ies_odonto$vaga_total <- as.numeric(ies_odonto$vaga_total)
 
 ```
 
-Tratamento de IES
+Tratamento de IES para extrair alguns atributos.
 
 ```{r}
 
@@ -150,9 +148,31 @@ ies_tratado <-
 
 ```
 
+Vamos acessar a média de matrículas do últimos cinco anos. Em sequência, vamos juntar com a base
+
+```{r}
+
+media_matriculas <- 
+  ies_tratado |> 
+  filter(ano > 2016) |> 
+  group_by(cod_regsaud) |> 
+  summarise(matriculas = mean(matriculas_total)) |> 
+  mutate(cod_regsaud = as.numeric(cod_regsaud))
+
+base_completa <- 
+  base_completa |> 
+  left_join(media_matriculas, 
+            by = c("cod_regsaud"="cod_regsaud")) |> 
+  mutate(across(starts_with("matriculas"), 
+                ~replace_na(.,0)))
+
+```
+
 #### 1.1.2. Taxa de crescimento de vagas e matrículas de odontologia em IES
 
 A taxa de crescimento foi calculada de acordo com o seguinte bloco de código. Calculamos o crescimento de vagas e matrículas em um período de cinco anos, entre 2017 e 2022. Nem todas as regiões de saúde tiveram registro de profissionais em formação.
+
+Obs.: Talvez a gente não use esta variável.
 
 ```{r}
 
@@ -160,20 +180,28 @@ crescimento_ies <-
   ies_tratado |> 
   filter(ano == 2017 | ano == 2022) |> 
   ungroup() |> 
-  group_by(ano, uf_sigla, cod_regsaud,
+  group_by(ano, uf_sigla, 
+           cod_regsaud,
            regiao_saude) |> 
   summarise(vagas = sum(vagas_total),
             matriculas = sum(matriculas_total)) |> 
   pivot_wider(
-    id_cols = c(uf_sigla, regiao_saude, cod_regsaud),
+    id_cols = c(uf_sigla, 
+                regiao_saude, 
+                cod_regsaud),
     names_from = ano,
     values_from = c(vagas, matriculas),
     names_glue = "{.value}_{ano}"
   ) |> 
-  mutate(across(starts_with("vagas"), ~replace_na(.,1)),
-         across(starts_with("matriculas"), ~replace_na(.,1))) |> 
-  mutate(crescimento_vagas = (vagas_2022 * 100/vagas_2017) - 100, .after = vagas_2022) |> 
-  mutate(crescimento_matriculas = (matriculas_2022 * 100/matriculas_2017) - 100, .after = matriculas_2022)
+  mutate(across(starts_with("vagas"), 
+                ~replace_na(.,1)),
+         across(starts_with("matriculas"), 
+                ~replace_na(.,1))) |> 
+  mutate(crescimento_vagas = (vagas_2022 * 100/vagas_2017) - 100, 
+         .after = vagas_2022) |> 
+  mutate(crescimento_matriculas = 
+           (matriculas_2022 * 100/matriculas_2017) - 100, 
+         .after = matriculas_2022)
 
 
 ```
@@ -292,14 +320,16 @@ A seguir serão acessados dados de retenção de profissionais pelas regiões de
 query_retencao <- 'SELECT * FROM Dados.retencao."Cirurgiões-dentistas_retencao_geral.parquet"'
 
 
-
 retencao <- sqlQuery(channel,
                      query_retencao, 
                      as.is = TRUE) 
 
-baseline <- baseline |> 
-               left_join(retencao, 
-                         by = c("reg_id"="regiao_saude"))
+
+retencao$regiao_saude <- as.numeric(retencao$regiao_saude)
+
+base_completa <- base_completa |> 
+                    left_join(retencao, 
+                         by = c("cod_regsaud"="regiao_saude"))
 
 ```
 
@@ -326,6 +356,33 @@ query <- 'SELECT * FROM
 equip_odonto <- sqlQuery(channel, 
                          query, 
                          as.is = TRUE) 
+
+equip_odonto$equip_nao_sus <- as.numeric(equip_odonto$equip_nao_sus)
+
+equip_odonto$equip_sus <- as.numeric(equip_odonto$equip_sus)
+
+```
+
+```{r}
+
+equip <- 
+  equip_odonto |>
+  mutate(equip = equip_sus + equip_nao_sus) |> 
+  filter(ano > 2016) |> 
+  group_by(cod_regsaud) |> 
+  summarise(equip = mean(equip)) |> 
+  mutate(cod_regsaud = as.numeric(cod_regsaud))
+
+base_completa <- 
+  base_completa |> 
+  left_join(equip, by = c("cod_regsaud"))
+
+
+```
+
+Crescimento de equipamentos do SUS.
+
+```{r}
 
 equip_odonto$equip_sus <- as.numeric(equip_odonto$equip_sus)
 equip_odonto$equip_nao_sus <- as.numeric(equip_odonto$equip_nao_sus)
@@ -354,10 +411,6 @@ crescimento_equip_odonto <-
          .after = equip_nao_sus_2024) |>
   ungroup() |> 
   select(-uf_sigla, -regiao_saude)
-  
-baseline <- baseline |> 
-  left_join(crescimento_equip_odonto,
-            by = c("reg_id"="cod_regsaud"))
 
 
 ```
@@ -394,7 +447,7 @@ ceo <- sqlQuery(channel, query_ceo,
 ceo$ANO <- as.numeric(ceo$ANO)
 ceo$total <- as.numeric(ceo$total)
 
-ceo_regioes <- 
+ceo_regioes_var <- 
             ceo |> 
             filter(ANO == 2019 | ANO == 2024) |> 
             group_by(ANO, uf, cod_regsaud,
@@ -414,19 +467,24 @@ ceo_regioes <-
             ungroup() |> 
             select(-uf, -regiao_saude)
 
+
+ceo_media <- ceo |> 
+            filter(ANO > 2019) |> 
+            group_by(cod_regsaud) |> 
+            summarise(ceo = mean(total)) |> 
+            mutate(cod_regsaud = as.numeric(cod_regsaud))
+
 ```
 
 ```{r}
 
-baseline <- baseline |> 
-  left_join(ceo_regioes, 
-            by = c("reg_id"="cod_regsaud"))
-
-
-baseline <- 
-  baseline |> 
+base_completa <- 
+  base_completa |> 
+  left_join(ceo_media, 
+            by = c("cod_regsaud"="cod_regsaud")) |> 
   mutate(across(starts_with("ceo"), 
                           ~replace_na(.,0)))
+
 
 ```
 
@@ -435,41 +493,44 @@ baseline <-
 Esta subseção é focada no levantamento de PIB per capita por região de saúde.
 
 ```{r}
+#| message: false
+#| warning: false
 
-query_pib <- 'SELECT * FROM "Analytics Layer"."Econômico"."PIB per capita por regiões de saúde"'
+pib <- 
+  read_excel("~/GitHub/saude_bucal/09_artigo3_tratamento/pib.xlsx") |>   
+  filter(ano == 2021)
+  
+hierarquia <- 
+  read_csv("C:/Users/Lapei_Cigets/OneDrive/Documents/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv") |> 
+  select(cod_regsaud, regiao_saude, 
+         cod_municipio, cod_municipiodv)
+
+pib <- pib |> 
+  left_join(hierarquia, 
+            by = c("cod_ibge"="cod_municipiodv"))
+
+pop_21_rs <- 
+  read_excel("~/GitHub/saude_bucal/09_artigo3_tratamento/pop_21.xls", 
+             col_types = c("text", "numeric", "text", 
+                           "numeric", "text", "numeric")) |> 
+  left_join(hierarquia,
+            by = c("ibge"="cod_municipiodv")) |> 
+  group_by(cod_regsaud) |> 
+  summarise(pop = sum(pop))
 
 
-
-pib_percapita <- sqlQuery(channel,
-                          query_pib, 
-                          as.is = TRUE) 
-
-pib_percapita$PIB_PER_CAPITA <- as.numeric(pib_percapita$PIB_PER_CAPITA)
-
-pib_percapita$POPULACAO <- as.numeric(pib_percapita$POPULACAO)
-
-pib_percapita$PIB_REGIOES <- as.numeric(pib_percapita$PIB_REGIOES)
+pibpercapita_rs <- 
+  pib |> 
+  group_by(cod_regsaud) |> 
+  summarise(pib = sum(PIB_1000)) |> 
+  left_join(pop_21_rs, by = c("cod_regsaud"="cod_regsaud")) |> 
+  mutate(pibpc_rs = pib * 1000/pop) |> 
+  mutate(cod_regsaud = as.numeric(cod_regsaud))
 
 
-variacao_pib <- 
-  pib_percapita |> 
-  filter(ANO == '2010' | ANO == '2021') |> 
-  pivot_wider(
-    id_cols = c(regiao_saude, cod_regsaud),
-    names_from = ANO,
-    values_from = c(PIB_PER_CAPITA),
-    names_glue = "{.value}_{ANO}"
-  ) |> 
-  mutate(across(starts_with("equip_sus"), ~replace_na(.,1)),
-         across(starts_with("equip_nao_sus"), ~replace_na(.,1))) |> 
-  mutate(crescimento_equip_sus = 
-           (equip_sus_2024 * 100/equip_sus_2010) - 100, 
-         .after = equip_sus_2024) |> 
-  mutate(crescimento_equip_nsus = 
-           (equip_nao_sus_2024 * 100/equip_nao_sus_2010) - 100, 
-         .after = equip_nao_sus_2024) |>
-  ungroup() |> 
-  select(-uf_sigla, -regiao_saude)
+base_completa <- base_completa |> 
+  left_join(pibpercapita_rs,
+            by = c("cod_regsaud"="cod_regsaud"))
 
 
 ```
@@ -478,27 +539,93 @@ variacao_pib <-
 
 quantidade vínculos de profissionais de odonto em diferentes tipos de estabelecimento (público e privado)
 
-2.  Juntando tudo
+## 2. Modelagem
 
 ```{r}
 
-cenario_aes$cod_regsaud <- as.character(cenario_aes$cod_regsaud)
+base_completa <- 
+  base_completa |> 
+  mutate(equip_pop = equip/pop,
+         ceo_pop = ceo/pop) |> 
+  mutate(retencao_geral = retencao_geral * 100) |> 
+  mutate(r1_log = log(rr_1),
+         r2_log = log(rr_2),
+         r3_log = log(rr_3))
 
-teste <- cenario_aes |> 
-  left_join(retencao, by = c("cod_regsaud"="regiao_saude"))
+```
 
-teste |> 
-  ggplot(aes(x = retencao_geral, y = rr)) + 
-  geom_point() + geom_smooth(se = FALSE)
+R1
 
-cor(teste$retencao_geral, teste$rr)
+```{r}
+#| message: false
+#| warning: false
+
+# R1 APS
+
+base_completa |> 
+  select(rr_1, matriculas, retencao_geral, 
+         equip_pop, ceo_pop, pibpc_rs) |> 
+  GGally::ggpairs()
+  
+
+```
+
+R2
+
+```{r}
+
+base_completa |> 
+  select(rr_2, matriculas, retencao_geral, 
+         equip_pop, ceo, pibpc_rs) |> 
+  GGally::ggpairs()
+```
+
+```{r}
+
+base_completa |> 
+  select(rr_3, matriculas, retencao_geral, 
+        equip_pop, ceo, pibpc_rs) |> 
+  GGally::ggpairs()
+
 
 ```
 
 ```{r}
 
-modelo = lm("rr ~ retencao_geral", 
-            data = teste)
+modelo_multiplo <- 
+  lm("rr_2 ~ retencao_geral + pibpc_rs + 
+             matriculas + equip", 
+     data = base_completa)
 
-summary(modelo)
+modelo_quanti <- 
+  rq("rr_2 ~ retencao_geral + pibpc_rs + 
+             matriculas + equip", 
+     tau = c(0.25, 0.5, 0.75), 
+     data = base_completa)
+
+summary(modelo_multiplo, 
+        se = "boot", 
+        rho = TRUE)
+
+bptest(modelo_multiplo)
+
+
+
+```
+
+```{r}
+
+
+modelo_robusto <- coeftest(modelo_multiplo, vcov = vcovHC(modelo_multiplo, type = "HC3"))
+
+modelo_ponderado <- lm("rr_2 ~ retencao_geral + pibpc_rs + 
+                        matriculas + equip", 
+                       data = base_completa, 
+                       weights = 1 / (residuals(modelo_multiplo)^2))
+
+# Verificar novamente heterocedasticidade
+bptest(modelo_ponderado)
+
+summary(modelo_ponderado)
+
 ```

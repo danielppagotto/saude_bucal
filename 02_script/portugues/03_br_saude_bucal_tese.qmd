@@ -131,7 +131,8 @@ O censo possui outras divisões de faixa etárias. Utilizamos estas para padroni
 A seguir é feito um levantamento de plano de saúde por região de saúde de acordo com dados da ANS.
 
 ```{r}
-#|warning: FALSE
+#| message: false
+#| warning: false
 
 hierarquia_municipios <- 
   read_csv("~/GitHub/saude_bucal/01_dados/hierarquia_atualizada.csv") |> 
@@ -192,23 +193,42 @@ populacao_tratado <-
 
 A variável pop_sus será útil para simular os resultados usando a população que não tem acesso a plano de saúde (exclusivamente odontológico).
 
+### 2.1.2. População por região de saúde
+
+Vamos levantar a população por região de saúde.
+
+```{r}
+
+a <- populacao_tratado |> 
+  group_by(uf_sigla, cod_regsaud,regiao_saude, faixa) |> 
+  summarise(pop = sum(total)) |> 
+  filter(cod_regsaud == "52001") |> 
+  ggplot(aes(x = faixa, y = pop)) + geom_col() + 
+  geom_label(aes(label = pop)) +
+  theme(axis.title.x = element_text(size = 14)) +
+  coord_flip() + theme_minimal() + xlab("Faixa etária") + 
+  ylab("População") + 
+  ylim(0,900000)
+
+a
+
+#ggsave(a, 
+#       filename = "~/GitHub/saude_bucal/05_graficos/pop_regsaude.png", dpi = 1000, width = 8, height = 6)
+
+```
+
 ### 2.2. Cobertura de condições de saúde bucal (H)
 
 O Ministério da Saúde traz uma série de parâmetros para planejamento dos serviços de saúde bucal (Brasil, 2021). Um dos parâmetros é a **cobertura de serviços de saúde**. A cobertura foi calculada a partir da pesquisa SB 2010 para cada faixa etária e tipo de procedimento conforme a lógica expressa abaixo.
 
 Cabe destacar que, devido à estrutura da SB2010, estes parâmetros foram calculados para capitais de cada estado ou interior da região.
 
-+----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Área                             | Expressões usadas para cálculo de cobertura                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-+==================================+=======================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================================+
-| Atenção básica                   | NT_1 (Número de dentes necessitando de restauração de 1 superfície) + NT_2 (Número de dentes necessitando de restauração de 2 ou mais superfícies) + NT_6 (Número de dentes necessitando de extração) + NT_7 (Número de dentes necessitando de controle de lesão branca) + NT_8 (Número de dentes necessitando de selante) + P_CALC (Prevalência de cálculo) + P_BR (Prevalência de bolsa rasa). Foi então criada a variável COB_AB. Se COB_AB = 0 o indivíduo não necessita de procedimentos de atenção básica, se COB_AB =1 ele necessita. A cobertura de atenção básica foi então estimada pelo percentual de pessoas com COB_AB=1 |
-+----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Endodontia                       | A cobertura de endodontia foi calculada a partir da variável NT_5 (Número de dentes necessitando de tratamento pulpar + restauração). Foi criada a variável ENDO onde ENDO=0 se NT_5=0 e ENDO=1 se NT_5≠0. Desta forma, a cobertura de endodontia foi então estimada pelo percentual de pessoas com ENDO=1                                                                                                                                                                                                                                                                                                                            |
-+----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Periodontia especializada        | A cobertura de periodontia especializada foi estimada pelo percentual de pessoas com a variável P_BP (Prevalência de bolsa profunda) = 1                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-+----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Prótese                          | A cobertura de prótese foi calculada pelo percentual de pessoas com a variável NECPROT (Necessidade geral de prótese) ≠ 0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-+----------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Área | Expressões usadas para cálculo de cobertura |
+|----|----|
+| Atenção básica | NT_1 (Número de dentes necessitando de restauração de 1 superfície) + NT_2 (Número de dentes necessitando de restauração de 2 ou mais superfícies) + NT_6 (Número de dentes necessitando de extração) + NT_7 (Número de dentes necessitando de controle de lesão branca) + NT_8 (Número de dentes necessitando de selante) + P_CALC (Prevalência de cálculo) + P_BR (Prevalência de bolsa rasa). Foi então criada a variável COB_AB. Se COB_AB = 0 o indivíduo não necessita de procedimentos de atenção básica, se COB_AB =1 ele necessita. A cobertura de atenção básica foi então estimada pelo percentual de pessoas com COB_AB=1 |
+| Endodontia | A cobertura de endodontia foi calculada a partir da variável NT_5 (Número de dentes necessitando de tratamento pulpar + restauração). Foi criada a variável ENDO onde ENDO=0 se NT_5=0 e ENDO=1 se NT_5≠0. Desta forma, a cobertura de endodontia foi então estimada pelo percentual de pessoas com ENDO=1 |
+| Periodontia especializada | A cobertura de periodontia especializada foi estimada pelo percentual de pessoas com a variável P_BP (Prevalência de bolsa profunda) = 1 |
+| Prótese | A cobertura de prótese foi calculada pelo percentual de pessoas com a variável NECPROT (Necessidade geral de prótese) ≠ 0 |
 
 : Fonte: Brasil (2021)
 
@@ -227,12 +247,17 @@ cobertura_sb <-
 
 # apresentando dados
 
-cobertura_sb |>
+cobertura_goiania <- cobertura_sb |>
   select(-ibge,
          -id_faixa,
          -li_cobertura, 
-         -ls_cobertura)
+         -ls_cobertura) |> 
+  filter(municipio == "Goiânia")
   
+
+writexl::write_xlsx(cobertura_goiania, 
+                    "~/GitHub/saude_bucal/01_dados/cobertura_gyn.xlsx")
+
 ```
 
 Considerando os dados de população (P) e de cobertura (H), temos os seguintes resultados para população coberta.
@@ -339,15 +364,14 @@ producao_brasil <- producao_normativa_br |>
 
 necessidades_servicos_br <- pop_coberta_br |> 
                             left_join(producao_brasil, 
-                                      by = c("ibge" = "ibge",
-                                             "id_faixa",
-                                             "procedimento")) |> 
+                                by = c("ibge" = "ibge",
+                                       "id_faixa",
+                                       "procedimento")) |>                             mutate(nec_servicos = 
+                      populacao_coberta * producao_pc) |> 
                             mutate(nec_servicos = 
-                                    populacao_coberta * producao_pc) |> 
-                            mutate(nec_servicos = 
-                                     round(nec_servicos, 2)) |> 
+                               round(nec_servicos, 2)) |> 
                             mutate(nec_servicos_sus = 
-                                     populacao_coberta_sus * producao_pc) |> 
+                   populacao_coberta_sus * producao_pc) |>
                             mutate(nec_servicos_sus = round(nec_servicos_sus,2))
 
 necessidades_servicos_br |> 
@@ -362,13 +386,14 @@ necessidades_servicos_br |>
   summarise(populacao = sum(populacao),
             servicos = sum(nec_servicos),
             servicos_sus = sum(nec_servicos_sus))
+
 ```
 
 ## 3. Tradução do número de serviços em número de profissionais necessários
 
 A etapa 3 consiste na tradução do número de serviços, calculado pela equação 1, em número de profissionais necessários (NPSB). Para isso, devem ser considerados dois elementos: produtividade (T) e o tempo total disponível (TTD).
 
-![](images/eq2_sb.png){fig-align="center"}
+![](images/eq2_sb.png){fig-align="center" width="309"}
 
 Onde:
 
@@ -421,6 +446,18 @@ necessidades_prof_br |>
          necessidade,
          necessidade_sus) 
   
+```
+
+Acessando a produção normativa apenas de Goiânia.
+
+```{r}
+
+producao_gyn <- producao_normativa_br |> 
+                  filter(municipio == "Goiânia")
+
+writexl::write_xlsx(producao_gyn, 
+                    "~/GitHub/saude_bucal/01_dados/prod_normativa_gyn.xlsx")
+
 ```
 
 ## 4. Exploração das implicações em termos de recursos, como a oferta atual de profissionais e custos
@@ -1118,21 +1155,14 @@ cenarios <- rbind(baseline,
 
 Utilizamos uma lista de valores para iterar conforme a tabela abaixo. Estas combinações resultaram em 1600 combinações de resultados.
 
-+----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
-| Parâmetro                                    | Sigla                | Valores                                                                                  |
-+==============================================+======================+==========================================================================================+
-| Tempo total disponível                       | TTD                  | em horas: 1576; 1676; 1776; 1876                                                         |
-+----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
-| Tempo de procedimentos                       | T                    | em minutos: 25, 35, 45, 55                                                               |
-+----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
-| Percentual de atividades diretas             | PD                   | em unidade percentual: 50%, 60%, 80%, 90%, 100%                                          |
-+----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
-| Percentual de atividades da linha de cuidado | PL                   | em unidade percentual: 50%, 60%, 80%, 90%, 100%                                          |
-+----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
-| Categoria profissional                       | CAT                  | Cirurgião-dentista e Técnico/Auxiliar de Saúde Bucal                                     |
-+----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
-| Recorte de Profissionais                     | SUS                  | TRUE (pegar todos profissionais, SUS e não SUS) ou FALSE (pegar só os profissionais SUS) |
-+----------------------------------------------+----------------------+------------------------------------------------------------------------------------------+
+| Parâmetro | Sigla | Valores |
+|----|----|----|
+| Tempo total disponível | TTD | em horas: 1576; 1676; 1776; 1876 |
+| Tempo de procedimentos | T | em minutos: 25, 35, 45, 55 |
+| Percentual de atividades diretas | PD | em unidade percentual: 50%, 60%, 80%, 90%, 100% |
+| Percentual de atividades da linha de cuidado | PL | em unidade percentual: 50%, 60%, 80%, 90%, 100% |
+| Categoria profissional | CAT | Cirurgião-dentista e Técnico/Auxiliar de Saúde Bucal |
+| Recorte de Profissionais | SUS | TRUE (pegar todos profissionais, SUS e não SUS) ou FALSE (pegar só os profissionais SUS) |
 
 ```{r eval=FALSE}
 #| warning: false

@@ -1,6 +1,7 @@
 
 # Carregar pacotes
 library(sf)
+library(geobr)
 library(ggplot2)
 library(rnaturalearth)
 library(ggspatial)
@@ -10,9 +11,12 @@ library(geojsonsf)
 library(patchwork)
 
 # Dados geográficos
-brasil_municipios <- read_municipality(code_muni = "all", year = 2020)
+brasil_municipios <- read_municipality(code_muni = "all", 
+                                       year = 2020)
+
 brasil_estados <- read_state(year = 2020)
-paises_vizinhos <- ne_countries(scale = "medium", continent = "South America", returnclass = "sf")
+paises_vizinhos <- ne_countries(scale = "medium", 
+                                continent = "South America", returnclass = "sf")
 
 # Adicionar coluna com as regiões no shapefile de estados
 brasil_estados <- brasil_estados %>%
@@ -43,15 +47,7 @@ a <-
        geom_sf(data = brasil_municipios, aes(fill = as.factor(code_state)), color = "gray80", size = 0.1, show.legend = FALSE) +
        # Adicionar estados com bordas mais destacadas e cores por região
        geom_sf(data = brasil_estados, aes(fill = regiao), color = "black", size = 0.4, alpha = 0.5) +
-       scale_fill_manual(values = cores_regioes, name = "Regions") +
-       # Adicionar siglas dos estados
-       geom_text(
-             data = estados_siglas,
-             aes(x = x, y = y, label = abbrev_state),
-             size = 2.5,
-             fontface = "bold",
-             color = "black"
-         ) +
+       scale_fill_manual(values = cores_regioes, name = "Regiões") +
        # Rosa dos ventos e escala
        annotation_north_arrow(location = "tr", which_north = "true", 
                               style = north_arrow_fancy_orienteering) +
@@ -94,11 +90,11 @@ spdf <-
 
 spdf_fortified_go <- 
   sf::st_as_sf(spdf) |> 
-  filter(est_id == "52") |> 
+  filter(est_id == "13") |> 
   distinct_all()
 
 municipios_go <- brasil_municipios |> 
-                      filter(code_state == "52")
+                      filter(code_state == "13")
 
 spdf_fortified_go <- st_set_crs(spdf_fortified_go, 4674)
 municipios_go <- st_set_crs(municipios_go, 4674)
@@ -108,24 +104,15 @@ municipios_go <- st_transform(municipios_go, 4674)
 
 
 cores_regioes_go <- c(
-  "Norte" = "#66c2a5",
-  "Oeste I" = "#fc8d62",
-  "Centro Sul" = "#8da0cb",
-  "Entorno Norte" = "#e78ac3",
-  "Central" = "#a6d854",
-  "Nordeste I" = "#ffd92f",
-  "Nordeste II" = "#e5c494",
-  "Entorno Sul" = "#b3b3b3",
-  "Estrada de Ferro" = "#a6cee3",
-  "São Patrício II" = "#1f78b4",
-  "Pirineus" = "#b2df8a",
-  "Oeste II" = "#33a02c",
-  "São Patrício I" = "#fb9a99",
-  "Rio Vermelho" = "#e31a1c",
-  "Sudoeste I" = "#fdbf6f",
-  "Serra da Mesa" = "#ff7f00",
-  "Sul" = "#cab2d6",
-  "Sudoeste II" = "#6a3d9a"
+  "Baixo Amazonas" = "#66c2a5",
+  "Médio Amazonas" = "#fc8d62",
+  "Regional Juruá" = "#8da0cb",
+  "Regional Purus" = "#e78ac3",
+  "Manaus, Entorno e Alto Rio Negro" = "#a6d854",
+  "Rio Madeira" = "#ffd92f",
+  "Rio Negro e Solimões" = "#e5c494",
+  "Alto Solimões" = "#b3b3b3",
+  "Triângulo" = "#e31a1c"
 )
 
 b <- ggplot() +
@@ -174,5 +161,5 @@ c <- a + b
 
 c
 
-ggsave(filename = "mapas_brasil_hr.png",
-       c, dpi = 500, height = 8, width = 10)
+ggsave(filename = "mapas_brasil_am.png",
+       c, dpi = 500, height = 8, width = 12)

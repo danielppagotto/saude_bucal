@@ -15,6 +15,8 @@ library(shinycssloaders)  # Para os spinners
 # Evita o aviso do jsonlite
 options(jsonlite.keep_vec_names = FALSE)
 
+setwd("~/GitHub/saude_bucal/07_shiny_app")
+
 # ---------------------------
 # Leitura dos dados
 # ---------------------------

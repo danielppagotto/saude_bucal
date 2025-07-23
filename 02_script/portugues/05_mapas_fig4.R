@@ -16,7 +16,7 @@ library(readxl)
 library(leaflet)
 
 
-cenarios_regioes <- read_excel("01_dados/cenarios_regioes.xlsx")
+cenarios_regioes <- read_excel("~/GitHub/saude_bucal/01_dados/cenarios_regioes.xlsx")
 
 estados_br <- read_state(year = 2020,
                          showProgress = FALSE)
