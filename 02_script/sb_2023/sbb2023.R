@@ -448,7 +448,8 @@ prop_cob_endo_capint_faixa_formatado <- prop_cob_endo_capint_faixa %>%
     erro_padrao      = round(se * 100, 4),
     IC_inf           = round(ci_l * 100, 4),
     IC_sup           = round(ci_u * 100, 4)
-  ) %>%
+  ) |>
+  mutate(tipo_procedimento = 'Endodontia')
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(capint, match(faixa_etaria,
                     c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
@@ -757,7 +758,7 @@ prop_cob_protese_uf_faixa_formatado <- prop_cob_protese_uf_faixa %>%
     perc_necessidade = round(COB_PROTESE * 100, 4),
     erro_padrao      = round(se * 100, 4),
     IC_inf           = round(ci_l * 100, 4),
-    IC_sup           = round(ci_u * 100, 4)
+    IC_sup           = round(ci_u * 100, )
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   filter(faixa_etaria != "de 0 a 14 anos") %>%
