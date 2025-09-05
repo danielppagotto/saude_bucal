@@ -164,7 +164,7 @@ prop_cob_ab_faixa <- svyby(
 
 # Formatar como percentual e renomear colunas
 prop_cob_ab_faixa_formatado <- prop_cob_ab_faixa %>%
-  mutate(across(c(COB_AB, se, ci_l, ci_u), ~ round(.x * 100, 1))) %>%
+  mutate(across(c(COB_AB, se, ci_l, ci_u), ~ round(.x * 100, 4))) %>%
   rename(
     faixa_etaria = faixa_etaria,
     perc_necessidade = COB_AB,
@@ -221,10 +221,10 @@ prop_cob_ab_uf_faixa <- svyby(
 prop_cob_ab_uf_faixa_formatado <- prop_cob_ab_uf_faixa %>%
   separate(`interaction(nome_uf, faixa_etaria)`, into = c("UF", "faixa_etaria"), sep = "\\.") %>%
   mutate(
-    perc_necessidade = round(COB_AB * 100, 1),
-    erro_padrao      = round(se * 100, 1),
-    IC_inf           = round(ci_l * 100, 1),
-    IC_sup           = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_AB * 100, 4),
+    erro_padrao      = round(se * 100, 4),
+    IC_inf           = round(ci_l * 100, 4),
+    IC_sup           = round(ci_u * 100, 4)
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(UF, match(faixa_etaria,
@@ -248,7 +248,7 @@ prop_cob_ab_capint <- svyby(
 
 # Formatar como percentual
 prop_cob_ab_capint_formatado <- prop_cob_ab_capint %>%
-  mutate(across(c(COB_AB, se, ci_l, ci_u), ~ round(.x * 100, 1))) %>%
+  mutate(across(c(COB_AB, se, ci_l, ci_u), ~ round(.x * 100, 4))) %>%
   rename(
     capint = capint2,
     perc_necessidade = COB_AB,
@@ -278,10 +278,10 @@ prop_cob_ab_capint_faixa <- svyby(
 prop_cob_ab_capint_faixa_formatado <- prop_cob_ab_capint_faixa %>%
   separate(`interaction(capint2, faixa_etaria)`, into = c("capint", "faixa_etaria"), sep = "\\.") %>%
   mutate(
-    perc_necessidade = round(COB_AB * 100, 1),
-    erro_padrao      = round(se * 100, 1),
-    IC_inf           = round(ci_l * 100, 1),
-    IC_sup           = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_AB * 100, 4),
+    erro_padrao      = round(se * 100, 4),
+    IC_inf           = round(ci_l * 100, 4),
+    IC_sup           = round(ci_u * 100, 4)
   ) %>%
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(capint, match(faixa_etaria,
@@ -328,7 +328,7 @@ prop_cob_endo_faixa <- svyby(
 
 # Formatar como percentual e renomear colunas
 prop_cob_endo_faixa_formatado <- prop_cob_endo_faixa %>%
-  mutate(across(c(COB_ENDO, se, ci_l, ci_u), ~ round(.x * 100, 1))) %>%
+  mutate(across(c(COB_ENDO, se, ci_l, ci_u), ~ round(.x * 100, 4))) %>%
   rename(
     faixa_etaria = faixa_etaria,
     perc_necessidade = COB_ENDO,
@@ -358,10 +358,10 @@ prop_cob_endo_uf <- svyby(
 # Formatar como percentual
 prop_cob_endo_uf_formatado <- prop_cob_endo_uf %>%
   mutate(
-    perc_necessidade = round(COB_ENDO * 100, 1),
-    erro_padrao = round(se * 100, 1),
-    IC_inf = round(ci_l * 100, 1),
-    IC_sup = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_ENDO * 100, 4),
+    erro_padrao = round(se * 100, 4),
+    IC_inf = round(ci_l * 100, 4),
+    IC_sup = round(ci_u * 100, 4)
   ) %>%
   rename(UF = nome_uf) %>%
   select(UF, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
@@ -387,10 +387,10 @@ prop_cob_endo_uf_faixa <- svyby(
 prop_cob_endo_uf_faixa_formatado <- prop_cob_endo_uf_faixa %>%
   separate(`interaction(nome_uf, faixa_etaria)`, into = c("UF", "faixa_etaria"), sep = "\\.") %>%
   mutate(
-    perc_necessidade = round(COB_ENDO * 100, 1),
-    erro_padrao      = round(se * 100, 1),
-    IC_inf           = round(ci_l * 100, 1),
-    IC_sup           = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_ENDO * 100, 4),
+    erro_padrao      = round(se * 100, 4),
+    IC_inf           = round(ci_l * 100, 4),
+    IC_sup           = round(ci_u * 100, 4)
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(UF, match(faixa_etaria,
@@ -416,10 +416,10 @@ prop_cob_endo_capint <- svyby(
 # Formatar como percentual
 prop_cob_endo_capint_formatado <- prop_cob_endo_capint %>%
   mutate(
-    perc_necessidade = round(COB_ENDO * 100, 1),
-    erro_padrao = round(se * 100, 1),
-    IC_inf = round(ci_l * 100, 1),
-    IC_sup = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_ENDO * 100, 4),
+    erro_padrao = round(se * 100, 4),
+    IC_inf = round(ci_l * 100, 4),
+    IC_sup = round(ci_u * 100, 4)
   ) %>%
   rename(capint = capint2) %>%
   select(capint, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
@@ -444,10 +444,10 @@ prop_cob_endo_capint_faixa <- svyby(
 prop_cob_endo_capint_faixa_formatado <- prop_cob_endo_capint_faixa %>%
   separate(`interaction(capint2, faixa_etaria)`, into = c("capint", "faixa_etaria"), sep = "\\.") %>%
   mutate(
-    perc_necessidade = round(COB_ENDO * 100, 1),
-    erro_padrao      = round(se * 100, 1),
-    IC_inf           = round(ci_l * 100, 1),
-    IC_sup           = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_ENDO * 100, 4),
+    erro_padrao      = round(se * 100, 4),
+    IC_inf           = round(ci_l * 100, 4),
+    IC_sup           = round(ci_u * 100, 4)
   ) %>%
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(capint, match(faixa_etaria,
@@ -494,7 +494,7 @@ prop_cob_perio_faixa <- svyby(
 
 # Formatar como percentual e renomear colunas
 prop_cob_perio_faixa_formatado <- prop_cob_perio_faixa %>%
-  mutate(across(c(COB_PERIO, se, ci_l, ci_u), ~ round(.x * 100, 1))) %>%
+  mutate(across(c(COB_PERIO, se, ci_l, ci_u), ~ round(.x * 100, 4))) %>%
   rename(
     faixa_etaria = faixa_etaria,
     perc_necessidade = COB_PERIO,
@@ -526,10 +526,10 @@ prop_cob_perio_uf <- svyby(
 # Formatar como percentual
 prop_cob_perio_uf_formatado <- prop_cob_perio_uf %>%
   mutate(
-    perc_necessidade = round(COB_PERIO * 100, 1),
-    erro_padrao = round(se * 100, 1),
-    IC_inf = round(ci_l * 100, 1),
-    IC_sup = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_PERIO * 100, 4),
+    erro_padrao = round(se * 100, 4),
+    IC_inf = round(ci_l * 100, 4),
+    IC_sup = round(ci_u * 100, 4)
   ) %>%
   rename(UF = nome_uf) %>%
   select(UF, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
@@ -556,10 +556,10 @@ prop_cob_perio_uf_faixa_formatado <- prop_cob_perio_uf_faixa %>%
            into = c("UF", "faixa_etaria"),
            sep = "\\.") %>%
   mutate(
-    perc_necessidade = round(COB_PERIO * 100, 1),
-    erro_padrao = round(se * 100, 1),
-    IC_inf = round(ci_l * 100, 1),
-    IC_sup = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_PERIO * 100, 4),
+    erro_padrao = round(se * 100, 4),
+    IC_inf = round(ci_l * 100, 4),
+    IC_sup = round(ci_u * 100, 4)
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   filter(faixa_etaria != "de 0 a 14 anos") %>%
@@ -588,10 +588,10 @@ prop_cob_perio_capint <- svyby(
 # Formatar como percentual
 prop_cob_perio_capint_formatado <- prop_cob_perio_capint %>%
   mutate(
-    perc_necessidade = round(COB_PERIO * 100, 1),
-    erro_padrao = round(se * 100, 1),
-    IC_inf = round(ci_l * 100, 1),
-    IC_sup = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_PERIO * 100, 4),
+    erro_padrao = round(se * 100, 4),
+    IC_inf = round(ci_l * 100, 4),
+    IC_sup = round(ci_u * 100, 4)
   ) %>%
   rename(capint = capint2) %>%
   select(capint, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
@@ -619,10 +619,10 @@ prop_cob_perio_capint_faixa_formatado <- prop_cob_perio_capint_faixa %>%
            into = c("capint", "faixa_etaria"),
            sep = "\\.") %>%
   mutate(
-    perc_necessidade = round(COB_PERIO * 100, 1),
-    erro_padrao = round(se * 100, 1),
-    IC_inf = round(ci_l * 100, 1),
-    IC_sup = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_PERIO * 100, 4),
+    erro_padrao = round(se * 100, 4),
+    IC_inf = round(ci_l * 100, 4),
+    IC_sup = round(ci_u * 100, 4)
   ) %>%
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   filter(faixa_etaria != "de 0 a 14 anos") %>%
@@ -693,7 +693,7 @@ prop_cob_protese_faixa <- svyby(
 
 # Formatar como percentual
 prop_cob_protese_faixa_formatado <- prop_cob_protese_faixa %>%
-  mutate(across(c(COB_PROTESE, se, ci_l, ci_u), ~ round(.x * 100, 1))) %>%
+  mutate(across(c(COB_PROTESE, se, ci_l, ci_u), ~ round(.x * 100, 4))) %>%
   rename(
     perc_necessidade = COB_PROTESE,
     erro_padrao = se,
@@ -723,10 +723,10 @@ prop_cob_protese_uf <- svyby(
 # Formatar como percentual
 prop_cob_protese_uf_formatado <- prop_cob_protese_uf %>%
   mutate(
-    perc_necessidade = round(COB_PROTESE * 100, 1),
-    erro_padrao      = round(se * 100, 1),
-    IC_inf           = round(ci_l * 100, 1),
-    IC_sup           = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_PROTESE * 100, 4),
+    erro_padrao      = round(se * 100, 4),
+    IC_inf           = round(ci_l * 100, 4),
+    IC_sup           = round(ci_u * 100, 4)
   ) %>%
   rename(UF = nome_uf) %>%
   select(UF, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
@@ -754,10 +754,10 @@ prop_cob_protese_uf_faixa_formatado <- prop_cob_protese_uf_faixa %>%
            into = c("UF", "faixa_etaria"),
            sep = "\\.") %>%
   mutate(
-    perc_necessidade = round(COB_PROTESE * 100, 1),
-    erro_padrao      = round(se * 100, 1),
-    IC_inf           = round(ci_l * 100, 1),
-    IC_sup           = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_PROTESE * 100, 4),
+    erro_padrao      = round(se * 100, 4),
+    IC_inf           = round(ci_l * 100, 4),
+    IC_sup           = round(ci_u * 100, 4)
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   filter(faixa_etaria != "de 0 a 14 anos") %>%
@@ -786,10 +786,10 @@ prop_cob_protese_capint <- svyby(
 # Formatar como percentual
 prop_cob_protese_capint_formatado <- prop_cob_protese_capint %>%
   mutate(
-    perc_necessidade = round(COB_PROTESE * 100, 1),
-    erro_padrao      = round(se * 100, 1),
-    IC_inf           = round(ci_l * 100, 1),
-    IC_sup           = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_PROTESE * 100, 4),
+    erro_padrao      = round(se * 100, 4),
+    IC_inf           = round(ci_l * 100, 4),
+    IC_sup           = round(ci_u * 100, 4)
   ) %>%
   rename(capint = capint2) %>%
   select(capint, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
@@ -817,10 +817,10 @@ prop_cob_protese_capint_faixa_formatado <- prop_cob_protese_capint_faixa %>%
            into = c("capint", "faixa_etaria"),
            sep = "\\.") %>%
   mutate(
-    perc_necessidade = round(COB_PROTESE * 100, 1),
-    erro_padrao      = round(se * 100, 1),
-    IC_inf           = round(ci_l * 100, 1),
-    IC_sup           = round(ci_u * 100, 1)
+    perc_necessidade = round(COB_PROTESE * 100, 4),
+    erro_padrao      = round(se * 100, 4),
+    IC_inf           = round(ci_l * 100, 4),
+    IC_sup           = round(ci_u * 100, 4)
   ) %>%
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   filter(faixa_etaria != "de 0 a 14 anos") %>%
