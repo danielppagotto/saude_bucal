@@ -1105,6 +1105,9 @@ endo_percapita_uf_faixa <- svyby(
   arrange(UF, match(faixa_etaria,
                     c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
 
+endo_percapita_uf_faixa <- endo_percapita_uf_faixa %>%
+  rename(proc_per_capita = endo_per_capita)
+
 # Visualizar resultado por UF e faixa etária
 print(endo_percapita_uf_faixa)
 
@@ -1511,10 +1514,14 @@ tabela_cobertura <- do.call(rbind,mget(tabelas_uf)) %>%
   left_join(faixas_cod, by = "faixa_etaria") %>%
   relocate(cod_faixa, .after = faixa_etaria)
 
-tabelas_percapita <- ls(pattern = "uf.*faixa.*percapita")
+tabelas_percapita <- ls(pattern = "percapita.*uf.*faixa")
 
 tabela_percapita <- do.call(rbind,mget(tabelas_percapita)) %>%
   left_join(ufs_cod, by = "UF") %>%
   relocate(cod_uf, .after = UF) %>%
+  left_join(faixas_cod, by = "faixa_etaria") %>%
+  relocate(cod_faixa, .after = faixa_etaria)
+
+
 
 
