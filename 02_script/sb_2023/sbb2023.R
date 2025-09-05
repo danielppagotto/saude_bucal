@@ -171,7 +171,8 @@ prop_cob_ab_faixa_formatado <- prop_cob_ab_faixa %>%
     erro_padrao = se,
     IC_inf = ci_l,
     IC_sup = ci_u
-  )
+  ) |>
+  mutate(tipo_procedimento = 'APS')
 
 # Exibir resultado
 print(prop_cob_ab_faixa_formatado)
@@ -201,7 +202,8 @@ prop_cob_ab_uf_formatado <-
     IC_inf = ci_l,
     IC_sup = ci_u
   ) %>%
-  arrange(UF)
+  arrange(UF) |>
+  mutate(tipo_procedimento = 'APS')
 
 # Exibir resultado
 print(prop_cob_ab_uf_formatado)
@@ -228,7 +230,8 @@ prop_cob_ab_uf_faixa_formatado <- prop_cob_ab_uf_faixa %>%
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(UF, match(faixa_etaria,
-                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
+  mutate(tipo_procedimento = 'APS')
 
 # Exibir tabela final
 print(prop_cob_ab_uf_faixa_formatado)
@@ -256,7 +259,8 @@ prop_cob_ab_capint_formatado <- prop_cob_ab_capint %>%
     IC_inf = ci_l,
     IC_sup = ci_u
   ) %>%
-  arrange(capint)
+  arrange(capint) |>
+  mutate(tipo_procedimento = 'APS')
 
 # Exibir resultado
 print(prop_cob_ab_capint_formatado)
@@ -285,7 +289,8 @@ prop_cob_ab_capint_faixa_formatado <- prop_cob_ab_capint_faixa %>%
   ) %>%
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(capint, match(faixa_etaria,
-                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
+  mutate(tipo_procedimento = 'APS')
 
 # Exibir tabela final
 print(prop_cob_ab_capint_faixa_formatado)
@@ -335,7 +340,8 @@ prop_cob_endo_faixa_formatado <- prop_cob_endo_faixa %>%
     erro_padrao = se,
     IC_inf = ci_l,
     IC_sup = ci_u
-  )
+  ) |>
+  mutate(tipo_procedimento = 'Endodontia')
 
 # Exibir resultado
 print(prop_cob_endo_faixa_formatado)
@@ -365,7 +371,8 @@ prop_cob_endo_uf_formatado <- prop_cob_endo_uf %>%
   ) %>%
   rename(UF = nome_uf) %>%
   select(UF, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  arrange(UF)
+  arrange(UF) |>
+  mutate(tipo_procedimento = 'Endodontia')
 
 # Exibir resultado
 print(prop_cob_endo_uf_formatado)
@@ -394,7 +401,8 @@ prop_cob_endo_uf_faixa_formatado <- prop_cob_endo_uf_faixa %>%
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(UF, match(faixa_etaria,
-                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
+  mutate(tipo_procedimento = 'Endodontia')
 
 # Exibir resultado
 print(prop_cob_endo_uf_faixa_formatado)
@@ -423,7 +431,8 @@ prop_cob_endo_capint_formatado <- prop_cob_endo_capint %>%
   ) %>%
   rename(capint = capint2) %>%
   select(capint, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  arrange(capint)
+  arrange(capint) |>
+  mutate(tipo_procedimento = 'Endodontia')
 
 # Exibir resultado
 print(prop_cob_endo_capint_formatado)
@@ -452,7 +461,8 @@ prop_cob_endo_capint_faixa_formatado <- prop_cob_endo_capint_faixa %>%
   mutate(tipo_procedimento = 'Endodontia')
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(capint, match(faixa_etaria,
-                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
+    mutate(tipo_procedimento = 'Endodontia')
 
 # Exibir resultado
 print(prop_cob_endo_capint_faixa_formatado)
@@ -534,7 +544,8 @@ prop_cob_perio_uf_formatado <- prop_cob_perio_uf %>%
   ) %>%
   rename(UF = nome_uf) %>%
   select(UF, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  arrange(UF)
+  arrange(UF) |>
+  mutate(tipo_procedimento = 'Periodontia')
 
 # Exibir resultado
 print(prop_cob_perio_uf_formatado)
@@ -596,7 +607,8 @@ prop_cob_perio_capint_formatado <- prop_cob_perio_capint %>%
   ) %>%
   rename(capint = capint2) %>%
   select(capint, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  arrange(capint)
+  arrange(capint) |>
+  mutate(tipo_procedimento = 'Periodontia')
 
 # Exibir resultado
 print(prop_cob_perio_capint_formatado)
@@ -630,7 +642,8 @@ prop_cob_perio_capint_faixa_formatado <- prop_cob_perio_capint_faixa %>%
   arrange(capint, match(faixa_etaria,
                     c("de 15 a 29 anos",
                       "de 30 a 59 anos",
-                      "60 anos e mais")))
+                      "60 anos e mais"))) |> 
+    mutate(tipo_procedimento = 'Periodontia')
 
 # Exibir resultado
 print(prop_cob_perio_capint_faixa_formatado)
@@ -700,7 +713,8 @@ prop_cob_protese_faixa_formatado <- prop_cob_protese_faixa %>%
     erro_padrao = se,
     IC_inf = ci_l,
     IC_sup = ci_u
-  )
+  ) |> 
+  mutate(tipo_procedimento = 'Prótese')
 
 # Exibir resultado (exceto crianças de 0 a 14 anos)
 print(
@@ -731,7 +745,8 @@ prop_cob_protese_uf_formatado <- prop_cob_protese_uf %>%
   ) %>%
   rename(UF = nome_uf) %>%
   select(UF, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  arrange(UF)
+  arrange(UF) |> 
+  mutate(tipo_procedimento = 'Prótese')
 
 # Exibir resultado
 print(prop_cob_protese_uf_formatado)
@@ -794,7 +809,8 @@ prop_cob_protese_capint_formatado <- prop_cob_protese_capint %>%
   ) %>%
   rename(capint = capint2) %>%
   select(capint, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  arrange(capint)
+  arrange(capint) |>
+  mutate(tipo_procedimento = 'Prótese')
 
 # Exibir resultado
 print(prop_cob_protese_capint_formatado)
@@ -828,7 +844,8 @@ prop_cob_protese_capint_faixa_formatado <- prop_cob_protese_capint_faixa %>%
   arrange(capint, match(faixa_etaria,
                     c("de 15 a 29 anos",
                       "de 30 a 59 anos",
-                      "60 anos e mais")))
+                      "60 anos e mais"))) |> 
+  mutate(tipo_procedimento = 'Prótese')
 
 # Exibir resultado
 print(prop_cob_protese_capint_faixa_formatado)
