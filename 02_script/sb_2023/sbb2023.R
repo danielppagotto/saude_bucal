@@ -1480,34 +1480,41 @@ print(proc_protese_percapita_capint_faixa)
 
 # Unindo tudo -------------------------------------------------------------
 
-coberturas_recod <- coberturas |> 
-  mutate(cod_uf = case_when(
-    UF == "Rondônia" ~ 11,
-    UF == "Acre" ~ 12,
-    UF == "Amazonas" ~ 13,
-    UF == "Roraima" ~ 14,
-    UF == "Pará" ~ 15,
-    UF == "Amapá" ~ 16,
-    UF == "Tocantins" ~ 17,
-    UF == "Maranhão" ~ 21,
-    UF == "Piauí" ~ 22,
-    UF == "Ceará" ~ 23,
-    UF == "Rio Grande do Norte" ~ 24,
-    UF == "Paraíba" ~ 25,
-    UF == "Pernambuco" ~ 26,
-    UF == "Alagoas" ~ 27,
-    UF == "Sergipe" ~ 28,
-    UF == "Bahia" ~ 29,
-    UF == "Minas Gerais" ~ 31,
-    UF == "Espírito Santo" ~ 32,
-    UF == "Rio de Janeiro" ~ 33,
-    UF == "São Paulo" ~ 35,
-    UF == "Paraná" ~ 41,
-    UF == "Santa Catarina" ~ 42,
-    UF == "Rio Grande do Sul" ~ 43,
-    UF == "Mato Grosso do Sul" ~ 50,
-    UF == "Mato Grosso" ~ 51,
-    UF == "Goiás" ~ 52,
-    UF == "Distrito Federal" ~ 53,
-    TRUE ~ NA_real_  
-  ), .after = UF)
+ufs_cod <- data.frame(
+  UF = c("Rondônia", "Acre", "Amazonas", "Roraima", "Pará", "Amapá", "Tocantins",
+         "Maranhão", "Piauí", "Ceará", "Rio Grande do Norte", "Paraíba", 
+         "Pernambuco", "Alagoas", "Sergipe", "Bahia", "Minas Gerais", 
+         "Espírito Santo", "Rio de Janeiro", "São Paulo", "Paraná", 
+         "Santa Catarina", "Rio Grande do Sul", "Mato Grosso do Sul", 
+         "Mato Grosso", "Goiás", "Distrito Federal"),
+  
+  cod_uf = c(11, 12, 13, 14, 15, 16, 17,
+             21, 22, 23, 24, 25, 26, 27, 28, 29,
+             31, 32, 33, 35, 41, 42, 43, 50, 
+             51, 52, 53),
+)
+
+
+faixas_cod <- data.frame(
+  faixa_etaria = c("de 0 a 14 anos", 
+                   "de 15 a 29 anos", 
+                   "de 30 a 59 anos", 
+                   "60 anos e mais"),
+  cod_faixa = c(1, 2, 3, 4)
+)
+
+tabelas_cobertura <- ls(pattern = "^prop_cob_.*_uf_.*_formatado$")
+
+tabela_cobertura <- do.call(rbind,mget(tabelas_uf)) %>%
+  left_join(ufs_cod, by = "UF") %>%
+  relocate(cod_uf, .after = UF) %>%
+  left_join(faixas_cod, by = "faixa_etaria") %>%
+  relocate(cod_faixa, .after = faixa_etaria)
+
+tabelas_percapita <- ls(pattern = "uf.*faixa.*percapita")
+
+tabela_percapita <- do.call(rbind,mget(tabelas_percapita)) %>%
+  left_join(ufs_cod, by = "UF") %>%
+  relocate(cod_uf, .after = UF) %>%
+
+
