@@ -457,12 +457,11 @@ prop_cob_endo_capint_faixa_formatado <- prop_cob_endo_capint_faixa %>%
     erro_padrao      = round(se * 100, 4),
     IC_inf           = round(ci_l * 100, 4),
     IC_sup           = round(ci_u * 100, 4)
-  ) |>
-  mutate(tipo_procedimento = 'Endodontia')
+  ) %>%
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   arrange(capint, match(faixa_etaria,
-                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
-    mutate(tipo_procedimento = 'Endodontia')
+                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) %>%
+  mutate(tipo_procedimento = 'Endodontia')
 
 # Exibir resultado
 print(prop_cob_endo_capint_faixa_formatado)
@@ -515,11 +514,8 @@ prop_cob_perio_faixa_formatado <- prop_cob_perio_faixa %>%
   ) |> 
   mutate(tipo_procedimento = 'Periodontia')
 
-# Exibir resultado (somente faixas acima de 14 anos)
-print(
-  prop_cob_perio_faixa_formatado %>%
-    filter(faixa_etaria != "de 0 a 14 anos")
-)
+# Exibir resultado
+print(prop_cob_perio_faixa_formatado)
 
 
 
@@ -574,7 +570,6 @@ prop_cob_perio_uf_faixa_formatado <- prop_cob_perio_uf_faixa %>%
     IC_sup = round(ci_u * 100, 4)
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  filter(faixa_etaria != "de 0 a 14 anos") %>%
   arrange(UF, match(faixa_etaria,
                     c("de 15 a 29 anos",
                       "de 30 a 59 anos",
@@ -717,10 +712,7 @@ prop_cob_protese_faixa_formatado <- prop_cob_protese_faixa %>%
   mutate(tipo_procedimento = 'Prótese')
 
 # Exibir resultado (exceto crianças de 0 a 14 anos)
-print(
-  prop_cob_protese_faixa_formatado %>%
-    filter(faixa_etaria != "de 0 a 14 anos")
-)
+print(prop_cob_protese_faixa_formatado)
 
 
 
@@ -773,7 +765,7 @@ prop_cob_protese_uf_faixa_formatado <- prop_cob_protese_uf_faixa %>%
     perc_necessidade = round(COB_PROTESE * 100, 4),
     erro_padrao      = round(se * 100, 4),
     IC_inf           = round(ci_l * 100, 4),
-    IC_sup           = round(ci_u * 100, )
+    IC_sup           = round(ci_u * 100, 4)
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
   filter(faixa_etaria != "de 0 a 14 anos") %>%
@@ -785,6 +777,7 @@ prop_cob_protese_uf_faixa_formatado <- prop_cob_protese_uf_faixa %>%
 
 # Exibir resultado
 print(prop_cob_protese_uf_faixa_formatado)
+
 
 
 
@@ -1201,10 +1194,7 @@ proc_perio_percapita_faixa <- svyby(
                 c("de 0 a 14 anos","de 15 a 29 anos","de 30 a 59 anos","60 anos e mais")))
 
 # Printar o indicador per capita por faixa etária
-print(
-  proc_perio_percapita_faixa %>%
-    filter(faixa_etaria != "de 0 a 14 anos")
-)
+print(proc_perio_percapita_faixa)
 
 
 
@@ -1255,10 +1245,7 @@ proc_perio_percapita_uf_faixa <- svyby(
                     c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
 
 # Visualizar resultado por UF e faixa etária
-print(
-  proc_perio_percapita_uf_faixa %>%
-    filter(faixa_etaria != "de 0 a 14 anos")
-)
+print(proc_perio_percapita_uf_faixa)
 
 
 
@@ -1311,10 +1298,7 @@ proc_perio_percapita_capint_faixa <- svyby(
                     c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
 
 # Visualizar resultado por UF e faixa etária
-print(
-  proc_perio_percapita_capint_faixa %>%
-    filter(faixa_etaria != "de 0 a 14 anos")
-)
+print(proc_perio_percapita_capint_faixa)
 
 
 
@@ -1369,10 +1353,7 @@ proc_protese_percapita_faixa <- svyby(
                 c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
 
 # Exibir resultados
-print(
-  proc_protese_percapita_faixa %>%
-    filter(faixa_etaria != "de 0 a 14 anos")
-)
+print(proc_protese_percapita_faixa)
 
 
 
@@ -1419,11 +1400,10 @@ proc_protese_percapita_uf_faixa <- svyby(
     ic_sup          = round(ci_u, 4)
   ) %>%
   select(UF, faixa_etaria, proc_per_capita, se, ic_inf, ic_sup) %>%
-  filter(faixa_etaria != "de 0 a 14 anos") %>%
   arrange(UF, match(faixa_etaria,
                     c("de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
 
-# Exibir resultado por UF e faixa etária (exceto 0 a 14 anos)
+# Exibir resultado
 print(proc_protese_percapita_uf_faixa)
 
 
@@ -1471,11 +1451,10 @@ proc_protese_percapita_capint_faixa <- svyby(
     ic_sup          = round(ci_u, 4)
   ) %>%
   select(capint, faixa_etaria, proc_per_capita, se, ic_inf, ic_sup) %>%
-  filter(faixa_etaria != "de 0 a 14 anos") %>%
   arrange(capint, match(faixa_etaria,
                     c("de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
 
-# Exibir resultado por UF e faixa etária (exceto 0 a 14 anos)
+# Exibir resultado por UF e faixa etária
 print(proc_protese_percapita_capint_faixa)
 ###############################################################################################################
 
@@ -1494,8 +1473,9 @@ ufs_cod <- data.frame(
   cod_uf = c(11, 12, 13, 14, 15, 16, 17,
              21, 22, 23, 24, 25, 26, 27, 28, 29,
              31, 32, 33, 35, 41, 42, 43, 50, 
-             51, 52, 53),
+             51, 52, 53)
 )
+
 
 
 faixas_cod <- data.frame(
@@ -1508,7 +1488,7 @@ faixas_cod <- data.frame(
 
 tabelas_cobertura <- ls(pattern = "^prop_cob_.*_uf_.*_formatado$")
 
-tabela_cobertura <- do.call(rbind,mget(tabelas_uf)) %>%
+tabela_cobertura <- do.call(rbind,mget(tabelas_cobertura)) %>%
   left_join(ufs_cod, by = "UF") %>%
   relocate(cod_uf, .after = UF) %>%
   left_join(faixas_cod, by = "faixa_etaria") %>%
