@@ -951,7 +951,8 @@ proc_ab_percapita_uf_faixa <- svyby(
   ) %>%
   select(UF, faixa_etaria, proc_per_capita, se, ic_inf, ic_sup) %>%
   arrange(UF, match(faixa_etaria,
-                    c("de 0 a 14 anos","de 15 a 29 anos","de 30 a 59 anos","60 anos e mais")))
+                    c("de 0 a 14 anos","de 15 a 29 anos","de 30 a 59 anos","60 anos e mais")))|>
+  mutate(tipo_procedimento = 'APS')
 
 # Visualizar resultado por UF e faixa etária
 print(proc_ab_percapita_uf_faixa)
@@ -1007,7 +1008,8 @@ proc_ab_percapita_capint_faixa <- svyby(
   ) %>%
   select(capint, faixa_etaria, proc_per_capita, se, ic_inf, ic_sup) %>%
   arrange(capint, match(faixa_etaria,
-                    c("de 0 a 14 anos","de 15 a 29 anos","de 30 a 59 anos","60 anos e mais")))
+                    c("de 0 a 14 anos","de 15 a 29 anos","de 30 a 59 anos","60 anos e mais")))  |>
+  mutate(tipo_procedimento = 'APS')
 
 # Visualizar resultado por capint e faixa etária
 print(proc_ab_percapita_capint_faixa)
@@ -1044,7 +1046,8 @@ endo_percapita_faixa <- svyby(
   ) %>%
   select(faixa_etaria, endo_per_capita, se, ic_inf, ic_sup) %>%
   arrange(match(faixa_etaria,
-                c("de 0 a 14 anos","de 15 a 29 anos","de 30 a 59 anos","60 anos e mais")))
+                c("de 0 a 14 anos","de 15 a 29 anos","de 30 a 59 anos","60 anos e mais")))  |>
+  mutate(tipo_procedimento = 'Endodontia')
 
 
 # Printar o indicador per capita por faixa etária
@@ -1096,7 +1099,8 @@ endo_percapita_uf_faixa <- svyby(
   ) %>%
   select(UF, faixa_etaria, endo_per_capita, se, ic_inf, ic_sup) %>%
   arrange(UF, match(faixa_etaria,
-                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))  |>
+  mutate(tipo_procedimento = 'Endodontia')
 
 endo_percapita_uf_faixa <- endo_percapita_uf_faixa %>%
   rename(proc_per_capita = endo_per_capita)
@@ -1153,7 +1157,8 @@ endo_percapita_capint_faixa <- svyby(
   ) %>%
   select(capint, faixa_etaria, endo_per_capita, se, ic_inf, ic_sup) %>%
   arrange(capint, match(faixa_etaria,
-                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
+  mutate(tipo_procedimento = 'Endodontia')
 
 # Visualizar resultado por capint e faixa etária
 print(endo_percapita_capint_faixa)
@@ -1191,7 +1196,8 @@ proc_perio_percapita_faixa <- svyby(
   ) %>%
   select(faixa_etaria, proc_per_capita, se, ic_inf, ic_sup) %>%
   arrange(match(faixa_etaria,
-                c("de 0 a 14 anos","de 15 a 29 anos","de 30 a 59 anos","60 anos e mais")))
+                c("de 0 a 14 anos","de 15 a 29 anos","de 30 a 59 anos","60 anos e mais"))) |>
+  mutate(tipo_procedimento = 'Endodontia')
 
 # Printar o indicador per capita por faixa etária
 print(proc_perio_percapita_faixa)
@@ -1242,7 +1248,8 @@ proc_perio_percapita_uf_faixa <- svyby(
   ) %>%
   select(UF, faixa_etaria, proc_per_capita, se, ic_inf, ic_sup) %>%
   arrange(UF, match(faixa_etaria,
-                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
+  mutate(tipo_procedimento = 'Periodontia')
 
 # Visualizar resultado por UF e faixa etária
 print(proc_perio_percapita_uf_faixa)
@@ -1295,7 +1302,8 @@ proc_perio_percapita_capint_faixa <- svyby(
   ) %>%
   select(capint, faixa_etaria, proc_per_capita, se, ic_inf, ic_sup) %>%
   arrange(capint, match(faixa_etaria,
-                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                    c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
+  mutate(tipo_procedimento = 'Periodontia')
 
 # Visualizar resultado por UF e faixa etária
 print(proc_perio_percapita_capint_faixa)
@@ -1350,7 +1358,8 @@ proc_protese_percapita_faixa <- svyby(
   ) %>%
   select(faixa_etaria, proc_per_capita, se, ic_inf, ic_sup) %>%
   arrange(match(faixa_etaria,
-                c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                c("de 0 a 14 anos", "de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
+  mutate(tipo_procedimento = 'Prótese')
 
 # Exibir resultados
 print(proc_protese_percapita_faixa)
@@ -1376,7 +1385,8 @@ proc_perio_percapita_uf <- svyby(
   ) %>%
   rename(UF = nome_uf) %>%
   select(UF, proc_per_capita, se, ic_inf, ic_sup) %>%
-  arrange(UF)
+  arrange(UF) |>
+  mutate(tipo_procedimento = 'Periodontia')
 
 # Visualizar resultado por UF
 print(proc_perio_percapita_uf)
@@ -1401,7 +1411,8 @@ proc_protese_percapita_uf_faixa <- svyby(
   ) %>%
   select(UF, faixa_etaria, proc_per_capita, se, ic_inf, ic_sup) %>%
   arrange(UF, match(faixa_etaria,
-                    c("de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais")))
+                    c("de 15 a 29 anos", "de 30 a 59 anos", "60 anos e mais"))) |>
+  mutate(tipo_procedimento = 'Prótese')
 
 # Exibir resultado
 print(proc_protese_percapita_uf_faixa)
