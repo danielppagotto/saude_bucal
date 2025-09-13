@@ -633,7 +633,6 @@ prop_cob_perio_capint_faixa_formatado <- prop_cob_perio_capint_faixa %>%
     IC_sup = round(ci_u * 100, 4)
   ) %>%
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  filter(faixa_etaria != "de 0 a 14 anos") %>%
   arrange(capint, match(faixa_etaria,
                     c("de 15 a 29 anos",
                       "de 30 a 59 anos",
@@ -768,7 +767,6 @@ prop_cob_protese_uf_faixa_formatado <- prop_cob_protese_uf_faixa %>%
     IC_sup           = round(ci_u * 100, 4)
   ) %>%
   select(UF, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  filter(faixa_etaria != "de 0 a 14 anos") %>%
   arrange(UF, match(faixa_etaria,
                     c("de 15 a 29 anos",
                       "de 30 a 59 anos",
@@ -833,7 +831,6 @@ prop_cob_protese_capint_faixa_formatado <- prop_cob_protese_capint_faixa %>%
     IC_sup           = round(ci_u * 100, 4)
   ) %>%
   select(capint, faixa_etaria, perc_necessidade, erro_padrao, IC_inf, IC_sup) %>%
-  filter(faixa_etaria != "de 0 a 14 anos") %>%
   arrange(capint, match(faixa_etaria,
                     c("de 15 a 29 anos",
                       "de 30 a 59 anos",
