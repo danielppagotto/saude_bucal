@@ -1,0 +1,433 @@
+Unnamed: 0,UF,cod_uf,faixa_etaria,cod_faixa,perc_necessidade,erro_padrao,IC_inf,IC_sup,tipo_procedimento,total_populacao
+1,Acre,12,de 0 a 14 anos,1,60.0049,4.9677,50.2684,69.7414,APS,221160
+2,Acre,12,de 15 a 29 anos,2,73.8244,5.6339,62.7822,84.8667,APS,224784
+3,Acre,12,de 30 a 59 anos,3,71.6449,5.1444,61.562,81.7278,APS,305658
+4,Acre,12,60 anos e mais,4,32.6133,5.8149,21.2163,44.0104,APS,78416
+5,Alagoas,27,de 0 a 14 anos,1,47.255,10.5078,26.66,67.85,APS,711691
+6,Alagoas,27,de 15 a 29 anos,2,59.86,9.0386,42.1447,77.5753,APS,759755
+7,Alagoas,27,de 30 a 59 anos,3,78.1527,4.7647,68.814,87.4914,APS,1247016
+8,Alagoas,27,60 anos e mais,4,47.0319,4.1539,38.8904,55.1733,APS,409221
+9,Amapá,16,de 0 a 14 anos,1,63.5441,4.3141,55.0886,71.9996,APS,198176
+10,Amapá,16,de 15 a 29 anos,2,67.3064,4.0654,59.3383,75.2746,APS,200435
+11,Amapá,16,de 30 a 59 anos,3,74.1964,5.0763,64.247,84.1459,APS,273232
+12,Amapá,16,60 anos e mais,4,44.7364,4.949,35.0365,54.4363,APS,61916
+13,Amazonas,13,de 0 a 14 anos,1,61.5046,4.543,52.6005,70.4087,APS,1075426
+14,Amazonas,13,de 15 a 29 anos,2,77.5719,3.9488,69.8323,85.3115,APS,1063019
+15,Amazonas,13,de 30 a 59 anos,3,82.968,3.1089,76.8747,89.0613,APS,1446186
+16,Amazonas,13,60 anos e mais,4,56.8192,2.9025,51.1304,62.508,APS,356982
+17,Bahia,29,de 0 a 14 anos,1,46.5681,3.2791,40.1412,52.9951,APS,2863071
+18,Bahia,29,de 15 a 29 anos,2,54.0827,3.6131,47.0012,61.1642,APS,3174682
+19,Bahia,29,de 30 a 59 anos,3,67.4473,4.9019,57.8399,77.0548,APS,5944594
+20,Bahia,29,60 anos e mais,4,57.2782,5.3438,46.8046,67.7518,APS,2159279
+21,Ceará,23,de 0 a 14 anos,1,46.0955,5.4513,35.4111,56.7799,APS,1802435
+22,Ceará,23,de 15 a 29 anos,2,68.6506,7.1495,54.6379,82.6633,APS,2070180
+23,Ceará,23,de 30 a 59 anos,3,82.7036,4.8058,73.2845,92.1227,APS,3631809
+24,Ceará,23,60 anos e mais,4,49.1827,4.0367,41.2709,57.0945,APS,1290533
+25,Distrito Federal,53,de 0 a 14 anos,1,31.2088,3.2273,24.8835,37.5342,APS,534233
+26,Distrito Federal,53,de 15 a 29 anos,2,40.3817,5.5234,29.5561,51.2073,APS,660674
+27,Distrito Federal,53,de 30 a 59 anos,3,70.7927,3.5521,63.8307,77.7546,APS,1257384
+28,Distrito Federal,53,60 anos e mais,4,43.0963,4.0994,35.0616,51.131,APS,365090
+29,Espírito Santo,32,de 0 a 14 anos,1,41.3678,5.9876,29.6324,53.1032,APS,741496
+30,Espírito Santo,32,de 15 a 29 anos,2,57.9466,8.381,41.5202,74.373,APS,811486
+31,Espírito Santo,32,de 30 a 59 anos,3,74.2426,5.1886,64.0731,84.4121,APS,1649332
+32,Espírito Santo,32,60 anos e mais,4,49.4975,5.4923,38.7329,60.2622,APS,631398
+33,Goiás,52,de 0 a 14 anos,1,61.1575,5.0453,51.2688,71.0462,APS,1431289
+34,Goiás,52,de 15 a 29 anos,2,66.7807,5.8025,55.4079,78.1534,APS,1627589
+35,Goiás,52,de 30 a 59 anos,3,69.0749,4.0643,61.1089,77.0408,APS,3033200
+36,Goiás,52,60 anos e mais,4,36.8606,5.1542,26.7586,46.9627,APS,964417
+37,Maranhão,21,de 0 a 14 anos,1,47.6264,8.0577,31.8336,63.4193,APS,1645580
+38,Maranhão,21,de 15 a 29 anos,2,53.0079,8.1666,37.0017,69.0142,APS,1703431
+39,Maranhão,21,de 30 a 59 anos,3,68.3059,7.7122,53.1903,83.4215,APS,2605727
+40,Maranhão,21,60 anos e mais,4,53.3893,6.8867,39.8916,66.8871,APS,821961
+41,Mato Grosso,51,de 0 a 14 anos,1,57.8804,4.4312,49.1954,66.5654,APS,829686
+42,Mato Grosso,51,de 15 a 29 anos,2,68.7393,4.8474,59.2385,78.2401,APS,864067
+43,Mato Grosso,51,de 30 a 59 anos,3,80.2246,4.8072,70.8026,89.6466,APS,1534417
+44,Mato Grosso,51,60 anos e mais,4,49.6107,5.4323,38.9636,60.2578,APS,430479
+45,Mato Grosso do Sul,50,de 0 a 14 anos,1,44.3924,3.6478,37.2429,51.542,APS,606792
+46,Mato Grosso do Sul,50,de 15 a 29 anos,2,65.496,3.1553,59.3117,71.6803,APS,621841
+47,Mato Grosso do Sul,50,de 30 a 59 anos,3,74.9376,4.7481,65.6315,84.2436,APS,1137289
+48,Mato Grosso do Sul,50,60 anos e mais,4,47.2899,6.5352,34.4812,60.0986,APS,391091
+49,Minas Gerais,31,de 0 a 14 anos,1,35.1524,4.081,27.1537,43.151,APS,3707919
+50,Minas Gerais,31,de 15 a 29 anos,2,60.35,4.688,51.1618,69.5383,APS,4426257
+51,Minas Gerais,31,de 30 a 59 anos,3,57.2883,6.9429,43.6804,70.8962,APS,8745877
+52,Minas Gerais,31,60 anos e mais,4,39.7037,5.3482,29.2214,50.1861,APS,3659936
+53,Paraná,41,de 0 a 14 anos,1,40.1531,4.7662,30.8114,49.4947,APS,2195297
+54,Paraná,41,de 15 a 29 anos,2,52.1945,7.8852,36.7398,67.6492,APS,2496695
+55,Paraná,41,de 30 a 59 anos,3,71.5802,5.5673,60.6685,82.4919,APS,4859268
+56,Paraná,41,60 anos e mais,4,33.4996,4.3686,24.9374,42.0619,APS,1893120
+57,Paraíba,25,de 0 a 14 anos,1,53.5209,4.2393,45.212,61.8298,APS,826921
+58,Paraíba,25,de 15 a 29 anos,2,69.2694,6.5859,56.3613,82.1775,APS,893666
+59,Paraíba,25,de 30 a 59 anos,3,79.2926,4.8646,69.7582,88.8271,APS,1638772
+60,Paraíba,25,60 anos e mais,4,44.1686,5.3868,33.6107,54.7266,APS,615328
+61,Pará,15,de 0 a 14 anos,1,58.9782,4.1985,50.7492,67.2071,APS,1990942
+62,Pará,15,de 15 a 29 anos,2,68.1758,7.3224,53.8241,82.5275,APS,2100629
+63,Pará,15,de 30 a 59 anos,3,81.3515,5.4515,70.6667,92.0362,APS,3152228
+64,Pará,15,60 anos e mais,4,43.9059,4.4849,35.1157,52.6962,APS,876332
+65,Pernambuco,26,de 0 a 14 anos,1,57.2182,7.8704,41.7925,72.6439,APS,1894679
+66,Pernambuco,26,de 15 a 29 anos,2,61.6385,9.391,43.2325,80.0445,APS,2079231
+67,Pernambuco,26,de 30 a 59 anos,3,72.4078,5.1304,62.3523,82.4632,APS,3752862
+68,Pernambuco,26,60 anos e mais,4,52.0694,4.2076,43.8227,60.3161,APS,1332159
+69,Piauí,22,de 0 a 14 anos,1,59.0149,2.9057,53.3199,64.7099,APS,681934
+70,Piauí,22,de 15 a 29 anos,2,65.9351,5.034,56.0686,75.8016,APS,758510
+71,Piauí,22,de 30 a 59 anos,3,70.2757,4.7365,60.9923,79.5591,APS,1336856
+72,Piauí,22,60 anos e mais,4,40.0445,8.2785,23.819,56.27,APS,493899
+73,Rio Grande do Norte,24,de 0 a 14 anos,1,64.1943,7.7285,49.0467,79.3419,APS,654658
+74,Rio Grande do Norte,24,de 15 a 29 anos,2,82.3736,5.4938,71.6059,93.1414,APS,755428
+75,Rio Grande do Norte,24,de 30 a 59 anos,3,91.3604,2.1476,87.1511,95.5697,APS,1394752
+76,Rio Grande do Norte,24,60 anos e mais,4,40.5492,6.3419,28.1194,52.979,APS,497891
+77,Rio Grande do Sul,43,de 0 a 14 anos,1,54.2754,4.9472,44.5789,63.9718,APS,1906510
+78,Rio Grande do Sul,43,de 15 a 29 anos,2,73.592,7.1118,59.6532,87.5309,APS,2207936
+79,Rio Grande do Sul,43,de 30 a 59 anos,3,68.8813,5.6362,57.8345,79.928,APS,4575103
+80,Rio Grande do Sul,43,60 anos e mais,4,56.3791,4.0958,48.3515,64.4067,APS,2193416
+81,Rio de Janeiro,33,de 0 a 14 anos,1,33.8348,3.4144,27.1427,40.5268,APS,2856146
+82,Rio de Janeiro,33,de 15 a 29 anos,2,56.5322,4.8044,47.1158,65.9487,APS,3321915
+83,Rio de Janeiro,33,de 30 a 59 anos,3,75.3126,5.0538,65.4073,85.2179,APS,6851484
+84,Rio de Janeiro,33,60 anos e mais,4,51.842,4.1359,43.7358,59.9482,APS,3025629
+85,Rondônia,11,de 0 a 14 anos,1,50.8139,4.987,41.0397,60.5882,APS,348152
+86,Rondônia,11,de 15 a 29 anos,2,65.196,5.0698,55.2594,75.1325,APS,372629
+87,Rondônia,11,de 30 a 59 anos,3,79.208,3.4996,72.349,86.067,APS,664369
+88,Rondônia,11,60 anos e mais,4,40.5376,3.9427,32.81,48.2652,APS,196046
+89,Roraima,14,de 0 a 14 anos,1,68.269,3.6868,61.043,75.495,APS,186208
+90,Roraima,14,de 15 a 29 anos,2,73.7855,5.2677,63.461,84.1099,APS,171286
+91,Roraima,14,de 30 a 59 anos,3,79.3787,4.6066,70.3499,88.4075,APS,228753
+92,Roraima,14,60 anos e mais,4,39.1543,2.5258,34.2038,44.1049,APS,50460
+93,Santa Catarina,42,de 0 a 14 anos,1,30.1685,3.7073,22.9024,37.4346,APS,1423210
+94,Santa Catarina,42,de 15 a 29 anos,2,43.1968,5.7609,31.9056,54.488,APS,1678213
+95,Santa Catarina,42,de 30 a 59 anos,3,65.7555,6.0519,53.894,77.617,APS,3324545
+96,Santa Catarina,42,60 anos e mais,4,39.4935,4.5851,30.5068,48.4801,APS,1184393
+97,Sergipe,28,de 0 a 14 anos,1,58.1019,3.7719,50.7093,65.4946,APS,469501
+98,Sergipe,28,de 15 a 29 anos,2,66.9849,3.9738,59.1965,74.7734,APS,526722
+99,Sergipe,28,de 30 a 59 anos,3,73.6242,4.1036,65.5813,81.6672,APS,919172
+100,Sergipe,28,60 anos e mais,4,50.9454,4.3474,42.4246,59.4662,APS,294609
+101,São Paulo,35,de 0 a 14 anos,1,33.5042,5.2265,23.2604,43.7481,APS,7975163
+102,São Paulo,35,de 15 a 29 anos,2,53.3244,7.8179,38.0017,68.6471,APS,9374648
+103,São Paulo,35,de 30 a 59 anos,3,77.4822,3.4376,70.7447,84.2197,APS,19410859
+104,São Paulo,35,60 anos e mais,4,49.7565,4.7001,40.5445,58.9684,APS,7650568
+105,Tocantins,17,de 0 a 14 anos,1,55.5045,6.9192,41.9431,69.066,APS,350986
+106,Tocantins,17,de 15 a 29 anos,2,66.1128,5.0721,56.1717,76.0539,APS,366420
+107,Tocantins,17,de 30 a 59 anos,3,73.1126,8.7978,55.8692,90.3559,APS,605133
+108,Tocantins,17,60 anos e mais,4,42.5134,5.2935,32.1384,52.8884,APS,188921
+109,Acre,12,de 0 a 14 anos,1,15.7818,3.226,9.4588,22.1047,Endodontia,221160
+110,Acre,12,de 15 a 29 anos,2,14.6619,3.3444,8.107,21.2167,Endodontia,224784
+111,Acre,12,de 30 a 59 anos,3,12.8052,3.3179,6.3022,19.3083,Endodontia,305658
+112,Acre,12,60 anos e mais,4,3.9823,1.674,0.7013,7.2633,Endodontia,78416
+113,Alagoas,27,de 0 a 14 anos,1,7.153,2.9707,1.3305,12.9756,Endodontia,711691
+114,Alagoas,27,de 15 a 29 anos,2,9.6565,2.3487,5.0531,14.2598,Endodontia,759755
+115,Alagoas,27,de 30 a 59 anos,3,6.1233,2.1756,1.8591,10.3875,Endodontia,1247016
+116,Alagoas,27,60 anos e mais,4,0.2602,0.1662,-0.0656,0.5859,Endodontia,409221
+117,Amapá,16,de 0 a 14 anos,1,6.5552,3.121,0.4382,12.6721,Endodontia,198176
+118,Amapá,16,de 15 a 29 anos,2,10.5155,5.2149,0.2944,20.7366,Endodontia,200435
+119,Amapá,16,de 30 a 59 anos,3,5.9188,1.674,2.6379,9.1998,Endodontia,273232
+120,Amapá,16,60 anos e mais,4,3.4287,1.2668,0.9459,5.9115,Endodontia,61916
+121,Amazonas,13,de 0 a 14 anos,1,13.1702,3.0472,7.1978,19.1427,Endodontia,1075426
+122,Amazonas,13,de 15 a 29 anos,2,12.189,4.1246,4.1049,20.2732,Endodontia,1063019
+123,Amazonas,13,de 30 a 59 anos,3,8.0644,1.44,5.242,10.8869,Endodontia,1446186
+124,Amazonas,13,60 anos e mais,4,4.8191,1.6686,1.5487,8.0894,Endodontia,356982
+125,Bahia,29,de 0 a 14 anos,1,7.7099,2.42,2.9668,12.453,Endodontia,2863071
+126,Bahia,29,de 15 a 29 anos,2,7.2576,3.476,0.4448,14.0703,Endodontia,3174682
+127,Bahia,29,de 30 a 59 anos,3,16.9907,3.7004,9.738,24.2434,Endodontia,5944594
+128,Bahia,29,60 anos e mais,4,5.5234,2.0107,1.5826,9.4642,Endodontia,2159279
+129,Ceará,23,de 0 a 14 anos,1,6.7668,1.5758,3.6783,9.8553,Endodontia,1802435
+130,Ceará,23,de 15 a 29 anos,2,6.7194,2.744,1.3412,12.0975,Endodontia,2070180
+131,Ceará,23,de 30 a 59 anos,3,9.3918,3.2171,3.0865,15.6971,Endodontia,3631809
+132,Ceará,23,60 anos e mais,4,1.3954,0.8164,-0.2047,2.9954,Endodontia,1290533
+133,Distrito Federal,53,de 0 a 14 anos,1,5.6482,1.3904,2.923,8.3733,Endodontia,534233
+134,Distrito Federal,53,de 15 a 29 anos,2,5.7171,1.9317,1.931,9.5032,Endodontia,660674
+135,Distrito Federal,53,de 30 a 59 anos,3,8.691,2.0326,4.7071,12.6749,Endodontia,1257384
+136,Distrito Federal,53,60 anos e mais,4,3.0798,1.6485,-0.1513,6.3108,Endodontia,365090
+137,Espírito Santo,32,de 0 a 14 anos,1,6.6406,2.9246,0.9085,12.3727,Endodontia,741496
+138,Espírito Santo,32,de 15 a 29 anos,2,12.8296,4.9006,3.2246,22.4345,Endodontia,811486
+139,Espírito Santo,32,de 30 a 59 anos,3,3.4246,1.9801,-0.4564,7.3056,Endodontia,1649332
+140,Espírito Santo,32,60 anos e mais,4,4.7757,2.5178,-0.159,9.7105,Endodontia,631398
+141,Goiás,52,de 0 a 14 anos,1,11.0966,4.3552,2.5606,19.6327,Endodontia,1431289
+142,Goiás,52,de 15 a 29 anos,2,14.5309,3.0979,8.4591,20.6028,Endodontia,1627589
+143,Goiás,52,de 30 a 59 anos,3,15.9855,5.6221,4.9663,27.0046,Endodontia,3033200
+144,Goiás,52,60 anos e mais,4,0.9782,0.3744,0.2443,1.712,Endodontia,964417
+145,Maranhão,21,de 0 a 14 anos,1,9.286,2.8134,3.7719,14.8002,Endodontia,1645580
+146,Maranhão,21,de 15 a 29 anos,2,5.8905,3.7332,-1.4264,13.2075,Endodontia,1703431
+147,Maranhão,21,de 30 a 59 anos,3,15.2146,4.2745,6.8367,23.5926,Endodontia,2605727
+148,Maranhão,21,60 anos e mais,4,3.5013,1.9721,-0.364,7.3665,Endodontia,821961
+149,Mato Grosso,51,de 0 a 14 anos,1,13.607,3.7829,6.1927,21.0213,Endodontia,829686
+150,Mato Grosso,51,de 15 a 29 anos,2,16.2249,2.6739,10.9841,21.4658,Endodontia,864067
+151,Mato Grosso,51,de 30 a 59 anos,3,11.9856,2.5766,6.9355,17.0357,Endodontia,1534417
+152,Mato Grosso,51,60 anos e mais,4,2.3887,1.7361,-1.014,5.7914,Endodontia,430479
+153,Mato Grosso do Sul,50,de 0 a 14 anos,1,3.9814,1.4291,1.1804,6.7823,Endodontia,606792
+154,Mato Grosso do Sul,50,de 15 a 29 anos,2,9.7128,3.0934,3.6498,15.7758,Endodontia,621841
+155,Mato Grosso do Sul,50,de 30 a 59 anos,3,6.6287,2.5525,1.6259,11.6315,Endodontia,1137289
+156,Mato Grosso do Sul,50,60 anos e mais,4,5.8537,2.016,1.9025,9.8049,Endodontia,391091
+157,Minas Gerais,31,de 0 a 14 anos,1,5.319,1.1534,3.0584,7.5796,Endodontia,3707919
+158,Minas Gerais,31,de 15 a 29 anos,2,6.2058,2.3332,1.6327,10.7788,Endodontia,4426257
+159,Minas Gerais,31,de 30 a 59 anos,3,13.003,3.6301,5.8882,20.1179,Endodontia,8745877
+160,Minas Gerais,31,60 anos e mais,4,2.3374,0.9402,0.4947,4.1802,Endodontia,3659936
+161,Paraná,41,de 0 a 14 anos,1,5.0,1.7758,1.5196,8.4805,Endodontia,2195297
+162,Paraná,41,de 15 a 29 anos,2,6.812,3.002,0.9282,12.6958,Endodontia,2496695
+163,Paraná,41,de 30 a 59 anos,3,7.892,2.9071,2.1943,13.5897,Endodontia,4859268
+164,Paraná,41,60 anos e mais,4,1.2166,0.5874,0.0654,2.3679,Endodontia,1893120
+165,Paraíba,25,de 0 a 14 anos,1,3.9809,1.2121,1.6051,6.3566,Endodontia,826921
+166,Paraíba,25,de 15 a 29 anos,2,4.8401,2.5406,-0.1393,9.8195,Endodontia,893666
+167,Paraíba,25,de 30 a 59 anos,3,8.1724,1.7875,4.669,11.6758,Endodontia,1638772
+168,Paraíba,25,60 anos e mais,4,2.17,1.0554,0.1014,4.2387,Endodontia,615328
+169,Pará,15,de 0 a 14 anos,1,9.4324,1.771,5.9613,12.9035,Endodontia,1990942
+170,Pará,15,de 15 a 29 anos,2,8.2927,3.0415,2.3314,14.2539,Endodontia,2100629
+171,Pará,15,de 30 a 59 anos,3,7.3785,1.7129,4.0213,10.7356,Endodontia,3152228
+172,Pará,15,60 anos e mais,4,3.321,1.3831,0.6103,6.0318,Endodontia,876332
+173,Pernambuco,26,de 0 a 14 anos,1,7.7309,1.3563,5.0725,10.3892,Endodontia,1894679
+174,Pernambuco,26,de 15 a 29 anos,2,9.5437,4.0662,1.5741,17.5132,Endodontia,2079231
+175,Pernambuco,26,de 30 a 59 anos,3,12.3985,4.7843,3.0215,21.7755,Endodontia,3752862
+176,Pernambuco,26,60 anos e mais,4,2.1633,1.055,0.0955,4.231,Endodontia,1332159
+177,Piauí,22,de 0 a 14 anos,1,11.0628,3.4826,4.237,17.8887,Endodontia,681934
+178,Piauí,22,de 15 a 29 anos,2,14.3151,3.6933,7.0764,21.5539,Endodontia,758510
+179,Piauí,22,de 30 a 59 anos,3,6.9236,2.47,2.0825,11.7646,Endodontia,1336856
+180,Piauí,22,60 anos e mais,4,3.0945,1.9062,-0.6416,6.8307,Endodontia,493899
+181,Rio Grande do Norte,24,de 0 a 14 anos,1,14.6652,5.3047,4.2683,25.0622,Endodontia,654658
+182,Rio Grande do Norte,24,de 15 a 29 anos,2,21.7164,7.0611,7.8768,35.5559,Endodontia,755428
+183,Rio Grande do Norte,24,de 30 a 59 anos,3,5.4942,2.0193,1.5364,9.452,Endodontia,1394752
+184,Rio Grande do Norte,24,60 anos e mais,4,3.6678,1.6988,0.3383,6.9973,Endodontia,497891
+185,Rio Grande do Sul,43,de 0 a 14 anos,1,8.3127,3.2063,2.0283,14.597,Endodontia,1906510
+186,Rio Grande do Sul,43,de 15 a 29 anos,2,5.2358,2.6036,0.1329,10.3386,Endodontia,2207936
+187,Rio Grande do Sul,43,de 30 a 59 anos,3,10.3717,3.9228,2.6832,18.0602,Endodontia,4575103
+188,Rio Grande do Sul,43,60 anos e mais,4,3.8737,1.8527,0.2425,7.5049,Endodontia,2193416
+189,Rio de Janeiro,33,de 0 a 14 anos,1,6.045,2.8319,0.4945,11.5954,Endodontia,2856146
+190,Rio de Janeiro,33,de 15 a 29 anos,2,5.6415,1.8271,2.0604,9.2225,Endodontia,3321915
+191,Rio de Janeiro,33,de 30 a 59 anos,3,10.2914,2.5463,5.3008,15.282,Endodontia,6851484
+192,Rio de Janeiro,33,60 anos e mais,4,2.0108,0.5429,0.9467,3.0749,Endodontia,3025629
+193,Rondônia,11,de 0 a 14 anos,1,14.707,2.2177,10.3603,19.0538,Endodontia,348152
+194,Rondônia,11,de 15 a 29 anos,2,10.2895,2.293,5.7954,14.7836,Endodontia,372629
+195,Rondônia,11,de 30 a 59 anos,3,8.8782,2.5862,3.8093,13.9471,Endodontia,664369
+196,Rondônia,11,60 anos e mais,4,0.8831,0.502,-0.1008,1.867,Endodontia,196046
+197,Roraima,14,de 0 a 14 anos,1,10.0064,1.2312,7.5932,12.4196,Endodontia,186208
+198,Roraima,14,de 15 a 29 anos,2,17.3893,5.149,7.2973,27.4812,Endodontia,171286
+199,Roraima,14,de 30 a 59 anos,3,13.9661,1.8836,10.2743,17.6579,Endodontia,228753
+200,Roraima,14,60 anos e mais,4,0.8329,0.5295,-0.2049,1.8707,Endodontia,50460
+201,Santa Catarina,42,de 0 a 14 anos,1,4.341,1.4558,1.4878,7.1943,Endodontia,1423210
+202,Santa Catarina,42,de 15 a 29 anos,2,7.2309,3.1676,1.0226,13.4392,Endodontia,1678213
+203,Santa Catarina,42,de 30 a 59 anos,3,4.7566,1.7706,1.2863,8.2269,Endodontia,3324545
+204,Santa Catarina,42,60 anos e mais,4,4.401,1.8781,0.72,8.0821,Endodontia,1184393
+205,Sergipe,28,de 0 a 14 anos,1,12.9443,3.1559,6.7589,19.1297,Endodontia,469501
+206,Sergipe,28,de 15 a 29 anos,2,9.7163,3.647,2.5683,16.8643,Endodontia,526722
+207,Sergipe,28,de 30 a 59 anos,3,6.5402,2.1245,2.3762,10.7041,Endodontia,919172
+208,Sergipe,28,60 anos e mais,4,3.7633,1.9407,-0.0404,7.567,Endodontia,294609
+209,São Paulo,35,de 0 a 14 anos,1,6.7947,2.2929,2.3007,11.2887,Endodontia,7975163
+210,São Paulo,35,de 15 a 29 anos,2,3.6395,1.4194,0.8575,6.4215,Endodontia,9374648
+211,São Paulo,35,de 30 a 59 anos,3,5.8705,2.1545,1.6479,10.0932,Endodontia,19410859
+212,São Paulo,35,60 anos e mais,4,3.7659,2.0428,-0.238,7.7698,Endodontia,7650568
+213,Tocantins,17,de 0 a 14 anos,1,13.0832,4.4273,4.4058,21.7607,Endodontia,350986
+214,Tocantins,17,de 15 a 29 anos,2,18.0813,6.4476,5.4443,30.7184,Endodontia,366420
+215,Tocantins,17,de 30 a 59 anos,3,14.6622,7.4045,0.1496,29.1747,Endodontia,605133
+216,Tocantins,17,60 anos e mais,4,1.9818,1.5885,-1.1317,5.0953,Endodontia,188921
+217,Acre,12,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,224784
+218,Acre,12,de 30 a 59 anos,3,0.0,0.0,0.0,0.0,Periodontia,305658
+219,Acre,12,60 anos e mais,4,0.6647,0.5136,-0.3419,1.6713,Periodontia,78416
+220,Acre,12,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,221160
+221,Alagoas,27,de 15 a 29 anos,2,0.0411,0.0418,-0.0408,0.1231,Periodontia,759755
+222,Alagoas,27,de 30 a 59 anos,3,0.484,0.2483,-0.0026,0.9706,Periodontia,1247016
+223,Alagoas,27,60 anos e mais,4,1.1731,0.9948,-0.7767,3.123,Periodontia,409221
+224,Alagoas,27,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,711691
+225,Amapá,16,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,200435
+226,Amapá,16,de 30 a 59 anos,3,0.88,0.6914,-0.4752,2.2351,Periodontia,273232
+227,Amapá,16,60 anos e mais,4,0.0,0.0,0.0,0.0,Periodontia,61916
+228,Amapá,16,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,198176
+229,Amazonas,13,de 15 a 29 anos,2,0.2517,0.2497,-0.2378,0.7411,Periodontia,1063019
+230,Amazonas,13,de 30 a 59 anos,3,0.8993,0.4706,-0.0231,1.8216,Periodontia,1446186
+231,Amazonas,13,60 anos e mais,4,2.5408,1.1838,0.2205,4.8611,Periodontia,356982
+232,Amazonas,13,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,1075426
+233,Bahia,29,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,3174682
+234,Bahia,29,de 30 a 59 anos,3,2.0477,1.1687,-0.2429,4.3383,Periodontia,5944594
+235,Bahia,29,60 anos e mais,4,3.3734,1.2449,0.9334,5.8134,Periodontia,2159279
+236,Bahia,29,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,2863071
+237,Ceará,23,de 15 a 29 anos,2,0.3331,0.3298,-0.3133,0.9795,Periodontia,2070180
+238,Ceará,23,de 30 a 59 anos,3,1.4852,0.9594,-0.3953,3.3656,Periodontia,3631809
+239,Ceará,23,60 anos e mais,4,0.7615,0.3772,0.0222,1.5008,Periodontia,1290533
+240,Ceará,23,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,1802435
+241,Distrito Federal,53,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,660674
+242,Distrito Federal,53,de 30 a 59 anos,3,6.464,1.9055,2.7294,10.1986,Periodontia,1257384
+243,Distrito Federal,53,60 anos e mais,4,2.3803,1.1152,0.1944,4.5661,Periodontia,365090
+244,Distrito Federal,53,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,534233
+245,Espírito Santo,32,de 15 a 29 anos,2,0.2153,0.1664,-0.1109,0.5415,Periodontia,811486
+246,Espírito Santo,32,de 30 a 59 anos,3,0.4596,0.2272,0.0143,0.905,Periodontia,1649332
+247,Espírito Santo,32,60 anos e mais,4,0.4497,0.2433,-0.0272,0.9267,Periodontia,631398
+248,Espírito Santo,32,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,741496
+249,Goiás,52,de 15 a 29 anos,2,2.1143,2.0045,-1.8145,6.0431,Periodontia,1627589
+250,Goiás,52,de 30 a 59 anos,3,1.1164,0.7737,-0.4001,2.6329,Periodontia,3033200
+251,Goiás,52,60 anos e mais,4,5.9509,1.8185,2.3867,9.515,Periodontia,964417
+252,Goiás,52,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,1431289
+253,Maranhão,21,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,1703431
+254,Maranhão,21,de 30 a 59 anos,3,2.5178,2.4696,-2.3226,7.3582,Periodontia,2605727
+255,Maranhão,21,60 anos e mais,4,2.3583,1.4463,-0.4764,5.1931,Periodontia,821961
+256,Maranhão,21,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,1645580
+257,Mato Grosso,51,de 15 a 29 anos,2,1.8966,1.3147,-0.6801,4.4732,Periodontia,864067
+258,Mato Grosso,51,de 30 a 59 anos,3,4.6692,2.4285,-0.0905,9.429,Periodontia,1534417
+259,Mato Grosso,51,60 anos e mais,4,1.9566,0.983,0.0299,3.8833,Periodontia,430479
+260,Mato Grosso,51,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,829686
+261,Mato Grosso do Sul,50,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,621841
+262,Mato Grosso do Sul,50,de 30 a 59 anos,3,2.0606,1.0678,-0.0322,4.1535,Periodontia,1137289
+263,Mato Grosso do Sul,50,60 anos e mais,4,1.9503,1.151,-0.3055,4.2061,Periodontia,391091
+264,Mato Grosso do Sul,50,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,606792
+265,Minas Gerais,31,de 15 a 29 anos,2,0.0347,0.035,-0.0338,0.1032,Periodontia,4426257
+266,Minas Gerais,31,de 30 a 59 anos,3,2.1185,1.4155,-0.6558,4.8929,Periodontia,8745877
+267,Minas Gerais,31,60 anos e mais,4,0.9649,0.5941,-0.1995,2.1293,Periodontia,3659936
+268,Minas Gerais,31,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,3707919
+269,Paraná,41,de 15 a 29 anos,2,0.6601,0.6527,-0.6191,1.9393,Periodontia,2496695
+270,Paraná,41,de 30 a 59 anos,3,2.6841,1.2663,0.2022,5.166,Periodontia,4859268
+271,Paraná,41,60 anos e mais,4,2.5644,1.1428,0.3247,4.8042,Periodontia,1893120
+272,Paraná,41,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,2195297
+273,Paraíba,25,de 15 a 29 anos,2,0.059,0.0598,-0.0582,0.1762,Periodontia,893666
+274,Paraíba,25,de 30 a 59 anos,3,4.4535,2.659,-0.758,9.6651,Periodontia,1638772
+275,Paraíba,25,60 anos e mais,4,0.8597,0.7909,-0.6904,2.4098,Periodontia,615328
+276,Paraíba,25,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,826921
+277,Pará,15,de 15 a 29 anos,2,1.4199,0.8349,-0.2165,3.0563,Periodontia,2100629
+278,Pará,15,de 30 a 59 anos,3,2.3707,1.5915,-0.7487,5.49,Periodontia,3152228
+279,Pará,15,60 anos e mais,4,2.9489,2.0047,-0.9803,6.8781,Periodontia,876332
+280,Pará,15,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,1990942
+281,Pernambuco,26,de 15 a 29 anos,2,0.0381,0.0392,-0.0388,0.1149,Periodontia,2079231
+282,Pernambuco,26,de 30 a 59 anos,3,0.3667,0.1819,0.0101,0.7232,Periodontia,3752862
+283,Pernambuco,26,60 anos e mais,4,1.2595,0.5244,0.2317,2.2872,Periodontia,1332159
+284,Pernambuco,26,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,1894679
+285,Piauí,22,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,758510
+286,Piauí,22,de 30 a 59 anos,3,1.8888,0.9148,0.0959,3.6818,Periodontia,1336856
+287,Piauí,22,60 anos e mais,4,2.0277,0.7585,0.5411,3.5143,Periodontia,493899
+288,Piauí,22,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,681934
+289,Rio Grande do Norte,24,de 15 a 29 anos,2,0.2525,0.1897,-0.1192,0.6242,Periodontia,755428
+290,Rio Grande do Norte,24,de 30 a 59 anos,3,0.6737,0.3023,0.0813,1.2662,Periodontia,1394752
+291,Rio Grande do Norte,24,60 anos e mais,4,0.9673,0.5514,-0.1134,2.0481,Periodontia,497891
+292,Rio Grande do Norte,24,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,654658
+293,Rio Grande do Sul,43,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,2207936
+294,Rio Grande do Sul,43,de 30 a 59 anos,3,0.2047,0.0984,0.0118,0.3977,Periodontia,4575103
+295,Rio Grande do Sul,43,60 anos e mais,4,5.3667,1.6672,2.0991,8.6343,Periodontia,2193416
+296,Rio Grande do Sul,43,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,1906510
+297,Rio de Janeiro,33,de 15 a 29 anos,2,0.3861,0.265,-0.1334,0.9055,Periodontia,3321915
+298,Rio de Janeiro,33,de 30 a 59 anos,3,3.2923,1.1798,0.9798,5.6047,Periodontia,6851484
+299,Rio de Janeiro,33,60 anos e mais,4,2.8747,1.1678,0.5858,5.1636,Periodontia,3025629
+300,Rio de Janeiro,33,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,2856146
+301,Rondônia,11,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,372629
+302,Rondônia,11,de 30 a 59 anos,3,0.0,0.0,0.0,0.0,Periodontia,664369
+303,Rondônia,11,60 anos e mais,4,0.6818,0.4669,-0.2333,1.5969,Periodontia,196046
+304,Rondônia,11,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,348152
+305,Roraima,14,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,171286
+306,Roraima,14,de 30 a 59 anos,3,0.6832,0.4957,-0.2884,1.6549,Periodontia,228753
+307,Roraima,14,60 anos e mais,4,1.0476,0.6271,-0.1815,2.2767,Periodontia,50460
+308,Roraima,14,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,186208
+309,Santa Catarina,42,de 15 a 29 anos,2,0.0,0.0,0.0,0.0,Periodontia,1678213
+310,Santa Catarina,42,de 30 a 59 anos,3,4.91,1.8923,1.2012,8.6188,Periodontia,3324545
+311,Santa Catarina,42,60 anos e mais,4,1.6634,0.9128,-0.1257,3.4525,Periodontia,1184393
+312,Santa Catarina,42,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,1423210
+313,Sergipe,28,de 15 a 29 anos,2,0.9168,0.9266,-0.8993,2.7329,Periodontia,526722
+314,Sergipe,28,de 30 a 59 anos,3,7.3415,3.1738,1.1211,13.562,Periodontia,919172
+315,Sergipe,28,60 anos e mais,4,4.9924,2.191,0.6981,9.2867,Periodontia,294609
+316,Sergipe,28,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,469501
+317,São Paulo,35,de 15 a 29 anos,2,0.1946,0.1968,-0.1912,0.5804,Periodontia,9374648
+318,São Paulo,35,de 30 a 59 anos,3,7.8533,4.3484,-0.6693,16.376,Periodontia,19410859
+319,São Paulo,35,60 anos e mais,4,3.5336,2.2091,-0.7961,7.8633,Periodontia,7650568
+320,São Paulo,35,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,7975163
+321,Tocantins,17,de 15 a 29 anos,2,1.1697,0.978,-0.7472,3.0865,Periodontia,366420
+322,Tocantins,17,de 30 a 59 anos,3,2.2744,1.8525,-1.3565,5.9053,Periodontia,605133
+323,Tocantins,17,60 anos e mais,4,1.8986,1.5896,-1.2171,5.0142,Periodontia,188921
+324,Tocantins,17,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Periodontia,350986
+325,Acre,12,de 15 a 29 anos,2,10.2529,3.4551,3.481,17.0249,Prótese,224784
+326,Acre,12,de 30 a 59 anos,3,61.0991,5.5154,50.2891,71.909,Prótese,305658
+327,Acre,12,60 anos e mais,4,81.6018,2.8765,75.9639,87.2396,Prótese,78416
+328,Acre,12,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,221160
+329,Alagoas,27,de 15 a 29 anos,2,20.1626,5.0678,10.2299,30.0952,Prótese,759755
+330,Alagoas,27,de 30 a 59 anos,3,65.8288,5.6141,54.8255,76.8322,Prótese,1247016
+331,Alagoas,27,60 anos e mais,4,78.974,4.4966,70.1608,87.7872,Prótese,409221
+332,Alagoas,27,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,711691
+333,Amapá,16,de 15 a 29 anos,2,17.4797,2.6953,12.1971,22.7624,Prótese,200435
+334,Amapá,16,de 30 a 59 anos,3,56.5212,6.1715,44.4254,68.6171,Prótese,273232
+335,Amapá,16,60 anos e mais,4,74.5564,4.4865,65.7631,83.3497,Prótese,61916
+336,Amapá,16,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,198176
+337,Amazonas,13,de 15 a 29 anos,2,20.0572,3.4347,13.3253,26.7891,Prótese,1063019
+338,Amazonas,13,de 30 a 59 anos,3,79.0361,3.337,72.4958,85.5764,Prótese,1446186
+339,Amazonas,13,60 anos e mais,4,73.8469,4.1005,65.81,81.8838,Prótese,356982
+340,Amazonas,13,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,1075426
+341,Bahia,29,de 15 a 29 anos,2,12.9256,3.0418,6.9638,18.8874,Prótese,3174682
+342,Bahia,29,de 30 a 59 anos,3,58.0831,7.4782,43.426,72.7401,Prótese,5944594
+343,Bahia,29,60 anos e mais,4,86.67,2.6063,81.5618,91.7782,Prótese,2159279
+344,Bahia,29,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,2863071
+345,Ceará,23,de 15 a 29 anos,2,11.4199,3.1672,5.2123,17.6275,Prótese,2070180
+346,Ceará,23,de 30 a 59 anos,3,67.576,8.4443,51.0255,84.1265,Prótese,3631809
+347,Ceará,23,60 anos e mais,4,83.8553,3.7943,76.4186,91.2921,Prótese,1290533
+348,Ceará,23,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,1802435
+349,Distrito Federal,53,de 15 a 29 anos,2,7.3199,2.6075,2.2092,12.4306,Prótese,660674
+350,Distrito Federal,53,de 30 a 59 anos,3,44.038,4.3523,35.5076,52.5684,Prótese,1257384
+351,Distrito Federal,53,60 anos e mais,4,71.5985,4.2783,63.2133,79.9838,Prótese,365090
+352,Distrito Federal,53,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,534233
+353,Espírito Santo,32,de 15 a 29 anos,2,2.3641,1.4419,-0.462,5.1902,Prótese,811486
+354,Espírito Santo,32,de 30 a 59 anos,3,40.2292,8.1594,24.2371,56.2213,Prótese,1649332
+355,Espírito Santo,32,60 anos e mais,4,74.5329,5.5428,63.6693,85.3966,Prótese,631398
+356,Espírito Santo,32,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,741496
+357,Goiás,52,de 15 a 29 anos,2,14.1683,3.8414,6.6394,21.6973,Prótese,1627589
+358,Goiás,52,de 30 a 59 anos,3,47.8235,4.1519,39.6859,55.961,Prótese,3033200
+359,Goiás,52,60 anos e mais,4,74.3181,6.8341,60.9236,87.7127,Prótese,964417
+360,Goiás,52,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,1431289
+361,Maranhão,21,de 15 a 29 anos,2,15.2491,4.416,6.5939,23.9043,Prótese,1703431
+362,Maranhão,21,de 30 a 59 anos,3,60.4509,7.3152,46.1134,74.7885,Prótese,2605727
+363,Maranhão,21,60 anos e mais,4,81.5965,6.2323,69.3815,93.8115,Prótese,821961
+364,Maranhão,21,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,1645580
+365,Mato Grosso,51,de 15 a 29 anos,2,9.8682,2.7802,4.4191,15.3174,Prótese,864067
+366,Mato Grosso,51,de 30 a 59 anos,3,48.3255,3.9235,40.6356,56.0154,Prótese,1534417
+367,Mato Grosso,51,60 anos e mais,4,75.2966,5.0116,65.474,85.1192,Prótese,430479
+368,Mato Grosso,51,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,829686
+369,Mato Grosso do Sul,50,de 15 a 29 anos,2,6.7309,2.4022,2.0226,11.4392,Prótese,621841
+370,Mato Grosso do Sul,50,de 30 a 59 anos,3,45.114,4.913,35.4847,54.7433,Prótese,1137289
+371,Mato Grosso do Sul,50,60 anos e mais,4,82.2787,3.1852,76.0357,88.5216,Prótese,391091
+372,Mato Grosso do Sul,50,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,606792
+373,Minas Gerais,31,de 15 a 29 anos,2,3.2835,1.8155,-0.2749,6.8418,Prótese,4426257
+374,Minas Gerais,31,de 30 a 59 anos,3,40.4924,6.2357,28.2707,52.714,Prótese,8745877
+375,Minas Gerais,31,60 anos e mais,4,68.4196,4.2484,60.0929,76.7462,Prótese,3659936
+376,Minas Gerais,31,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,3707919
+377,Paraná,41,de 15 a 29 anos,2,4.4633,2.153,0.2435,8.6831,Prótese,2496695
+378,Paraná,41,de 30 a 59 anos,3,37.315,7.1113,23.377,51.2529,Prótese,4859268
+379,Paraná,41,60 anos e mais,4,53.5728,4.9741,43.8239,63.3218,Prótese,1893120
+380,Paraná,41,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,2195297
+381,Paraíba,25,de 15 a 29 anos,2,6.5554,2.7311,1.2025,11.9082,Prótese,893666
+382,Paraíba,25,de 30 a 59 anos,3,67.0609,5.3856,56.5053,77.6165,Prótese,1638772
+383,Paraíba,25,60 anos e mais,4,88.7882,4.921,79.1433,98.4331,Prótese,615328
+384,Paraíba,25,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,826921
+385,Pará,15,de 15 a 29 anos,2,15.3481,5.3343,4.8931,25.803,Prótese,2100629
+386,Pará,15,de 30 a 59 anos,3,66.9306,4.1809,58.7363,75.125,Prótese,3152228
+387,Pará,15,60 anos e mais,4,84.5832,3.8221,77.092,92.0744,Prótese,876332
+388,Pará,15,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,1990942
+389,Pernambuco,26,de 15 a 29 anos,2,9.7688,4.5177,0.9142,18.6233,Prótese,2079231
+390,Pernambuco,26,de 30 a 59 anos,3,72.7102,3.6139,65.627,79.7933,Prótese,3752862
+391,Pernambuco,26,60 anos e mais,4,87.023,6.2813,74.712,99.3341,Prótese,1332159
+392,Pernambuco,26,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,1894679
+393,Piauí,22,de 15 a 29 anos,2,14.295,2.2066,9.9702,18.6198,Prótese,758510
+394,Piauí,22,de 30 a 59 anos,3,56.2265,5.7351,44.986,67.4671,Prótese,1336856
+395,Piauí,22,60 anos e mais,4,78.1877,4.1674,70.0198,86.3556,Prótese,493899
+396,Piauí,22,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,681934
+397,Rio Grande do Norte,24,de 15 a 29 anos,2,26.5499,9.152,8.6123,44.4875,Prótese,755428
+398,Rio Grande do Norte,24,de 30 a 59 anos,3,64.6229,16.3013,32.6729,96.5729,Prótese,1394752
+399,Rio Grande do Norte,24,60 anos e mais,4,89.3956,3.133,83.2551,95.5361,Prótese,497891
+400,Rio Grande do Norte,24,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,654658
+401,Rio Grande do Sul,43,de 15 a 29 anos,2,6.9848,2.5083,2.0687,11.9009,Prótese,2207936
+402,Rio Grande do Sul,43,de 30 a 59 anos,3,49.0643,7.3321,34.6937,63.4349,Prótese,4575103
+403,Rio Grande do Sul,43,60 anos e mais,4,70.1167,3.301,63.6468,76.5866,Prótese,2193416
+404,Rio Grande do Sul,43,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,1906510
+405,Rio de Janeiro,33,de 15 a 29 anos,2,5.3358,1.6776,2.0478,8.6238,Prótese,3321915
+406,Rio de Janeiro,33,de 30 a 59 anos,3,52.3937,5.0911,42.4153,62.3721,Prótese,6851484
+407,Rio de Janeiro,33,60 anos e mais,4,77.4096,2.9124,71.7014,83.1179,Prótese,3025629
+408,Rio de Janeiro,33,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,2856146
+409,Rondônia,11,de 15 a 29 anos,2,11.2527,2.1784,6.9831,15.5223,Prótese,372629
+410,Rondônia,11,de 30 a 59 anos,3,70.9111,6.2859,58.591,83.2313,Prótese,664369
+411,Rondônia,11,60 anos e mais,4,66.6355,4.464,57.8863,75.3847,Prótese,196046
+412,Rondônia,11,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,348152
+413,Roraima,14,de 15 a 29 anos,2,16.9694,1.7971,13.4472,20.4917,Prótese,171286
+414,Roraima,14,de 30 a 59 anos,3,63.8987,3.639,56.7663,71.0311,Prótese,228753
+415,Roraima,14,60 anos e mais,4,80.2245,2.7207,74.8921,85.5569,Prótese,50460
+416,Roraima,14,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,186208
+417,Santa Catarina,42,de 15 a 29 anos,2,3.8865,2.1078,-0.2447,8.0176,Prótese,1678213
+418,Santa Catarina,42,de 30 a 59 anos,3,40.1159,8.3496,23.751,56.4807,Prótese,3324545
+419,Santa Catarina,42,60 anos e mais,4,63.5547,5.9928,51.809,75.3005,Prótese,1184393
+420,Santa Catarina,42,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,1423210
+421,Sergipe,28,de 15 a 29 anos,2,4.9926,1.9017,1.2654,8.7198,Prótese,526722
+422,Sergipe,28,de 30 a 59 anos,3,61.0182,5.6631,49.9188,72.1176,Prótese,919172
+423,Sergipe,28,60 anos e mais,4,91.8321,2.2567,87.4089,96.2552,Prótese,294609
+424,Sergipe,28,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,469501
+425,São Paulo,35,de 15 a 29 anos,2,6.8839,3.864,-0.6894,14.4572,Prótese,9374648
+426,São Paulo,35,de 30 a 59 anos,3,53.3568,8.0119,37.6537,69.0599,Prótese,19410859
+427,São Paulo,35,60 anos e mais,4,74.9889,4.9676,65.2526,84.7253,Prótese,7650568
+428,São Paulo,35,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,7975163
+429,Tocantins,17,de 15 a 29 anos,2,17.0717,6.1389,5.0397,29.1037,Prótese,366420
+430,Tocantins,17,de 30 a 59 anos,3,54.9627,7.8727,39.5326,70.3929,Prótese,605133
+431,Tocantins,17,60 anos e mais,4,77.9982,7.1087,64.0654,91.9309,Prótese,188921
+432,Tocantins,17,de 0 a 14 anos,1,0.0,0.0,0.0,0.0,Prótese,350986
