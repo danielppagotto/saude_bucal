@@ -1,0 +1,198 @@
+---
+title: "Untitled"
+format: html
+editor: visual
+---
+
+Carregando bibliotecas necessárias.
+
+```{r}
+
+options(scipen = 999)
+library(tidyverse)
+library(readxl)
+
+```
+
+## Saúde bucal
+
+### Acessando a população (P)
+
+Acessando os dados de população por UF e faixa etária.
+
+```{r}
+
+projecoes_tratadas <- 
+  read_excel("~/GitHub/saude_bucal/10_sisdim/projecoes_tratadas.xlsx") |> 
+  mutate(id_faixa_etaria = 
+           case_when(
+             faixa_etaria == '00 a 14 anos' ~ 1, 
+             faixa_etaria == '15 a 29 anos' ~ 2,
+             faixa_etaria == '30 a 59 anos' ~ 3,
+             faixa_etaria == '60 anos ou mais' ~ 4
+           ))
+
+
+```
+
+O gráfico abaixo mostra a evolução do quantitativo por faixa etária e UF. Filtramos apenas as UF do Centro-Oeste.
+
+```{r}
+
+projecoes_tratadas |>
+  filter(uf == "GO"|
+         uf == "DF"|
+         uf == "MT"|
+         uf == "MS") |> 
+  ggplot(aes(x = ano, 
+             y = total, 
+             col = faixa_etaria)) + 
+  geom_line() + 
+  theme_minimal() + 
+  facet_wrap(~uf,
+             scales = "free_x") 
+
+```
+
+### Acessando a prevalência de condições (H)
+
+Primeiramente, acessamos a prevalência de condições de saúde bucal (H).
+
+```{r}
+#| message: false
+#| warning: false
+
+
+cobertura <- 
+  read_csv("~/GitHub/saude_bucal/10_sisdim/merge_sb_cobertura.csv") 
+
+cobertura_sb <- 
+  cobertura |> 
+  select(-`Unnamed: 0`, 
+         -total_populacao) |> 
+  mutate(perc_necessidade = perc_necessidade/100) |> 
+  select(-faixa_etaria, 
+         -erro_padrao,
+         -IC_inf,
+         -IC_sup) |> 
+  mutate(cod_procedimento = case_when(
+                    tipo_procedimento == "Endodontia" ~ 1, 
+                    tipo_procedimento == "Periodontia" ~ 2, 
+                    tipo_procedimento == 'APS' ~ 3, 
+                    tipo_procedimento == 'Prótese' ~ 4
+  )) 
+
+```
+
+O próximo passo consiste em juntar a base de população com a cobertura.
+
+```{r}
+
+populacao_cobertura <- 
+  projecoes_tratadas |> 
+  left_join(cobertura_sb, 
+            by = c("cod_uf"="cod_uf",
+                   "id_faixa_etaria"="cod_faixa")) |> 
+  mutate(necessidade_populacao = total * perc_necessidade)
+  
+```
+
+### Acessando a necessidade per capita (S)
+
+O próximo passo consiste em juntar a base criada anteriormente com a base de necessidade por indivíduo (necessidade per capita).
+
+Lendo a base de procedimentos per capita.
+
+```{r}
+
+percapita <- 
+  read_delim("~/GitHub/saude_bucal/10_sisdim/merge_sb_percapita.csv", delim = ';') |> 
+  select(-`Unnamed: 0`) |> 
+  select(-faixa_etaria, 
+         -se,
+         -ic_inf,
+         -ic_sup,
+         -UF,
+         -total_populacao) |> 
+  mutate(cod_procedimento = case_when(
+                    tipo_procedimento == "Endodontia" ~ 1, 
+                    tipo_procedimento == "Periodontia" ~ 2, 
+                    tipo_procedimento == 'APS' ~ 3, 
+                    tipo_procedimento == 'Prótese' ~ 4
+  )) |> 
+  select(-tipo_procedimento)
+  
+```
+
+O próximo passo é juntar todos os parâmetros (cobertura - H) e (procedimentos per capita - S).
+
+```{r}
+
+producao_completa <- 
+  populacao_cobertura |> 
+  left_join(percapita, 
+            c("cod_uf"="cod_uf",
+              "id_faixa_etaria"="cod_faixa",
+              "cod_procedimento"="cod_procedimento")) |> 
+  mutate(necessidade_procedimentos = 
+           necessidade_populacao * proc_per_capita) |> 
+  select(ano, uf, cod_uf, 
+         faixa_etaria,  total, 
+         tipo_procedimento, perc_necessidade,  
+         necessidade_populacao, 
+         proc_per_capita, 
+         necessidade_procedimentos) |> 
+  rename(populacao_total = total, 
+         necessidade_percentual = perc_necessidade, 
+         procedimentos_por_individuo = proc_per_capita, 
+         total_procedimentos_necessario = necessidade_procedimentos)
+  
+
+```
+
+Incluir elementos sobre tempo de procedimento.
+
+```{r}
+
+funcao_tempo <- 
+  
+  function(t_aps, 
+         t_endo,
+         t_periodontia,
+         t_protese, 
+         ttd){
+
+    producao_completa |> 
+      mutate(tempo_por_procedimento = 
+               case_when(
+                  tipo_procedimento == 'APS' ~ t_aps,
+                  tipo_procedimento == 'Endodontia' ~ t_endo,
+                  tipo_procedimento == 'Periodontia' ~ t_periodontia,
+                  tipo_procedimento == 'Protese' ~ t_protese
+                                
+                                )
+             ) |> 
+      mutate(total_por_hora = 
+                case_when(
+                  tipo_procedimento == 
+                  'APS' ~ t_aps * total_procedimentos_necessario,
+                  tipo_procedimento == 
+                  'Endodontia' ~ t_endo * total_procedimentos_necessario,
+                  tipo_procedimento == 
+                  'Periodontia' ~ t_periodontia * total_procedimentos_necessario,
+                  tipo_procedimento == 
+                  'Protese' ~ t_protese *  total_procedimentos_necessario)) |> 
+      mutate(fte40 = total_por_hora/ttd)
+    
+    
+}
+
+
+funcao_tempo(t_aps = 0.5,
+             t_endo = 0.5,
+             t_periodontia = 0.5,
+             t_protese = 0.5,
+             ttd = 1500) 
+
+
+```
